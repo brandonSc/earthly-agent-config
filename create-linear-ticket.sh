@@ -11,6 +11,13 @@ set -e
 TITLE="$1"
 DESCRIPTION="$2"
 
+# Append AI attribution note
+AI_NOTE="---
+*This ticket was drafted by AI.*"
+DESCRIPTION="${DESCRIPTION}
+
+${AI_NOTE}"
+
 if [ -z "$TITLE" ]; then
   echo "Usage: $0 \"Title\" \"Description\""
   echo ""
