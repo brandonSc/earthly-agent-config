@@ -2,6 +2,9 @@
 
 # Linear ticket creation script for earthly-technologies/ENG team
 # Usage: ./create-linear-ticket.sh "Title" "Description"
+#
+# Requires: LINEAR_API_TOKEN environment variable
+# The description supports full markdown formatting.
 
 set -e
 
@@ -10,15 +13,20 @@ DESCRIPTION="$2"
 
 if [ -z "$TITLE" ]; then
   echo "Usage: $0 \"Title\" \"Description\""
+  echo ""
+  echo "Environment: LINEAR_API_TOKEN must be set"
   exit 1
 fi
 
-API_TOKEN="${LINEAR_API_TOKEN:-lin_api_vvYm3akuIpe5h491xWZ49cUHl3UzzU1srnO6cAJP}"
+if [ -z "$LINEAR_API_TOKEN" ]; then
+  echo "Error: LINEAR_API_TOKEN environment variable is not set"
+  exit 1
+fi
 
-# First, get the team ID for ENG
+# Get the team ID for ENG
 TEAM_RESPONSE=$(curl -s -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: $API_TOKEN" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
   --data '{"query": "{ teams { nodes { id key name } } }"}' \
   https://api.linear.app/graphql)
 
@@ -30,14 +38,18 @@ if [ -z "$TEAM_ID" ] || [ "$TEAM_ID" == "null" ]; then
   exit 1
 fi
 
-# Create the issue (escape quotes and newlines for JSON)
-ESCAPED_TITLE=$(printf '%s' "$TITLE" | sed 's/"/\\"/g')
-ESCAPED_DESC=$(printf '%s' "$DESCRIPTION" | sed 's/"/\\"/g' | tr '\n' ' ')
-
+# Create the issue using GraphQL variables (handles escaping properly)
 RESPONSE=$(curl -s -X POST \
   -H "Content-Type: application/json" \
-  -H "Authorization: $API_TOKEN" \
-  --data "{\"query\": \"mutation { issueCreate(input: { teamId: \\\"$TEAM_ID\\\", title: \\\"$ESCAPED_TITLE\\\", description: \\\"$ESCAPED_DESC\\\" }) { success issue { id identifier url title } } }\"}" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
+  --data "$(jq -n \
+    --arg teamId "$TEAM_ID" \
+    --arg title "$TITLE" \
+    --arg desc "$DESCRIPTION" \
+    '{
+      query: "mutation CreateIssue($teamId: String!, $title: String!, $description: String) { issueCreate(input: { teamId: $teamId, title: $title, description: $description }) { success issue { id identifier url title } } }",
+      variables: { teamId: $teamId, title: $title, description: $desc }
+    }')" \
   https://api.linear.app/graphql)
 
 SUCCESS=$(echo "$RESPONSE" | jq -r '.data.issueCreate.success')

@@ -186,3 +186,125 @@ For detailed implementation guides, see `lunar-lib/ai-context/`:
 | `policy-reference.md` | How to write policies |
 | `component-json/conventions.md` | Schema design principles |
 | `guardrail-specs/` | Specifications for guardrails to implement |
+
+---
+
+## Creating Linear Tickets
+
+When the user asks to create a Linear ticket, use the `create-linear-ticket.sh` script or call the Linear GraphQL API directly.
+
+### Quick Method: Use the Script
+
+```bash
+cd /path/to/earthly-agent-config
+./create-linear-ticket.sh "Ticket Title" "Markdown description here"
+```
+
+### Requirements
+
+- **Environment variable**: `LINEAR_API_TOKEN` must be set
+- **Team**: Tickets are created in the **ENG** team by default
+
+### Writing Good Tickets
+
+When the user describes an issue or feature request:
+
+1. **Craft a clear, concise title** — Action-oriented, describes the change
+2. **Write a well-formatted description** using markdown:
+   - Use `##` headers to organize sections (e.g., `## Current Behavior`, `## Expected Behavior`)
+   - Use code blocks with triple backticks for errors, logs, or code examples
+   - Use bullet points for lists
+   - Be specific and actionable
+
+### Example Ticket Structure
+
+```markdown
+Brief summary of the issue or feature.
+
+## Current Behavior
+
+Description of what happens now (if it's a bug).
+
+## Expected Behavior
+
+What should happen instead.
+
+## Steps to Reproduce (if applicable)
+
+1. Do this
+2. Then this
+3. See error
+
+## Additional Context
+
+Any other relevant information.
+```
+
+### Direct API Usage
+
+If you need more control (e.g., updating tickets, setting labels), use the Linear GraphQL API directly.
+
+**Endpoint**: `https://api.linear.app/graphql`
+
+**Authentication**: `Authorization: $LINEAR_API_TOKEN` header
+
+**Organization**: `earthly-technologies`
+
+**Teams**:
+| Key | Name | ID |
+|-----|------|-----|
+| ENG | Earthly Engineering | `795b5b09-b860-4740-bccf-448dfc9962de` |
+| DEVR | Dev Rel | `8826682e-f108-4c19-9a98-55f398e41f60` |
+
+#### Create Issue
+
+```bash
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
+  --data "$(jq -n \
+    --arg teamId "795b5b09-b860-4740-bccf-448dfc9962de" \
+    --arg title "Ticket title" \
+    --arg desc "Markdown description" \
+    '{
+      query: "mutation CreateIssue($teamId: String!, $title: String!, $description: String) { issueCreate(input: { teamId: $teamId, title: $title, description: $description }) { success issue { id identifier url } } }",
+      variables: { teamId: $teamId, title: $title, description: $desc }
+    }')" \
+  https://api.linear.app/graphql
+```
+
+#### Update Issue
+
+```bash
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
+  --data "$(jq -n \
+    --arg id "ISSUE_UUID" \
+    --arg desc "Updated markdown description" \
+    '{
+      query: "mutation UpdateIssue($id: String!, $description: String!) { issueUpdate(id: $id, input: { description: $description }) { success } }",
+      variables: { id: $id, description: $desc }
+    }')" \
+  https://api.linear.app/graphql
+```
+
+#### Look Up Issue by Identifier
+
+```bash
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
+  --data '{"query": "{ issue(id: \"ENG-123\") { id identifier title description url } }"}' \
+  https://api.linear.app/graphql
+```
+
+#### List Teams
+
+```bash
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $LINEAR_API_TOKEN" \
+  --data '{"query": "{ teams { nodes { id key name } } }"}' \
+  https://api.linear.app/graphql
+```
