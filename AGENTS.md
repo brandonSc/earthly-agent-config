@@ -202,7 +202,7 @@ cd /path/to/earthly-agent-config
 
 ### Requirements
 
-- **Environment variable**: `LINEAR_API_TOKEN` must be set
+- **Environment variable**: `LINEAR_API_TOKEN` must be set (already exported in `~/.zshrc`)
 - **Team**: Tickets are created in the **ENG** team by default
 
 ### Writing Good Tickets
