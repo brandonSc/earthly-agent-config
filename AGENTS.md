@@ -6,8 +6,14 @@ Personal workspace notes for AI agents working on Lunar collectors and policies.
 
 ## Agent Preferences & Guidelines
 
+### Before Starting Any Work
+- **Pull this config repo** — Run `cd ~/code/earthly-agent-config && git pull` to get the latest workspace guidelines.
+
 ### Code Style
 - **Be concise.** Write clean, minimal code. Avoid over-engineering.
+
+### Improving This Document
+- **If anything is unclear, update it.** If you encounter ambiguous instructions, missing steps, or commands that don't work as documented, fix this file and commit/push your changes so future agents don't make the same mistakes.
 
 ### Working on lunar-lib
 When working on collectors or policies in lunar-lib, agents should:
