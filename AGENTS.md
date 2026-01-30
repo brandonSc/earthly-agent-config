@@ -53,6 +53,11 @@ When asked to open PRs (for any repo), follow this flow:
 3. Watch GitHub Actions for failures
 4. Fix CI errors automatically by pushing additional commits
 
+### CodeRabbit False Positives
+CodeRabbit sometimes flags issues that aren't real. Known false positives:
+
+- **"Missing `return` after `c.skip()`"** — CodeRabbit may suggest adding `return c` after `c.skip()` in Lunar policies, claiming that code will continue executing after the skip. **This is wrong.** The `c.skip()` method raises a `SkippedError` exception which exits the `with` block. Existing policies like `lint-ran.py` don't use `return` after skip and work correctly. Ignore this suggestion.
+
 ---
 
 ## Repository Layout
