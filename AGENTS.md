@@ -66,16 +66,41 @@ When asked to open PRs (for any repo), follow this flow:
 
 ## Agent Skills
 
-Use skills from [earthly/skills](https://github.com/earthly/skills) for detailed implementation guidance. Skills are at `/home/brandon/code/earthly/skills/skills/`.
+Use skills from [earthly/skills](https://github.com/earthly/skills) and [earthly/skills-internal](https://github.com/earthly/skills-internal) for detailed implementation guidance.
 
-| Skill | When to Use | Read Documentation |
-|-------|-------------|-------------------|
-| `lunar-collector` | Creating Lunar collectors (Bash scripts that gather SDLC metadata) | `cat /home/brandon/code/earthly/skills/skills/lunar-collector/SKILL.md` |
-| `lunar-policy` | Creating Lunar policies (Python scripts that enforce standards) | `cat /home/brandon/code/earthly/skills/skills/lunar-policy/SKILL.md` |
-| `lunar-sql` | Querying Lunar's SQL API for components, checks, PRs, domains | `cat /home/brandon/code/earthly/skills/skills/lunar-sql/SKILL.md` |
-| `earthfile` | Writing Earthfiles for containerized builds | `cat /home/brandon/code/earthly/skills/skills/earthfile/SKILL.md` |
+### Before Using Any Skill
 
-**Before implementing collectors or policies**, read the relevant skill's SKILL.md and references/ folder.
+**Always pull and reinstall skills** to ensure you have the latest documentation:
+
+```bash
+# Public skills (Lunar, Earthfiles)
+cd /home/brandon/code/earthly/skills && git pull && earthly +install-skills
+
+# Internal skills (Linear tickets)
+cd /home/brandon/code/earthly/skills-internal && git pull && earthly +install-skills
+```
+
+### Available Skills
+
+| Skill | Repo | When to Use |
+|-------|------|-------------|
+| `lunar-collector` | skills | Creating Lunar collectors (Bash scripts that gather SDLC metadata) |
+| `lunar-policy` | skills | Creating Lunar policies (Python scripts that enforce standards) |
+| `lunar-sql` | skills | Querying Lunar's SQL API for components, checks, PRs, domains |
+| `earthfile` | skills | Writing Earthfiles for containerized builds |
+| `linear-tickets` | skills-internal | Creating and managing Linear tickets |
+
+### Reading Skill Documentation
+
+```bash
+# Public skills
+cat /home/brandon/code/earthly/skills/skills/<skill-name>/SKILL.md
+
+# Internal skills
+cat /home/brandon/code/earthly/skills-internal/skills/<skill-name>/SKILL.md
+```
+
+**Before implementing collectors, policies, Earthfiles, or Linear tickets**, read the relevant skill's SKILL.md and references/ folder.
 
 ---
 
