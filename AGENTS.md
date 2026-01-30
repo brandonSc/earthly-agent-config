@@ -60,7 +60,7 @@ When asked to open PRs (for any repo), follow this flow:
 | `pantalasa/` | Test environment with sample components |
 | `lunar/` | Lunar CLI and core platform |
 | `skills/` | Agent skills for Lunar, Earthly, and related tools |
-| `linear-skill/` | Agent skill for Linear ticket management |
+| `skills-internal/` | Internal agent skills (Linear tickets, etc.) |
 
 ---
 
@@ -236,15 +236,15 @@ For detailed implementation guides, see `lunar-lib/ai-context/`:
 
 ## Creating Linear Tickets
 
-When the user asks to create a Linear ticket, use the **linear-tickets** skill from [earthly/linear-skill](https://github.com/earthly/linear-skill).
+When the user asks to create a Linear ticket, use the **linear-tickets** skill from [earthly/skills-internal](https://github.com/earthly/skills-internal).
 
 **Read the skill documentation:**
 ```bash
-cat /home/brandon/code/earthly/linear-skill/skills/linear-tickets/SKILL.md
+cat /home/brandon/code/earthly/skills-internal/skills/linear-tickets/SKILL.md
 ```
 
 **Quick reference:**
-- Scripts: `/home/brandon/code/earthly/linear-skill/skills/linear-tickets/scripts/`
+- Scripts: `/home/brandon/code/earthly/skills-internal/skills/linear-tickets/scripts/`
 - Create ticket: `./create-linear-ticket.sh "Title" "Description"`
 - Attach image: `./attach-linear-image.sh ENG-123 /path/to/image.png`
 - Requires: `LINEAR_API_TOKEN` env var, `jq`
