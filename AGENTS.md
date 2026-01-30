@@ -164,21 +164,25 @@ This token authenticates with the demo Lunar Hub for development testing.
 
 ## Testing Policies
 
-1. **Copy your policy to the pantalasa test directory:**
+**Preferred method:** Use a branch reference to test changes directly from your lunar-lib branch without copying files.
+
+1. **Push your changes to a branch in lunar-lib:**
 
    ```bash
-   cp -r policies/<policy-name>/* \
-     /home/brandon/code/earthly/pantalasa/lunar/policies/<policy-name>-test/
+   cd /home/brandon/code/earthly/lunar-lib
+   git checkout -b brandon/<feature-name>
+   # make changes...
+   git add . && git commit -m "Add <feature>" && git push -u origin brandon/<feature-name>
    ```
 
-2. **Add a policy reference to pantalasa's `lunar/lunar-config.yml`:**
+2. **Update pantalasa's `lunar/lunar-config.yml` to use your branch:**
 
    ```yaml
    policies:
-     - uses: ./policies/<policy-name>-test
-       name: <policy-name>-test
-       on: [go]  # or appropriate selector
-       enforcement: draft
+     # Change @main to @brandon/<feature-name>
+     - uses: github://earthly/lunar-lib/policies/<policy-name>@brandon/<feature-name>
+       on: ["domain:engineering"]
+       enforcement: score
        with:
          # your policy inputs here
    ```
@@ -188,28 +192,39 @@ This token authenticates with the demo Lunar Hub for development testing.
    ```bash
    cd /home/brandon/code/earthly/pantalasa/lunar
    LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
-     lunar policy dev <policy-name>-test \
+     lunar policy dev <plugin-name>.<policy-name> \
      --component github.com/pantalasa/backend
    ```
 
-4. **Iterate:** After each code change, copy the updated files and re-run the dev command.
+   **Examples:**
+   - `lunar policy dev vcs.require-signed-commits --component github.com/pantalasa/http-echo`
+   - `lunar policy dev golang.go-mod-exists --component github.com/pantalasa/backend`
+
+4. **Iterate:** Push new commits to your branch, then re-run the dev command. No copying needed!
+
+5. **After PR merges:** Update pantalasa config back to `@main`.
 
 ---
 
 ## Testing Collectors
 
-1. **Copy your collector to the pantalasa test directory:**
+**Preferred method:** Use a branch reference to test changes directly from your lunar-lib branch without copying files.
+
+1. **Push your changes to a branch in lunar-lib:**
 
    ```bash
-   cp -r collectors/<collector-name>/* \
-     /home/brandon/code/earthly/pantalasa/lunar/collectors/<collector-name>-test/
+   cd /home/brandon/code/earthly/lunar-lib
+   git checkout -b brandon/<feature-name>
+   # make changes...
+   git add . && git commit -m "Add <feature>" && git push -u origin brandon/<feature-name>
    ```
 
-2. **Add a collector reference to pantalasa's `lunar/lunar-config.yml`:**
+2. **Update pantalasa's `lunar/lunar-config.yml` to use your branch:**
 
    ```yaml
    collectors:
-     - uses: ./collectors/<collector-name>-test
+     # Change @main to @brandon/<feature-name>
+     - uses: github://earthly/lunar-lib/collectors/<collector-name>@brandon/<feature-name>
        on: ["domain:engineering"]
    ```
 
@@ -234,7 +249,9 @@ This token authenticates with the demo Lunar Hub for development testing.
    - `--secrets "KEY=value"` — Pass secrets to the collector
    - `--use-system-runtime` — Run without Docker (requires local dependencies like jq)
 
-4. **View collected data:** The dev command outputs the Component JSON that would be written.
+4. **Iterate:** Push new commits to your branch, then re-run the dev command. No copying needed!
+
+5. **After PR merges:** Update pantalasa config back to `@main`.
 
 ---
 
