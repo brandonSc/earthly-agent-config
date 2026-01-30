@@ -199,17 +199,30 @@ For detailed implementation guides, see `lunar-lib/ai-context/`:
 
 When the user asks to create a Linear ticket, use the `create-linear-ticket.sh` script or call the Linear GraphQL API directly.
 
-### Quick Method: Use the Script
+### Quick Method: Use the Scripts
 
+**Create a ticket:**
 ```bash
-cd /path/to/earthly-agent-config
 ./create-linear-ticket.sh "Ticket Title" "Markdown description here"
 ```
+
+**Attach an image to an existing ticket:**
+```bash
+./attach-linear-image.sh ENG-123 /path/to/screenshot.png
+```
+
+The image will be inserted after the summary line, before any `##` sections.
 
 ### Requirements
 
 - **Environment variable**: `LINEAR_API_TOKEN` must be set (already exported in `~/.zshrc`)
 - **Team**: Tickets are created in the **ENG** team by default
+
+### Returning Links
+
+Always return ticket links as clickable markdown:
+- ✓ Good: `[ENG-123](https://linear.app/earthly-technologies/issue/ENG-123/ticket-title)`
+- ✗ Bad: `https://linear.app/earthly-technologies/issue/ENG-123/ticket-title`
 
 ### Writing Good Tickets
 
@@ -227,19 +240,21 @@ When the user describes an issue or feature request:
 ```markdown
 Brief summary of the issue or feature.
 
-## Current Behavior
-
-Description of what happens now (if it's a bug).
-
-## Expected Behavior
-
-What should happen instead.
+[Screenshot goes here if provided — right after the summary, before sections]
 
 ## Steps to Reproduce (if applicable)
 
 1. Do this
 2. Then this
 3. See error
+
+## Expected Behavior
+
+What should happen instead.
+
+## Current Behavior
+
+Description of what happens now (if it's a bug).
 
 ## Additional Context
 
