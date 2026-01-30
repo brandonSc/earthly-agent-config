@@ -7,13 +7,23 @@ Personal workspace notes for AI agents working on Lunar collectors and policies.
 ## Agent Preferences & Guidelines
 
 ### Before Starting Any Work
-- **Pull this config repo** — Run `cd ~/code/earthly-agent-config && git pull` to get the latest workspace guidelines.
+- **Pull this config repo** — Run `cd ~/code/earthly/earthly-agent-config && git pull` to get the latest workspace guidelines.
 
 ### Code Style
 - **Be concise.** Write clean, minimal code. Avoid over-engineering.
 
-### Improving This Document
-- **If anything is unclear, update it.** If you encounter ambiguous instructions, missing steps, or commands that don't work as documented, fix this file and commit/push your changes so future agents don't make the same mistakes.
+### Improving This Document (Self-Improvement)
+- **Always refine these instructions.** When something doesn't work as documented, fix it immediately. This is critical for self-improvement over time.
+- Examples of what to update:
+  - Commands that fail or have wrong paths
+  - Missing dependencies or prerequisites
+  - Workarounds you discovered
+  - Better approaches than what's documented
+- After fixing, commit and push so future agents benefit:
+  ```bash
+  cd ~/code/earthly/earthly-agent-config
+  git add AGENTS.md && git commit -m "Fix: <what you fixed>" && git push
+  ```
 
 ### Working on lunar-lib
 When working on collectors or policies in lunar-lib, agents should:
@@ -217,6 +227,14 @@ The image will be inserted after the summary line, before any `##` sections.
 
 - **Environment variable**: `LINEAR_API_TOKEN` must be set (already exported in `~/.zshrc`)
 - **Team**: Tickets are created in the **ENG** team by default
+- **Dependencies**: The shell scripts require `jq`. If `jq` is not installed, use the Python method below or the direct API.
+
+### Windows/WSL Note
+
+When the user provides a Windows path like `C:\Users\...\screenshot.png`, convert it to WSL path:
+```
+/mnt/c/Users/.../screenshot.png
+```
 
 ### Returning Links
 
@@ -333,4 +351,45 @@ curl -s -X POST \
   -H "Authorization: $LINEAR_API_TOKEN" \
   --data '{"query": "{ teams { nodes { id key name } } }"}' \
   https://api.linear.app/graphql
+```
+
+#### Upload Image (Python fallback when jq unavailable)
+
+**Critical:** When uploading to Linear's signed URLs, you MUST use the exact headers returned by the `fileUpload` mutation. The `x-goog-content-length-range` header must be the exact file size (e.g., `137125,137125`), NOT a range like `0,137125`.
+
+```python
+import requests, os, json
+
+image_path = "/path/to/image.png"
+file_size = os.path.getsize(image_path)
+token = os.environ.get("LINEAR_API_TOKEN")
+
+# Step 1: Get upload URL with headers
+response = requests.post(
+    "https://api.linear.app/graphql",
+    headers={"Content-Type": "application/json", "Authorization": token},
+    json={
+        "query": """mutation FileUpload($filename: String!, $contentType: String!, $size: Int!) {
+            fileUpload(filename: $filename, contentType: $contentType, size: $size) {
+                success
+                uploadFile { uploadUrl assetUrl headers { key value } }
+            }
+        }""",
+        "variables": {"filename": "screenshot.png", "contentType": "image/png", "size": file_size}
+    }
+)
+
+data = response.json()["data"]["fileUpload"]["uploadFile"]
+upload_url, asset_url = data["uploadUrl"], data["assetUrl"]
+
+# Step 2: Build headers from API response (REQUIRED)
+upload_headers = {"Content-Type": "image/png"}
+for h in data.get("headers", []):
+    upload_headers[h["key"]] = h["value"]
+
+# Step 3: Upload
+with open(image_path, "rb") as f:
+    requests.put(upload_url, headers=upload_headers, data=f.read())
+
+print(f"Asset URL: {asset_url}")  # Use this in markdown: ![image]({asset_url})
 ```
