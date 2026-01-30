@@ -200,9 +200,11 @@ This token authenticates with the demo Lunar Hub for development testing.
    - `lunar policy dev vcs.require-signed-commits --component github.com/pantalasa/http-echo`
    - `lunar policy dev golang.go-mod-exists --component github.com/pantalasa/backend`
 
-4. **Iterate:** Push new commits to your branch, then re-run the dev command. No copying needed!
+4. **Iterate:** Push new commits to your branch, then re-run the dev command. The `lunar policy dev` command fetches fresh from the branch each time. No copying needed!
 
 5. **After PR merges:** Update pantalasa config back to `@main`.
+
+**Note:** Commit SHA references (e.g., `@7cd72d7...`) don't work - only branch/tag names are supported.
 
 ---
 
@@ -249,9 +251,11 @@ This token authenticates with the demo Lunar Hub for development testing.
    - `--secrets "KEY=value"` — Pass secrets to the collector
    - `--use-system-runtime` — Run without Docker (requires local dependencies like jq)
 
-4. **Iterate:** Push new commits to your branch, then re-run the dev command. No copying needed!
+4. **Iterate:** Push new commits to your branch, then re-run the dev command. The `lunar collector dev` command fetches fresh from the branch each time. No copying needed!
 
 5. **After PR merges:** Update pantalasa config back to `@main`.
+
+**Note:** Commit SHA references (e.g., `@7cd72d7...`) don't work - only branch/tag names are supported.
 
 ---
 
