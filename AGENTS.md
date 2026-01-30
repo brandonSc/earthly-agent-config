@@ -251,6 +251,30 @@ git push -u origin brandon/<feature-name>
 gh pr create --draft --title "Add <feature-name>" --body "Description..."
 ```
 
+### Making PR Ready for Review
+
+When the user says **"make PR ready for review"**, follow this workflow:
+
+1. **Mark PR as ready:** `gh pr ready <PR-number> --repo <owner/repo>`
+2. **Assign reviewer:** `gh api repos/<owner/repo>/pulls/<PR-number>/requested_reviewers -X POST -f 'reviewers[]=<username>'`
+3. **Wait for CodeRabbit:** Wait ~60 seconds, then check for CodeRabbit comments
+4. **Review CodeRabbit comments:** Present each comment to the user with:
+   - Severity (🔴 Critical, 🟠 Medium, 🟡 Minor)
+   - Summary of the issue
+   - Your recommendation (fix or skip with justification)
+5. **Discuss with user:** Let the user decide which issues to fix vs skip
+6. **Resolve comments:** For skipped issues, reply with justification and resolve:
+   ```bash
+   # Reply to comment
+   gh api repos/<owner/repo>/pulls/<PR-number>/comments/<comment-id>/replies -X POST -f body="<justification>"
+   
+   # Get thread ID and resolve
+   gh api graphql -f query='query { repository(owner: "<owner>", name: "<repo>") { pullRequest(number: <PR-number>) { reviewThreads(first: 10) { nodes { id isResolved } } } } }'
+   gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<thread-id>"}) { thread { isResolved } } }'
+   ```
+
+When the user says **"resolve the comments"** (without specifying which), resolve all remaining CodeRabbit comments with appropriate justifications based on prior discussion.
+
 ---
 
 ## Reference Documentation
