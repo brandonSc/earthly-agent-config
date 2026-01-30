@@ -163,12 +163,24 @@ This token authenticates with the demo Lunar Hub for development testing.
 
 3. **Run the collector in dev mode:**
 
+   The collector name format is `<plugin-name>.<sub-collector-name>`. The plugin name comes from `name:` in the `lunar-collector.yml`, and sub-collector names come from the `collectors:` array in that file.
+
    ```bash
    cd /home/brandon/code/earthly/pantalasa/lunar
    LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
-     lunar collect dev <collector-name>-test \
+     lunar collector dev <plugin-name>.<sub-collector-name> \
      --component github.com/pantalasa/backend
    ```
+
+   **Examples:**
+   - `lunar collector dev readme.readme --component github.com/pantalasa/frontend`
+   - `lunar collector dev github.branch-protection --component github.com/pantalasa/frontend`
+   - `lunar collector dev golang.golang --component github.com/pantalasa/backend`
+
+   **Useful flags:**
+   - `--verbose` — Show detailed output
+   - `--secrets "KEY=value"` — Pass secrets to the collector
+   - `--use-system-runtime` — Run without Docker (requires local dependencies like jq)
 
 4. **View collected data:** The dev command outputs the Component JSON that would be written.
 
