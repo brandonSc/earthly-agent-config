@@ -39,7 +39,9 @@ When working on collectors or policies in lunar-lib, agents should:
 
 3. **Use git worktrees** — Create a worktree for each feature so multiple agents can work in parallel without conflicts.
 
-4. **Test your work** — Either with unit tests or by testing in the `pantalasa/lunar` environment (see sections below).
+4. **Test your work** — Run unit tests **and** test in the `pantalasa/lunar` environment:
+   - **Unit tests catch typos** (e.g., `assert_equal` vs `assert_equals`) and logic errors
+   - **Integration tests** via pantalasa catch data/environment issues
 
 5. **Create draft PRs and iterate** — Once confident the implementation works:
    - Push commits directly to the branch
@@ -49,15 +51,26 @@ When working on collectors or policies in lunar-lib, agents should:
 
 ### PR Workflow (General)
 When asked to open PRs (for any repo), follow this flow:
-1. Commit and push changes
-2. Create a **draft PR** initially
-3. Watch GitHub Actions for failures
-4. Fix CI errors automatically by pushing additional commits
+1. **Verify staged files** before committing:
+   ```bash
+   git diff --name-only main  # Check what will be in the PR
+   ```
+   Only intended files should be listed. Repos often have other uncommitted work.
+2. **Run unit tests locally** before pushing (if tests exist):
+   ```bash
+   python -m pytest policies/<name>/test_*.py -v
+   ```
+3. Commit and push changes
+4. Create a **draft PR** initially
+5. Watch GitHub Actions for failures
+6. Fix CI errors automatically by pushing additional commits
 
-### CodeRabbit False Positives
+### CodeRabbit Notes
 CodeRabbit sometimes flags issues that aren't real. Known false positives:
 
 - **"Missing `return` after `c.skip()`"** — CodeRabbit may suggest adding `return c` after `c.skip()` in Lunar policies, claiming that code will continue executing after the skip. **This is wrong.** The `c.skip()` method raises a `SkippedError` exception which exits the `with` block. Existing policies like `lint-ran.py` don't use `return` after skip and work correctly. Ignore this suggestion.
+
+**Stale comments after force-push:** If you remove files from a PR via force-push, CodeRabbit comments on those files become stale but still appear in the review. These can be safely ignored - they no longer apply to the PR.
 
 ---
 
