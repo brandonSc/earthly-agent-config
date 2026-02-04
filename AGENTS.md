@@ -56,6 +56,7 @@ When asked to open PRs (for any repo), follow this flow:
    git diff --name-only main  # Check what will be in the PR
    ```
    Only intended files should be listed. Repos often have other uncommitted work.
+   When a temporary plan is generated for doing the work, that plan should not be committed.
 2. **Run unit tests locally** before pushing (if tests exist):
    ```bash
    python -m pytest policies/<name>/test_*.py -v
@@ -64,6 +65,46 @@ When asked to open PRs (for any repo), follow this flow:
 4. Create a **draft PR** initially
 5. Watch GitHub Actions for failures
 6. Fix CI errors automatically by pushing additional commits
+
+### Writing Policies - Preferred Pattern
+
+When writing Lunar policies, use the **node pattern** for clean, readable code:
+
+```python
+from lunar_policy import Check
+
+def check_example(node=None):
+    c = Check("example-check", "Description here", node=node)
+    with c:
+        # 1. Get the parent node first
+        go = c.get_node(".lang.go")
+        if not go.exists():
+            c.skip("Not a Go project")
+
+        # 2. Navigate from that node for nested paths
+        version_node = go.get_node(".version")
+        if not version_node.exists():
+            c.skip("Version data not available")
+
+        # 3. Get value only after confirming existence
+        version = version_node.get_value()
+
+        # 4. Make assertions
+        c.assert_true(version >= "1.21", f"Version {version} too old")
+    return c
+
+if __name__ == "__main__":
+    check_example()
+```
+
+**Key points:**
+- Use `c.get_node(".path")` then `node.exists()` to check data availability
+- Skip gracefully when data isn't available (collector may not have run)
+- Never call `get_value()` without first checking `exists()`
+- `c.skip()` raises `SkippedError` - no `return` needed after it
+- There is **no `c.succeed()` method** - checks auto-pass if no assertions fail
+
+**SDK Reference:** https://docs-lunar.earthly.dev/plugin-sdks/python-sdk/policy
 
 ### CodeRabbit Notes
 CodeRabbit sometimes flags issues that aren't real. Known false positives:
