@@ -34,6 +34,30 @@ Before implementing, read these docs in `lunar-lib/ai-context/`:
 
 Also read the Lunar docs at https://docs-lunar.earthly.dev
 
+### Keep This Guide Updated (Self-Improvement)
+
+When you learn something the hard way — through mistakes you fixed automatically or corrections from the user — **update this guide and AGENTS.md** so future agents don't repeat the same errors.
+
+**What to document:**
+- Commands that failed and the fix you discovered
+- Missing steps or prerequisites
+- Workarounds for unexpected issues
+- Better approaches than what was documented
+- Common CI failures and their solutions
+
+**What NOT to document:**
+- Task-specific details (specific policy names, one-off fixes)
+- Things only relevant to the current implementation
+- Obvious or trivial issues
+
+**After updating, commit and push:**
+```bash
+cd ~/code/earthly/earthly-agent-config
+git add . && git commit -m "Guide: <what you learned>" && git push
+```
+
+This is critical for continuous improvement — each agent should leave the docs better than they found them.
+
 ---
 
 ## 2. Git Worktrees
