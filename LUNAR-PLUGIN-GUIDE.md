@@ -414,13 +414,31 @@ done
 
 ### Building Custom Docker Images for Collectors
 
-If your collector needs dependencies not in the base image (e.g., Go, ast-grep, Python packages), you need to build a custom image.
+If your collector needs dependencies not in the base image, you need to build a custom image.
+
+#### What's Already in the Base Image
+
+The base image (`earthly/lunar-scripts`) includes these tools — **do NOT reinstall them**:
+
+| Tool | Alpine | Debian | Notes |
+|------|--------|--------|-------|
+| `bash` | ✓ | ✓ | |
+| `python3` | ✓ | ✓ | With venv at `/opt/venv` |
+| `pip` | ✓ | ✓ | `lunar-policy` pre-installed |
+| `jq` | ✓ | ✓ | JSON processing |
+| `yq` | ✓ | ✓ | YAML processing |
+| `curl` | ✓ | ✓ | |
+| `wget` | ✓ | ✓ | |
+| `parallel` | ✓ | ✓ | GNU parallel |
+| `lunar` CLI | ✓ | ✓ | `/usr/bin/lunar` |
+
+**Base image definition:** `/home/brandon/code/earthly/lunar/Earthfile` → `+lunar-scripts` target (lines ~388-423)
 
 #### When You Need a Custom Image
 
-- Collector requires CLI tools (Go, Python, Node.js, etc.)
-- Collector requires system packages (curl, jq, etc. beyond base)
-- Collector runs binaries not in `earthly/lunar-scripts`
+- Collector requires language runtimes (Go, Node.js, Ruby, etc.)
+- Collector requires specific CLI tools (golangci-lint, ast-grep, etc.)
+- Collector requires system packages not listed above
 
 #### Step 1: Create an Earthfile
 
