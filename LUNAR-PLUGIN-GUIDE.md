@@ -848,6 +848,41 @@ git checkout lunar/lunar-config.yml
 git push
 ```
 
+### After PR Merges
+
+Once the PR is merged to main:
+
+1. **Remove the worktree:**
+   ```bash
+   cd /home/brandon/code/earthly/lunar-lib
+   git worktree remove ../lunar-lib-wt-<feature-name>
+   ```
+
+2. **Update pantalasa-cronos to use @main:**
+   
+   If you added the collector/policy to `pantalasa-cronos/lunar/lunar-config.yml` during testing, update it to point to `@main`:
+   
+   ```yaml
+   # Change from branch reference:
+   # - uses: github://earthly/lunar-lib/policies/<name>@brandon/<feature>
+   
+   # To main:
+   - uses: github://earthly/lunar-lib/policies/<name>@main
+   ```
+   
+   ```bash
+   cd /home/brandon/code/earthly/pantalasa-cronos
+   # Edit lunar/lunar-config.yml to use @main
+   git add lunar/lunar-config.yml
+   git commit -m "Update <name> to use @main after merge"
+   git push
+   ```
+
+3. **Delete the remote branch (optional):**
+   ```bash
+   git push origin --delete brandon/<feature-name>
+   ```
+
 ---
 
 ## 6. PR Workflow
