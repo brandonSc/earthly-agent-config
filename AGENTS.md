@@ -60,6 +60,25 @@ Known false positives:
 - **"Missing `return` after `c.skip()`"** — Wrong. `c.skip()` raises `SkippedError` which exits the `with` block. Ignore this.
 - **Stale comments after force-push** — Comments on removed files can be ignored.
 
+**Valid feedback to watch for:**
+- **Unreachable skip logic** — If CodeRabbit says skip() is unreachable after `c.exists()`, it's correct. Use `c.get_node(path).exists()` for boolean checks (returns bool), not `c.exists()` (raises NoDataError).
+
+### Policy Style Guidelines
+
+**Naming:** README title AND `display_name` must end with "Guardrails" (e.g., "Testing Guardrails"), not "Policies".
+
+**Descriptions in lunar-policy.yml should be user-focused:**
+- ❌ BAD: "Skips if pass/fail data is not available (some collectors only report execution, not results)"
+- ✅ GOOD: "Ensures all tests pass. Skips if project does not contain a specified language."
+
+Move implementation details (data paths, skip conditions, collector specifics) to README only.
+
+### Debugging Tips
+
+- **Branch refs may cache** — If `@brandon/branch` shows stale behavior, copy to `./policies/<name>-test/` instead
+- **Debug prints** — Add to the test copy, not the source
+- **Docker required** — `lunar policy dev` needs Docker Desktop running
+
 ---
 
 ## Repository Layout
