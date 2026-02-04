@@ -171,16 +171,18 @@ gh api repos/pantalasa/<component>/issues/<pr-number>/comments --jq '.[-1].body'
 ```
 
 - **❌ Failing** — Policy ran and found issues
-- **🟡 Pending** — Waiting for collector data (collectors may still be running, or data doesn't exist)
+- **🟡 Pending** — Collectors/policies still processing (wait for CI to complete)
 - **✅ Passing** — Policy ran and passed
 - **(🔀 required)** — Blocking checks that must pass before merge
+
+**Important:** Always wait for pending to resolve before concluding tests. Pending means processing is incomplete, not that data is missing.
 
 #### Test Components
 
 | Component | Has Snyk | Good For Testing |
 |-----------|----------|------------------|
-| `pantalasa/backend` | ✅ Yes | SCA policies passing |
-| `pantalasa/whoami` | ❌ No | SCA policies pending/failing |
+| `pantalasa/backend` | ✅ Yes | SCA policies passing, Go policies |
+| `pantalasa/whoami` | ❌ No | SCA policies failing (no scanner configured) |
 | `pantalasa/frontend` | ✅ Yes | Node.js policies |
 | `pantalasa/auth` | ✅ Yes | Python policies |
 
