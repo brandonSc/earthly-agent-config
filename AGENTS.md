@@ -61,7 +61,50 @@ Known false positives:
 - **Stale comments after force-push** — Comments on removed files can be ignored.
 
 **Valid feedback to watch for:**
-- **Unreachable skip logic** — If CodeRabbit says skip() is unreachable after `c.exists()`, it's correct. Use `c.get_node(path).exists()` for boolean checks (returns bool), not `c.exists()` (raises NoDataError).
+- **Unreachable skip logic** — If CodeRabbit says skip() is unreachable after `c.exists()`, it's correct. See "Data Existence Checks" below.
+
+### Data Existence Checks in Policies
+
+This is a common source of bugs. There are **two different patterns** for checking if data exists:
+
+#### Pattern 1: `assert_exists()` — For Required Data (Pass/Fail)
+
+Use when missing data should **fail or pend** the check:
+
+```python
+# If .testing doesn't exist, check becomes PENDING (waiting for collectors)
+# or FAIL (if collectors finished and data is still missing)
+c.assert_exists(".testing", "No test execution data found")
+```
+
+#### Pattern 2: `get_node().exists()` — For Conditional Logic (Skip)
+
+Use when you need a **boolean** to decide whether to skip:
+
+```python
+# Returns True/False without raising exceptions
+if not c.get_node(".testing").exists():
+    c.skip("No test execution data found")
+    return c
+```
+
+#### ❌ WRONG: Using `c.exists()` for Skip Logic
+
+```python
+# BAD - c.exists() raises NoDataError, so skip() is never reached!
+if not c.exists(".testing"):
+    c.skip("...")  # Unreachable!
+```
+
+#### Summary Table
+
+| Method | Returns | Use For |
+|--------|---------|---------|
+| `c.assert_exists(path, msg)` | Nothing (raises on missing) | Required data - fail if missing |
+| `c.get_node(path).exists()` | `True`/`False` | Conditional logic - skip if missing |
+| `c.exists(path)` | Raises `NoDataError` if missing | **Avoid** - confusing behavior |
+
+**Good example:** See `lunar-lib/policies/testing/passing.py` — uses `get_node().exists()` for skip logic, then `assert_true()` for the actual check.
 
 ### Policy Style Guidelines
 
