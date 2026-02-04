@@ -843,6 +843,34 @@ After pushing:
 2. Fix errors automatically without waiting to be asked
 3. Push fixes as additional commits
 
+### Re-Testing After PR Changes
+
+If you make changes to the code after opening the PR (fixing CI, addressing review comments, etc.), **re-test your work**. Use judgment on scope:
+
+| Change Type | Re-Test Scope |
+|-------------|---------------|
+| Typo fix, comment change | No re-test needed |
+| YAML config fix (keywords, metadata) | CI pass is sufficient |
+| Logic change in policy/collector | Run `lunar policy dev` or `lunar collector dev` on 1-2 components |
+| Major refactor, new assertions | Full re-test in pantalasa-cronos |
+| Changed Docker image/dependencies | Rebuild image, full re-test |
+
+**Quick re-test (most common):**
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos/lunar
+
+# For policies - test on one relevant component
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar policy dev <plugin>.<check> --component github.com/pantalasa-cronos/backend
+
+# For collectors - verify output looks correct
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar collector dev <plugin>.<sub> --component github.com/pantalasa-cronos/backend
+```
+
+If the change affects multiple checks/sub-collectors, test each one. Don't skip re-testing just because CI passes — CI validates syntax and structure, not correctness.
+
 ### Common CI Issues
 
 | Issue | Fix |
