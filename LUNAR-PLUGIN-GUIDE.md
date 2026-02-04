@@ -844,6 +844,24 @@ git push
    python -m pytest policies/<name>/test_*.py -v
    ```
 
+3. **Run CI checks locally** — Same targets GitHub Actions runs:
+   ```bash
+   cd /home/brandon/code/earthly/lunar-lib  # Or your worktree
+   
+   # Validate README structure and landing page metadata
+   earthly +lint
+   
+   # Build images (optional, but catches Earthfile errors)
+   earthly +all --VERSION=test
+   ```
+   
+   **What `+lint` validates:**
+   - README.md structure (required sections, formatting)
+   - `lunar-collector.yml` / `lunar-policy.yml` landing page metadata
+   - Required fields: `display_name`, `long_description`, `category`, `status`, `keywords`
+   
+   Running these locally catches most CI failures before you push.
+
 ### Create Draft PR
 
 ```bash
