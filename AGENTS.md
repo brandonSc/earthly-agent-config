@@ -55,6 +55,9 @@ When asked to open PRs (for any repo), follow this flow:
 6. Fix CI errors automatically by pushing additional commits
 
 ### CodeRabbit Notes
+
+**Important:** CodeRabbit only reviews PRs that are **not in draft**. It will show "Review skipped" for draft PRs. Mark PR as ready (`gh pr ready <number>`) to trigger CodeRabbit review.
+
 Known false positives:
 
 - **"Missing `return` after `c.skip()`"** — Wrong. `c.skip()` raises `SkippedError` which exits the `with` block. Ignore this.
