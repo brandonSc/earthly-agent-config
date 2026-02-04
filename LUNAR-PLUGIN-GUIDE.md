@@ -412,6 +412,113 @@ done
 
 ---
 
+### Building Custom Docker Images for Collectors
+
+If your collector needs dependencies not in the base image (e.g., Go, ast-grep, Python packages), you need to build a custom image.
+
+#### When You Need a Custom Image
+
+- Collector requires CLI tools (Go, Python, Node.js, etc.)
+- Collector requires system packages (curl, jq, etc. beyond base)
+- Collector runs binaries not in `earthly/lunar-scripts`
+
+#### Step 1: Create an Earthfile
+
+Create `Earthfile` in your collector directory:
+
+```earthfile
+VERSION 0.8
+
+image:
+    # Extend from base image (Alpine-based)
+    FROM --pass-args ../../+base-image
+    
+    # Or for Debian-based (needed for some binaries):
+    # ARG SCRIPTS_VERSION=main-debian
+    # FROM earthly/lunar-scripts:$SCRIPTS_VERSION
+    
+    # Install your dependencies
+    RUN apk add --no-cache python3 py3-pip
+    # Or for Debian: RUN apt-get update && apt-get install -y python3
+    
+    # Example: Install Go
+    ARG GO_VERSION=1.23.4
+    ARG TARGETARCH
+    RUN wget -q "https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz" && \
+        tar -C /usr/local -xzf "go${GO_VERSION}.linux-${TARGETARCH}.tar.gz" && \
+        rm "go${GO_VERSION}.linux-${TARGETARCH}.tar.gz"
+    ENV PATH="/usr/local/go/bin:$PATH"
+    
+    # Verify installation
+    RUN go version
+    
+    ARG VERSION=main
+    SAVE IMAGE --push earthly/lunar-lib:<collector-name>-$VERSION
+```
+
+**Reference examples:**
+- `lunar-lib/collectors/golang/Earthfile` — Go + golangci-lint
+- `lunar-lib/collectors/ast-grep/Earthfile` — ast-grep CLI
+- `lunar-lib/collectors/dockerfile/Earthfile` — Dockerfile tools
+
+#### Step 2: Build and Push with Temporary Tag
+
+For testing, use a **temporary tag** — NOT the production tag:
+
+```bash
+cd /home/brandon/code/earthly/lunar-lib-wt-<feature>/collectors/<name>
+
+# Build with temporary test tag
+earthly --push +image --VERSION=test-brandon
+
+# This pushes: earthly/lunar-lib:<collector-name>-test-brandon
+```
+
+#### Step 3: Update lunar-collector.yml for Testing
+
+**Only in your test copy** (pantalasa-cronos), update the image:
+
+```yaml
+# In pantalasa-cronos/lunar/collectors/<name>-test/lunar-collector.yml
+version: 0
+name: my-collector
+default_image: earthly/lunar-lib:<collector-name>-test-brandon  # Temporary tag!
+# ...
+```
+
+#### Step 4: Test in pantalasa-cronos
+
+Run your tests using the temporary image.
+
+#### Step 5: Before Committing to lunar-lib — CRITICAL
+
+**Revert the image tag** in `lunar-collector.yml` before committing:
+
+```yaml
+# In lunar-lib worktree (NOT pantalasa-cronos)
+version: 0
+name: my-collector
+default_image: earthly/lunar-lib:<collector-name>-$VERSION  # Production pattern
+# Or if using base: earthly/lunar-scripts:1.0.0
+```
+
+The CI will build and push the proper image when the PR merges.
+
+#### Step 6: Add to Root Earthfile
+
+For the CI to build your image, add it to `lunar-lib/Earthfile`:
+
+```earthfile
+all:
+    BUILD --pass-args +base-image
+    BUILD --pass-args ./collectors/dockerfile+image
+    BUILD --pass-args ./collectors/golang+image
+    BUILD --pass-args ./collectors/ast-grep+image
+    BUILD --pass-args ./collectors/<your-collector>+image  # Add this line
+```
+
+---
+
 ### Testing Collectors
 
 #### Step 1: Copy Files to Test Directory
