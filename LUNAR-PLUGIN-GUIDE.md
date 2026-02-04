@@ -32,6 +32,8 @@ Before implementing, read these docs in `lunar-lib/ai-context/`:
 | `component-json/conventions.md` | Schema design principles |
 | `component-json/structure.md` | Component JSON paths |
 
+Also read the Lunar docs at https://docs-lunar.earthly.dev
+
 ---
 
 ## 2. Git Worktrees
@@ -130,6 +132,8 @@ example_component_json: |
     }
   }
 ```
+
+Don't over-document implementation details. Only document what is needed to understand the collector. More details can be added to READMEs for the collector or policy.
 
 ### Categories
 
@@ -376,78 +380,324 @@ https://docs-lunar.earthly.dev/plugin-sdks/python-sdk/policy
 
 ## 5. Testing in pantalasa-cronos
 
-Use `pantalasa-cronos` for testing (not `pantalasa` which may have demos running).
+Use `pantalasa-cronos` for integration testing (not `pantalasa` which may have demos running).
 
-### Hub & Token
+### Environment Setup
 
 ```bash
-# Hub: cronos.demo.earthly.dev
+cd /home/brandon/code/earthly/pantalasa-cronos/lunar
 export LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643
+# Hub: cronos.demo.earthly.dev
 ```
 
 ### Available Test Components
 
-| Component | Language | Tags |
-|-----------|----------|------|
-| `github.com/pantalasa-cronos/backend` | Go | go, SOC2 |
-| `github.com/pantalasa-cronos/frontend` | Node.js | node |
-| `github.com/pantalasa-cronos/auth` | Python | python, SOC2 |
-| `github.com/pantalasa-cronos/kafka-go` | Go | go, kafka |
-| `github.com/pantalasa-cronos/hadoop` | Java | java, SOC2 |
-| `github.com/pantalasa-cronos/spark` | Java | java, SOC2 |
+| Component | Language | Tags | Cloned At |
+|-----------|----------|------|-----------|
+| `github.com/pantalasa-cronos/backend` | Go | go, SOC2 | `pantalasa-cronos/backend` |
+| `github.com/pantalasa-cronos/frontend` | Node.js | node | `pantalasa-cronos/frontend` |
+| `github.com/pantalasa-cronos/auth` | Python | python, SOC2 | `pantalasa-cronos/auth` |
+| `github.com/pantalasa-cronos/kafka-go` | Go | go, kafka | `pantalasa-cronos/kafka-go` |
+| `github.com/pantalasa-cronos/hadoop` | Java | java, SOC2 | `pantalasa-cronos/hadoop` |
+| `github.com/pantalasa-cronos/spark` | Java | java, SOC2 | `pantalasa-cronos/spark` |
 
-### Branch Reference Method (Preferred)
-
-Instead of copying files, reference your branch directly:
-
-1. **Push changes to lunar-lib branch:**
-   ```bash
-   cd /home/brandon/code/earthly/lunar-lib-wt-<feature>
-   git add . && git commit -m "Add <feature>" && git push -u origin brandon/<feature>
-   ```
-
-2. **Update pantalasa-cronos lunar-config.yml:**
-   ```yaml
-   # For policies
-   policies:
-     - uses: github://earthly/lunar-lib/policies/<name>@brandon/<feature>
-       on: ["domain:engineering"]
-       enforcement: draft
-   
-   # For collectors
-   collectors:
-     - uses: github://earthly/lunar-lib/collectors/<name>@brandon/<feature>
-       on: ["domain:engineering"]
-   ```
-
-3. **Run dev command:**
-   ```bash
-   cd /home/brandon/code/earthly/pantalasa-cronos/lunar
-   LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
-     lunar policy dev <plugin>.<check> --component github.com/pantalasa-cronos/backend
-   ```
-
-4. **Iterate:** Push new commits, re-run dev command. No copying needed!
-
-5. **After PR merges:** Update config back to `@main`
-
-**Note:** Commit SHA references don't work — only branch/tag names.
-
-### Dev Command Examples
+**Important:** All component repos are cloned in `pantalasa-cronos/`. Keep them up to date:
 
 ```bash
-# Policy
-lunar policy dev golang.go-mod-exists --component github.com/pantalasa-cronos/backend
-
-# Collector
-lunar collector dev snyk.github-app --component github.com/pantalasa-cronos/backend
+cd /home/brandon/code/earthly/pantalasa-cronos
+for dir in backend frontend auth kafka-go hadoop spark; do
+  (cd "$dir" && git pull) 2>/dev/null || true
+done
 ```
 
-### Useful Flags
+---
 
-- `--verbose` — Show detailed output
-- `--secrets "KEY=value"` — Pass secrets to collector
-- `--use-system-runtime` — Run without Docker (requires local dependencies)
+### Testing Collectors
+
+#### Step 1: Copy Files to Test Directory
+
+```bash
+# Copy collector to pantalasa-cronos
+cp -r /home/brandon/code/earthly/lunar-lib-wt-<feature>/collectors/<name>/* \
+  /home/brandon/code/earthly/pantalasa-cronos/lunar/collectors/<name>-test/
+```
+
+#### Step 2: Wire Up in lunar-config.yml
+
+Edit `/home/brandon/code/earthly/pantalasa-cronos/lunar/lunar-config.yml`:
+
+```yaml
+collectors:
+  # Add your test collector
+  - uses: ./collectors/<name>-test
+    on: ["domain:engineering"]  # Or specific component tags
+  
+  # IMPORTANT: If porting an existing collector, disable the old one:
+  # - uses: github://earthly/lunar-lib/collectors/<old-name>@main
+  #   on: ["domain:engineering"]
+```
+
+#### Step 3: Commit and Push
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos
+git add lunar/collectors/<name>-test lunar/lunar-config.yml
+git commit -m "Add <name> collector for testing"
+git push
+```
+
+#### Step 4: Wait for GitHub Actions
+
+Check that the pantalasa-cronos CI passes:
+
+```bash
+gh run list --repo pantalasa-cronos/lunar --limit 5
+# Wait for the run to complete successfully
+```
+
+#### Step 5: Wait for Collection (5 minutes)
+
+After CI passes, wait ~5 minutes for Lunar to run collectors on all components.
+
+#### Step 6: Verify Component JSON
+
+For **each relevant component**, fetch and verify the collected data:
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos/lunar
+
+# Get Component JSON for a specific component
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar component get github.com/pantalasa-cronos/backend --json | jq '.path.to.expected.data'
+
+# Or get specific paths
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar component get github.com/pantalasa-cronos/backend --json | jq '.sca'
+```
+
+**Verify for each component in lunar-config.yml that matches the collector's `on` selector.**
+
+#### Step 7: Analyze Component Repos if Needed
+
+If you need to understand what data should be collected, examine the component source:
+
+```bash
+# Check if component has relevant files
+ls /home/brandon/code/earthly/pantalasa-cronos/backend/
+cat /home/brandon/code/earthly/pantalasa-cronos/backend/go.mod
+```
+
+#### If No Relevant Test Components Exist
+
+If none of the pantalasa-cronos components have the data your collector needs:
+
+1. **Stop and discuss with the user** — Explain what's missing
+2. **Plan a test scenario together** — Options include:
+   - Adding test files to a component repo
+   - Creating a new test component
+   - Using a different approach
+
+---
+
+### Testing CI/CD Collectors
+
+CI/CD collectors (hooks like `ci-after-job`, `ci-after-command`) require triggering actual CI builds.
+
+#### Step 1: Trigger CI Builds
+
+Push empty commits to trigger CI in the component repos:
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos/backend
+git commit --allow-empty -m "Trigger CI for collector testing"
+git push
+
+# Repeat for other relevant components
+```
+
+#### Step 2: Wait for CI to Complete
+
+```bash
+# Check GitHub Actions status
+gh run list --repo pantalasa-cronos/backend --limit 3
+gh run watch --repo pantalasa-cronos/backend  # Watch latest run
+```
+
+#### Step 3: Wait Additional Time
+
+After CI completes, wait ~5 minutes for Lunar to process the CI data.
+
+#### Step 4: Verify CI Data in Component JSON
+
+```bash
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar component get github.com/pantalasa-cronos/backend --json | jq '.ci'
+```
+
+---
+
+### Testing Policies
+
+#### Step 1: Copy Files to Test Directory
+
+```bash
+cp -r /home/brandon/code/earthly/lunar-lib-wt-<feature>/policies/<name>/* \
+  /home/brandon/code/earthly/pantalasa-cronos/lunar/policies/<name>-test/
+```
+
+#### Step 2: Wire Up in lunar-config.yml
+
+```yaml
+policies:
+  # Add your test policy
+  - uses: ./policies/<name>-test
+    name: <name>-test
+    on: ["domain:engineering"]  # Or specific tags
+    enforcement: draft  # Use draft for testing
+    with:
+      # Policy inputs here
+  
+  # IMPORTANT: If porting an existing policy, disable the old one:
+  # - uses: github://earthly/lunar-lib/policies/<old-name>@main
+  #   ...
+```
+
+#### Step 3: Commit and Push
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos
+git add lunar/policies/<name>-test lunar/lunar-config.yml
+git commit -m "Add <name> policy for testing"
+git push
+```
+
+#### Step 4: Wait for GitHub Actions
+
+```bash
+gh run list --repo pantalasa-cronos/lunar --limit 5
+```
+
+#### Step 5: Wait for Policy Evaluation (~5 minutes)
+
+After push, Lunar will evaluate policies on all matching components.
+
+#### Step 6: Run Policy Dev on Each Component
+
+Test the policy against each relevant component:
+
+```bash
+cd /home/brandon/code/earthly/pantalasa-cronos/lunar
+
+# Test against each component
+for component in \
+  github.com/pantalasa-cronos/backend \
+  github.com/pantalasa-cronos/frontend \
+  github.com/pantalasa-cronos/auth; do
+  
+  echo "=== Testing on $component ==="
+  LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+    lunar policy dev <name>-test.<check> --component "$component"
+done
+```
+
+#### Step 7: Verify Results Match Expectations
+
+For each component:
+1. **Check the policy result** (pass/fail/skip)
+2. **Examine the component repo** to understand why
+3. **Ensure the result makes sense** given the component's actual state
+
+```bash
+# Example: Check if go.mod exists before testing go-mod-exists policy
+ls /home/brandon/code/earthly/pantalasa-cronos/backend/go.mod
+```
+
+#### If No Relevant Test Components Exist
+
+If none of the components have the data your policy needs:
+
+1. **Stop and discuss with the user**
+2. **Plan together:**
+   - Can we add test data to an existing component?
+   - Should we create a dedicated test component?
+   - Is there another way to validate the policy?
+
+---
+
+### Unit Tests (For Agent Confidence Only)
+
+Unit tests help you validate logic before integration testing. **Do NOT commit unit tests to lunar-lib** — they are for your own confidence during development.
+
+#### Create Temporary Test File
+
+```python
+# test_<policy>.py (in your worktree, don't commit)
+import pytest
+from lunar_policy.testing import PolicyTestCase
+
+class TestMyCheck(PolicyTestCase):
+    policy_path = "policies/<name>"
+    policy_name = "<check>"
+    
+    def test_pass_case(self):
+        self.set_component_json({"expected": "data"})
+        self.assert_pass()
+    
+    def test_fail_case(self):
+        self.set_component_json({"bad": "data"})
+        self.assert_fail()
+    
+    def test_skip_when_no_data(self):
+        self.set_component_json({})
+        self.assert_skip()
+```
+
+#### Run Tests Locally
+
+```bash
+cd /home/brandon/code/earthly/lunar-lib-wt-<feature>
+python -m pytest policies/<name>/test_*.py -v
+
+# Delete test file before committing
+rm policies/<name>/test_*.py
+```
+
+---
+
+### Dev Command Quick Reference
+
+```bash
+# Policy dev (immediate, against live Component JSON)
+lunar policy dev <plugin>.<check> --component github.com/pantalasa-cronos/backend
+
+# Collector dev (runs collector locally, shows output)
+lunar collector dev <plugin>.<sub> --component github.com/pantalasa-cronos/backend
+
+# Get Component JSON
+lunar component get github.com/pantalasa-cronos/backend --json
+
+# Useful flags
+--verbose          # Detailed output
+--secrets "K=V"    # Pass secrets
+--use-system-runtime  # Run without Docker
+```
+
+---
+
+### Cleanup After Testing
+
+After testing is complete and before creating PR:
+
+```bash
+# Remove test directories from pantalasa-cronos
+rm -rf /home/brandon/code/earthly/pantalasa-cronos/lunar/collectors/<name>-test
+rm -rf /home/brandon/code/earthly/pantalasa-cronos/lunar/policies/<name>-test
+
+# Revert lunar-config.yml changes
+cd /home/brandon/code/earthly/pantalasa-cronos
+git checkout lunar/lunar-config.yml
+git push
+```
 
 ---
 
