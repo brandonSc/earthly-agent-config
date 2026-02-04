@@ -122,6 +122,80 @@ Move implementation details (data paths, skip conditions, collector specifics) t
 - **Debug prints** — Add to the test copy, not the source
 - **Docker required** — `lunar policy dev` needs Docker Desktop running
 
+### Testing Policy/Collector Behavior in Real PRs
+
+To verify collectors and policies work correctly in production, create test PRs on pantalasa components and check the **Earthly Lunar** GitHub comment.
+
+#### Creating Test PRs
+
+```bash
+# Pick a component (backend has Snyk, whoami doesn't)
+cd /home/brandon/code/earthly/pantalasa/<component>
+
+# Create test branch
+git checkout main && git pull
+git checkout -b test/<description>
+
+# Make a trivial change
+echo "" >> README.md
+git add README.md && git commit -m "Test: <what you're testing>"
+
+# Push and create PR
+git push -u origin test/<description>
+gh pr create --title "Test: <description>" --body "Testing <what>"
+```
+
+#### Checking Lunar Results
+
+Lunar posts a comment on each PR with policy results. To view it:
+
+```bash
+# Get the latest Lunar comment
+gh api repos/pantalasa/<component>/issues/<pr-number>/comments --jq '.[-1].body'
+```
+
+#### Understanding the Lunar Comment Format
+
+```markdown
+## 🌒 Earthly Lunar
+
+### ❌ N Failing
+* ❌ **check-name** policy.check - Description
+  * Error message explaining why it failed
+
+### 🟡 N Pending  
+* 🟡 **check-name** - Waiting for collector data
+
+### ✅ N Passing
+* ✅ **check-name** policy.check - Description (🔀 **required**)
+```
+
+- **❌ Failing** — Policy ran and found issues
+- **🟡 Pending** — Waiting for collector data (collectors may still be running, or data doesn't exist)
+- **✅ Passing** — Policy ran and passed
+- **(🔀 required)** — Blocking checks that must pass before merge
+
+#### Test Components
+
+| Component | Has Snyk | Good For Testing |
+|-----------|----------|------------------|
+| `pantalasa/backend` | ✅ Yes | SCA policies passing |
+| `pantalasa/whoami` | ❌ No | SCA policies pending/failing |
+| `pantalasa/frontend` | ✅ Yes | Node.js policies |
+| `pantalasa/auth` | ✅ Yes | Python policies |
+
+#### Cleanup After Testing
+
+```bash
+# Close test PR
+gh pr close <pr-number>
+
+# Delete test branch
+git checkout main
+git branch -D test/<description>
+git push origin --delete test/<description>
+```
+
 ---
 
 ## Repository Layout
