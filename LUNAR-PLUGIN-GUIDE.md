@@ -228,6 +228,21 @@ lunar collect -j ".cat.field1" "val1" ".cat.field2" "val2"
 
 ## 4. Implementing Policies
 
+### Policy Grouping Principle
+
+**Policies that operate on the same root Component JSON field should be grouped as checks within a single policy plugin.**
+
+For example, all checks that read from `.testing.*` should be in one `testing` policy:
+- `executed` → reads `.testing`
+- `passing` → reads `.testing.all_passing`
+- `coverage-collected` → reads `.testing.coverage`
+- `coverage-reported` → reads `.testing.coverage.percentage`
+- `min-coverage` → reads `.testing.coverage.percentage`
+
+**Why?** This creates logical groupings, simplifies configuration, and allows users to `include` specific checks from a single policy rather than managing multiple separate policies.
+
+**Anti-pattern:** Don't create separate `testing`, `coverage`, `test-results` policies if they all read `.testing.*` data.
+
 ### Directory Structure
 
 ```
