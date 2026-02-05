@@ -1247,6 +1247,38 @@ If you remove files from a PR via force-push, CodeRabbit comments on those files
 
 If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
 
+### Responding to CodeRabbit Comments
+
+**Always reply to CodeRabbit comments** — it learns from feedback, so keeping it updated improves future reviews.
+
+| Outcome | Action |
+|---------|--------|
+| **Addressed** | Reply explaining what you fixed, then resolve the thread |
+| **Won't fix** | Reply with justification, then resolve the thread |
+| **False positive** | Reply explaining why, then resolve the thread |
+
+**Reply and resolve commands:**
+
+```bash
+# 1. Reply to the comment
+gh api repos/earthly/lunar-lib/pulls/<PR>/comments/<comment-id>/replies \
+  -X POST -f body="Fixed in <commit-sha>: <brief description of fix>
+
+🤖"
+
+# 2. Resolve the thread (requires GraphQL — get thread ID from comment)
+gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<thread-id>"}) { thread { isResolved } } }'
+```
+
+**Finding comment and thread IDs:**
+
+```bash
+# List all review comments with IDs
+gh api repos/earthly/lunar-lib/pulls/<PR>/comments --jq '.[] | "\(.id) | \(.path):\(.line) | \(.body | split("\n")[0])"'
+```
+
+The thread ID is in the comment's `node_id` field (for GraphQL) or can be found in the PR review threads.
+
 ### Making PR Ready for Review
 
 When user says "make PR ready for review":
