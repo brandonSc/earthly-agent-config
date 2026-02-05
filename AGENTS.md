@@ -77,6 +77,8 @@ Focus on **architecture and design decisions**, not file lists or code examples.
 
 **Signature:** Always end with `🤖 *This PR was implemented by an AI agent.*` so reviewers know.
 
+**PR Comments:** When commenting on PRs (replying to reviews, etc.), also sign with 🤖 so it's clear the response is from an AI agent, not the human account owner.
+
 ### CodeRabbit Notes
 
 **Important:** CodeRabbit only reviews PRs that are **not in draft**. It will show "Review skipped" for draft PRs. Mark PR as ready (`gh pr ready <number>`) to trigger CodeRabbit review.
