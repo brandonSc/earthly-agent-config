@@ -54,6 +54,29 @@ When asked to open PRs (for any repo), follow this flow:
 5. Watch GitHub Actions for failures
 6. Fix CI errors automatically by pushing additional commits
 
+### PR Descriptions (lunar-lib)
+
+Focus on **architecture and design decisions**, not file lists or code examples.
+
+**Structure:**
+1. **One-liner** — What does this add?
+2. **Architecture** — Components/sub-collectors and their purpose (use tables)
+3. **Data normalization** — What's normalized (tool-agnostic) vs native (tool-specific)?
+4. **Category routing** — How are results categorized? (for collectors writing to multiple paths)
+5. **Tested** — What you actually tested and outcomes (e.g., "PR on pantalasa/backend → policy passes")
+
+**Do:**
+- Explain *why* architecture decisions were made
+- Show how normalization enables tool-agnostic policies
+- Include tested results with ✅/❌ outcomes
+
+**Don't:**
+- List files (reviewers can see the diff)
+- Include code examples (save for README)
+- Over-explain obvious things
+
+**Signature:** Always end with `🤖 *This PR was implemented by an AI agent.*` so reviewers know.
+
 ### CodeRabbit Notes
 
 **Important:** CodeRabbit only reviews PRs that are **not in draft**. It will show "Review skipped" for draft PRs. Mark PR as ready (`gh pr ready <number>`) to trigger CodeRabbit review.
