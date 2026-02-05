@@ -12,7 +12,7 @@ Create 4 security scanning policies that enforce scanning and vulnerability thre
 | `iac-scan` | `.iac_scan` | Infrastructure as Code security scanning |
 
 All policies share the same check structure:
-- `scanned` — Verify scanner ran
+- `executed` — Verify scanner ran (aligns with spec `sec-{category}-executed`)
 - `no-critical` — No critical severity findings
 - `no-high` — No high severity findings (optional, configurable)
 - `max-total` — Total findings under threshold (configurable)
@@ -48,12 +48,12 @@ Create 4 policy directories with identical structure:
 lunar-lib-wt-security-policies/policies/
 ├── sca/
 │   ├── lunar-policy.yml
-│   ├── scanned.py
+│   ├── executed.py
 │   ├── no-critical.py
 │   ├── no-high.py
 │   ├── max-total.py
 │   ├── requirements.txt
-│   ├── README.md
+│   ├── README.md          # Title must match display_name: "# SCA Guardrails"
 │   └── assets/sca.svg
 ├── sast/
 │   └── ... (same structure)
@@ -79,7 +79,7 @@ author: support@earthly.dev
 default_image: earthly/lunar-scripts:1.0.0
 
 landing_page:
-  display_name: "{DISPLAY_NAME} Guardrails"
+  display_name: "{DISPLAY_NAME} Guardrails"  # Must end with "Guardrails" per conventions
   long_description: |
     Enforces {DISPLAY_NAME} scanning standards.
     
@@ -95,24 +95,22 @@ landing_page:
   related: []
 
 policies:
-  - name: scanned
+  - name: executed
     description: |
       Verifies that {DISPLAY_NAME} scanning was executed on the component.
       Fails if no scanner has written to .{CATEGORY}.
-    mainPython: ./scanned.py
+    mainPython: ./executed.py
     keywords: ["{CATEGORY}", "security", "scanning", "compliance"]
 
   - name: no-critical
     description: |
       Ensures no critical severity findings exist.
-      Skips if scanning data is not available.
     mainPython: ./no-critical.py
     keywords: ["{CATEGORY}", "critical", "vulnerabilities", "security"]
 
   - name: no-high
     description: |
       Ensures no high severity findings exist.
-      Configurable via inputs.
     mainPython: ./no-high.py
     keywords: ["{CATEGORY}", "high", "vulnerabilities", "security"]
 
@@ -131,15 +129,20 @@ inputs:
     default: "0"
 ```
 
-#### scanned.py
+#### executed.py
 
 ```python
 from lunar_policy import Check
 
-def check_scanned(c: Check):
+def check_executed(node=None):
     """Verify {DISPLAY_NAME} scanning was executed."""
-    c.assert_exists(".{CATEGORY}", "No {DISPLAY_NAME} scanning data found. Ensure a scanner (Snyk, Semgrep, etc.) is configured.")
+    c = Check("executed", "{DISPLAY_NAME} scan must be executed", node=node)
+    with c:
+        c.assert_exists(".{CATEGORY}", "No {DISPLAY_NAME} scanning data found. Ensure a scanner (Snyk, Semgrep, etc.) is configured.")
     return c
+
+if __name__ == "__main__":
+    check_executed()
 ```
 
 #### no-critical.py
@@ -147,25 +150,31 @@ def check_scanned(c: Check):
 ```python
 from lunar_policy import Check
 
-def check_no_critical(c: Check):
+def check_no_critical(node=None):
     """Ensure no critical severity findings."""
-    node = c.get_node(".{CATEGORY}")
-    if not node.exists():
-        c.skip("No {DISPLAY_NAME} data available")
-        return c
-    
-    # Check summary first (preferred)
-    summary = c.get_node(".{CATEGORY}.summary.has_critical")
-    if summary.exists():
-        c.assert_false(summary.get_value(), "Critical {CATEGORY_DISPLAY} findings detected")
-        return c
-    
-    # Fall back to counting
-    critical = c.get_node(".{CATEGORY}.{FINDINGS_PATH}.critical")
-    if critical.exists():
-        c.assert_equal(critical.get_value(), 0, "Critical {CATEGORY_DISPLAY} findings detected")
+    c = Check("no-critical", "No critical {CATEGORY_DISPLAY} findings", node=node)
+    with c:
+        # Skip if no scan data (don't fail components without this scanner type)
+        category_node = c.get_node(".{CATEGORY}")
+        if not category_node.exists():
+            c.skip("No {DISPLAY_NAME} data available")
+            return c
+        
+        # Check summary first (preferred)
+        summary = category_node.get_node(".summary.has_critical")
+        if summary.exists():
+            c.assert_false(summary.get_value(), "Critical {CATEGORY_DISPLAY} findings detected")
+            return c
+        
+        # Fall back to counting
+        critical = category_node.get_node(".{FINDINGS_PATH}.critical")
+        if critical.exists():
+            c.assert_equal(critical.get_value(), 0, "Critical {CATEGORY_DISPLAY} findings detected")
     
     return c
+
+if __name__ == "__main__":
+    check_no_critical()
 ```
 
 #### no-high.py
@@ -173,30 +182,35 @@ def check_no_critical(c: Check):
 ```python
 from lunar_policy import Check, variable_or_default
 
-def check_no_high(c: Check):
+def check_no_high(node=None):
     """Ensure no high severity findings (if enabled)."""
-    enforce = variable_or_default("enforce_no_high", "true").lower() == "true"
-    if not enforce:
-        c.skip("High severity check disabled via inputs")
-        return c
-    
-    node = c.get_node(".{CATEGORY}")
-    if not node.exists():
-        c.skip("No {DISPLAY_NAME} data available")
-        return c
-    
-    # Check summary first (preferred)
-    summary = c.get_node(".{CATEGORY}.summary.has_high")
-    if summary.exists():
-        c.assert_false(summary.get_value(), "High severity {CATEGORY_DISPLAY} findings detected")
-        return c
-    
-    # Fall back to counting
-    high = c.get_node(".{CATEGORY}.{FINDINGS_PATH}.high")
-    if high.exists():
-        c.assert_equal(high.get_value(), 0, "High severity {CATEGORY_DISPLAY} findings detected")
+    c = Check("no-high", "No high severity {CATEGORY_DISPLAY} findings", node=node)
+    with c:
+        enforce = variable_or_default("enforce_no_high", "true").lower() == "true"
+        if not enforce:
+            c.skip("High severity check disabled via inputs")
+            return c
+        
+        category_node = c.get_node(".{CATEGORY}")
+        if not category_node.exists():
+            c.skip("No {DISPLAY_NAME} data available")
+            return c
+        
+        # Check summary first (preferred)
+        summary = category_node.get_node(".summary.has_high")
+        if summary.exists():
+            c.assert_false(summary.get_value(), "High severity {CATEGORY_DISPLAY} findings detected")
+            return c
+        
+        # Fall back to counting
+        high = category_node.get_node(".{FINDINGS_PATH}.high")
+        if high.exists():
+            c.assert_equal(high.get_value(), 0, "High severity {CATEGORY_DISPLAY} findings detected")
     
     return c
+
+if __name__ == "__main__":
+    check_no_high()
 ```
 
 #### max-total.py
@@ -204,31 +218,37 @@ def check_no_high(c: Check):
 ```python
 from lunar_policy import Check, variable_or_default
 
-def check_max_total(c: Check):
+def check_max_total(node=None):
     """Ensure total findings under threshold."""
-    threshold_str = variable_or_default("max_total_threshold", "0")
-    threshold = int(threshold_str)
-    
-    if threshold == 0:
-        c.skip("No maximum threshold configured (set max_total_threshold > 0 to enable)")
-        return c
-    
-    node = c.get_node(".{CATEGORY}")
-    if not node.exists():
-        c.skip("No {DISPLAY_NAME} data available")
-        return c
-    
-    total = c.get_node(".{CATEGORY}.{FINDINGS_PATH}.total")
-    if not total.exists():
-        c.skip("Total findings count not available")
-        return c
-    
-    c.assert_less_or_equal(
-        total.get_value(), 
-        threshold, 
-        f"Total {CATEGORY_DISPLAY} findings ({{total.get_value()}}) exceeds threshold ({threshold})"
-    )
+    c = Check("max-total", "Total {CATEGORY_DISPLAY} findings within threshold", node=node)
+    with c:
+        threshold_str = variable_or_default("max_total_threshold", "0")
+        threshold = int(threshold_str)
+        
+        if threshold == 0:
+            c.skip("No maximum threshold configured (set max_total_threshold > 0 to enable)")
+            return c
+        
+        category_node = c.get_node(".{CATEGORY}")
+        if not category_node.exists():
+            c.skip("No {DISPLAY_NAME} data available")
+            return c
+        
+        total_node = category_node.get_node(".{FINDINGS_PATH}.total")
+        if not total_node.exists():
+            c.skip("Total findings count not available")
+            return c
+        
+        total_value = total_node.get_value()
+        c.assert_less_or_equal(
+            total_value, 
+            threshold, 
+            f"Total {CATEGORY_DISPLAY} findings ({total_value}) exceeds threshold ({threshold})"
+        )
     return c
+
+if __name__ == "__main__":
+    check_max_total()
 ```
 
 ---
@@ -337,7 +357,7 @@ Run dev commands:
 export LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643
 
 # Test SCA on backend (has Snyk)
-lunar policy dev sca-test.scanned --component github.com/pantalasa/backend
+lunar policy dev sca-test.executed --component github.com/pantalasa/backend
 lunar policy dev sca-test.no-critical --component github.com/pantalasa/backend
 
 # Check what data is available
@@ -351,7 +371,7 @@ lunar component get github.com/pantalasa/backend --json | jq '.iac_scan'
 
 | Check | Component with Scanner | Component without Scanner |
 |-------|----------------------|---------------------------|
-| `scanned` | ✅ Pass | ❌ Fail (no data) |
+| `executed` | ✅ Pass | ❌ Fail (no data) |
 | `no-critical` | ✅ Pass (if no criticals) or ❌ Fail | ⏭️ Skip |
 | `no-high` | ✅ Pass (if no highs) or ❌ Fail | ⏭️ Skip |
 | `max-total` | ✅ Pass (if under threshold) | ⏭️ Skip |
