@@ -181,6 +181,19 @@ Don't over-document implementation details. Only document what is needed to unde
 | `ci-before-command` | Before command | Record command start |
 | `ci-after-command` | After command | Capture command output |
 
+### Execution Environment Differences
+
+**Important:** The environment where your collector runs depends on the hook type:
+
+| Hook Type | Runs In | Implications for `install.sh` |
+|-----------|---------|-------------------------------|
+| `code`, `cron` | Lunar's container (Debian-based) | Can assume `apt-get`, predictable environment |
+| `ci-*` hooks | User's CI runner (varies) | Must support multiple package managers (apk/apt-get/yum) |
+
+For CI collectors with `default_image_ci_collectors: native`, the scripts run directly on the user's CI runner. This could be Ubuntu, Alpine, RHEL, or any Linux distro. Your `install.sh` must detect the available package manager.
+
+For code collectors, scripts run in Lunar's `earthly/lunar-scripts` container which is Debian-based. You can safely assume `apt-get` is available.
+
 ### Separating PR vs Main Branch Logic
 
 Use `runs_on` to cleanly separate collectors instead of if/else blocks:
