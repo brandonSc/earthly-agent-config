@@ -19,6 +19,48 @@ All policies share the same check structure:
 
 ---
 
+## ⚠️ Current Collector Limitations
+
+**Important:** The current Snyk (PR #22) and Semgrep (PR #21) collectors only write **source metadata**, not vulnerability counts. This means:
+
+| Check | Current Status | What's Missing |
+|-------|----------------|----------------|
+| `executed` | ✅ Works | — |
+| `no-critical` | ❌ Will skip | `.{category}.vulnerabilities.critical` or `.summary.has_critical` |
+| `no-high` | ❌ Will skip | `.{category}.vulnerabilities.high` or `.summary.has_high` |
+| `max-total` | ❌ Will skip | `.{category}.vulnerabilities.total` |
+
+**What collectors currently write:**
+```json
+{
+  "sca": {
+    "source": { "tool": "snyk", "integration": "github_app" },
+    "native": { "snyk": { ... } }
+  }
+}
+```
+
+**What policies expect:**
+```json
+{
+  "sca": {
+    "source": { "tool": "snyk", "integration": "github_app" },
+    "vulnerabilities": { "critical": 0, "high": 1, "medium": 3, "total": 12 },
+    "summary": { "has_critical": false, "has_high": true }
+  }
+}
+```
+
+**Future enhancements:** The Snyk and Semgrep collectors will need to parse vulnerability counts from:
+- **GitHub App**: Check annotations/output (if available in API response)
+- **CLI**: JSON output (`snyk test --json`, `semgrep --json`)
+
+**PR Description:** When implementing this policy, note in the PR description that only `executed` is functional until collectors are enhanced. Example:
+
+> **Note:** Currently only the `executed` check is functional. The `no-critical`, `no-high`, and `max-total` checks will skip until the Snyk/Semgrep collectors are enhanced to write vulnerability counts to `.{category}.vulnerabilities.*` paths.
+
+---
+
 ## Pre-Implementation
 
 ```bash
