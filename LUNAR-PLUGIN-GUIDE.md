@@ -432,10 +432,34 @@ The website displays icons on dark backgrounds. If your SVG has a solid backgrou
 </svg>
 ```
 
+**Critical: Ensure contrast for embedded elements**
+
+If your icon has nested elements (e.g., a small symbol inside a larger shape), ensure there's enough contrast between them. Light-on-light elements become invisible:
+
+```svg
+<!-- ❌ BAD: White inner icon on light gray shape = invisible -->
+<svg viewBox="0 0 64 64">
+  <rect x="8" y="8" width="48" height="56" rx="4" fill="#e0e0e0"/>
+  <path d="..." fill="white"/>  <!-- Can't see this! -->
+</svg>
+
+<!-- ✅ GOOD: Dark inner icon on light shape = visible -->
+<svg viewBox="0 0 64 64">
+  <rect x="8" y="8" width="48" height="56" rx="4" fill="#e0e0e0"/>
+  <path d="..." fill="#333333"/>  <!-- Visible contrast -->
+</svg>
+
+<!-- ✅ ALSO GOOD: Use transparency/cutouts instead of layered fills -->
+<svg viewBox="0 0 64 64">
+  <path d="M8,8 h48 v56 h-48 z M16,20 ..." fill="white" fill-rule="evenodd"/>
+</svg>
+```
+
 ### SVG Specifications
 
 - **Size**: 64x64 viewBox recommended
-- **Colors**: Use white (`#ffffff`) or light colors for the main icon content
+- **Colors**: Use white (`#ffffff`) or light colors for outer shapes on dark backgrounds
+- **Embedded elements**: Use dark colors (`#333333`) or cutouts for inner icons/symbols
 - **Background**: Transparent (no `<rect>` filling the viewBox)
 - **Format**: Clean, minified SVG without embedded fonts or images
 
