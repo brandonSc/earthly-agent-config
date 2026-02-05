@@ -402,7 +402,71 @@ https://docs-lunar.earthly.dev/plugin-sdks/python-sdk/policy
 
 ---
 
-## 5. Testing in pantalasa-cronos
+## 5. Creating Plugin Icons
+
+Every collector and policy needs an SVG icon for the landing page. The icon goes in `assets/<plugin-name>.svg`.
+
+### Design Guidelines
+
+| Scenario | Approach |
+|----------|----------|
+| **Technology-specific** (e.g., Go, Python, Snyk) | Use the official technology logo or something inspired by it |
+| **Generic plugin** (e.g., testing, coverage) | Generate an icon that visually represents the concept |
+
+### Technical Requirements
+
+**Critical: Use transparency, not solid backgrounds**
+
+The website displays icons on dark backgrounds. If your SVG has a solid background color, it will appear as a flat rectangle:
+
+```svg
+<!-- ❌ BAD: Solid background gets flattened -->
+<svg viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="..." fill="white"/>
+</svg>
+
+<!-- ✅ GOOD: Transparent background -->
+<svg viewBox="0 0 64 64">
+  <path d="..." fill="white"/>
+</svg>
+```
+
+### SVG Specifications
+
+- **Size**: 64x64 viewBox recommended
+- **Colors**: Use white (`#ffffff`) or light colors for the main icon content
+- **Background**: Transparent (no `<rect>` filling the viewBox)
+- **Format**: Clean, minified SVG without embedded fonts or images
+
+### Generating Icons
+
+For technology logos:
+1. Find the official SVG logo (check the project's brand assets or GitHub)
+2. Simplify if needed (remove backgrounds, reduce complexity)
+3. Ensure transparent background
+
+For custom icons:
+1. Use an AI image generator or icon tool to create a concept
+2. Convert to clean SVG (tools like Figma, Inkscape, or online converters)
+3. Manually clean up: remove backgrounds, ensure transparency
+4. Test on dark background before committing
+
+### Testing Your Icon
+
+Before committing, test that your icon renders correctly:
+
+```bash
+# Quick visual test - open in browser on dark background
+echo '<html><body style="background:#1e1e1e;padding:20px">
+<img src="assets/my-plugin.svg" width="64" height="64">
+</body></html>' > /tmp/icon-test.html
+# Open /tmp/icon-test.html in browser
+```
+
+---
+
+## 6. Testing in pantalasa-cronos
 
 Use `pantalasa-cronos` for integration testing (not `pantalasa` which may have demos running).
 
@@ -885,7 +949,7 @@ Once the PR is merged to main:
 
 ---
 
-## 6. PR Workflow
+## 7. PR Workflow
 
 ### Before Committing
 
@@ -977,7 +1041,7 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 
 ---
 
-## 7. CodeRabbit Review Handling
+## 8. CodeRabbit Review Handling
 
 ### Known False Positives
 
@@ -1028,7 +1092,7 @@ When user says "make PR ready for review":
 
 ---
 
-## 8. Quick Reference
+## 9. Quick Reference
 
 ### File Checklist - Collector
 
