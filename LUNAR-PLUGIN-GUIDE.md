@@ -319,6 +319,49 @@ if __name__ == "__main__":
 - **`c.skip()` raises `SkippedError`** — no `return` needed after it
 - **There is no `c.succeed()` method** — checks auto-pass if no assertions fail
 
+### Data Existence Checks (Common Bug Source)
+
+There are **three different patterns** for checking if data exists. Using the wrong one causes bugs:
+
+#### Pattern 1: `assert_exists()` — For Required Data (Pass/Fail)
+
+Use when missing data should **fail or pend** the check:
+
+```python
+# If .testing doesn't exist, check becomes PENDING (waiting for collectors)
+# or FAIL (if collectors finished and data is still missing)
+c.assert_exists(".testing", "No test execution data found")
+```
+
+#### Pattern 2: `get_node().exists()` — For Conditional Logic (Skip)
+
+Use when you need a **boolean** to decide whether to skip:
+
+```python
+# Returns True/False without raising exceptions
+if not c.get_node(".testing").exists():
+    c.skip("No test execution data found")
+    return c
+```
+
+#### ❌ WRONG: Using `c.exists()` for Skip Logic
+
+```python
+# BAD - c.exists() raises NoDataError, so skip() is never reached!
+if not c.exists(".testing"):
+    c.skip("...")  # Unreachable!
+```
+
+#### Summary Table
+
+| Method | Returns | Use For |
+|--------|---------|---------|
+| `c.assert_exists(path, msg)` | Nothing (raises on missing) | Required data - fail if missing |
+| `c.get_node(path).exists()` | `True`/`False` | Conditional logic - skip if missing |
+| `c.exists(path)` | Raises `NoDataError` if missing | **Avoid** - confusing behavior |
+
+**Good example:** See `lunar-lib/policies/testing/passing.py` — uses `get_node().exists()` for skip logic, then `assert_true()` for the actual check.
+
 ### Available Assertions
 
 ```python
@@ -399,6 +442,22 @@ lunar-policy==0.2.2
 ### SDK Reference
 
 https://docs-lunar.earthly.dev/plugin-sdks/python-sdk/policy
+
+### Policy Style Guidelines
+
+**Naming:** README title AND `display_name` must end with **"Guardrails"** (e.g., "Testing Guardrails"), not "Policies".
+
+**Descriptions in lunar-policy.yml should be user-focused:**
+- ❌ BAD: "Skips if pass/fail data is not available (some collectors only report execution, not results)"
+- ✅ GOOD: "Ensures all tests pass. Skips if project does not contain a specified language."
+
+Move implementation details (data paths, skip conditions, collector specifics) to README only.
+
+### Debugging Tips
+
+- **Branch refs may cache** — If `@brandon/branch` shows stale behavior, copy to `./policies/<name>-test/` instead
+- **Debug prints** — Add to the test copy, not the source
+- **Docker required** — `lunar policy dev` needs Docker Desktop running
 
 ---
 
@@ -921,6 +980,84 @@ lunar component get github.com/pantalasa-cronos/backend --json
 
 ---
 
+### Testing in Real PRs (Production Verification)
+
+To verify collectors and policies work correctly in production, create test PRs on pantalasa components and check the **Earthly Lunar** GitHub comment.
+
+#### Creating Test PRs
+
+```bash
+# Pick a component (backend has Snyk, whoami doesn't)
+cd /home/brandon/code/earthly/pantalasa/<component>
+
+# Create test branch
+git checkout main && git pull
+git checkout -b test/<description>
+
+# Make a trivial change
+echo "" >> README.md
+git add README.md && git commit -m "Test: <what you're testing>"
+
+# Push and create PR
+git push -u origin test/<description>
+gh pr create --title "Test: <description>" --body "Testing <what>"
+```
+
+#### Checking Lunar Results
+
+Lunar posts a comment on each PR with policy results. To view it:
+
+```bash
+# Get the latest Lunar comment
+gh api repos/pantalasa/<component>/issues/<pr-number>/comments --jq '.[-1].body'
+```
+
+#### Understanding the Lunar Comment Format
+
+```markdown
+## 🌒 Earthly Lunar
+
+### ❌ N Failing
+* ❌ **check-name** policy.check - Description
+  * Error message explaining why it failed
+
+### 🟡 N Pending  
+* 🟡 **check-name** - Waiting for collector data
+
+### ✅ N Passing
+* ✅ **check-name** policy.check - Description (🔀 **required**)
+```
+
+- **❌ Failing** — Policy ran and found issues
+- **🟡 Pending** — Collectors/policies still processing (wait for CI to complete)
+- **✅ Passing** — Policy ran and passed
+- **(🔀 required)** — Blocking checks that must pass before merge
+
+**Important:** Always wait for pending to resolve before concluding tests. Pending means processing is incomplete, not that data is missing.
+
+#### Test Components for Real PR Testing
+
+| Component | Has Snyk | Good For Testing |
+|-----------|----------|------------------|
+| `pantalasa/backend` | ✅ Yes | SCA policies passing, Go policies |
+| `pantalasa/whoami` | ❌ No | SCA policies failing (no scanner configured) |
+| `pantalasa/frontend` | ✅ Yes | Node.js policies |
+| `pantalasa/auth` | ✅ Yes | Python policies |
+
+#### Cleanup Test PRs
+
+```bash
+# Close test PR
+gh pr close <pr-number>
+
+# Delete test branch
+git checkout main
+git branch -D test/<description>
+git push origin --delete test/<description>
+```
+
+---
+
 ### Cleanup After Testing
 
 After testing is complete and before creating PR:
@@ -1019,6 +1156,31 @@ git push -u origin brandon/<feature-name>
 gh pr create --draft --title "Add <feature-name>" --body "Description..."
 ```
 
+### PR Descriptions (lunar-lib)
+
+Focus on **architecture and design decisions**, not file lists or code examples.
+
+**Structure:**
+1. **One-liner** — What does this add?
+2. **Architecture** — Components/sub-collectors and their purpose (use tables)
+3. **Data normalization** — What's normalized (tool-agnostic) vs native (tool-specific)?
+4. **Category routing** — How are results categorized? (for collectors writing to multiple paths)
+5. **Tested** — What you actually tested and outcomes (e.g., "PR on pantalasa/backend → policy passes")
+
+**Do:**
+- Explain *why* architecture decisions were made
+- Show how normalization enables tool-agnostic policies
+- Include tested results with ✅/❌ outcomes
+
+**Don't:**
+- List files (reviewers can see the diff)
+- Include code examples (save for README)
+- Over-explain obvious things
+
+**Signature:** Always end with `🤖 *This PR was implemented by an AI agent.*` so reviewers know.
+
+**PR Comments:** When commenting on PRs (replying to reviews, etc.), also sign with 🤖 so it's clear the response is from an AI agent, not the human account owner.
+
 ### Monitor GitHub Actions
 
 After pushing:
@@ -1067,6 +1229,8 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 
 ## 8. CodeRabbit Review Handling
 
+**Important:** CodeRabbit only reviews PRs that are **not in draft**. It will show "Review skipped" for draft PRs. Mark PR as ready (`gh pr ready <number>`) to trigger CodeRabbit review.
+
 ### Known False Positives
 
 **"Missing `return` after `c.skip()`"**
@@ -1076,6 +1240,12 @@ CodeRabbit may suggest adding `return c` after `c.skip()`. **This is wrong.** Th
 **Stale comments after force-push**
 
 If you remove files from a PR via force-push, CodeRabbit comments on those files become stale but still appear. These can be safely ignored.
+
+### Valid Feedback to Watch For
+
+**"Unreachable skip logic"**
+
+If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
 
 ### Making PR Ready for Review
 
