@@ -183,7 +183,7 @@ Don't over-document implementation details. Only document what is needed to unde
 
 ### Execution Environment Differences
 
-**Important:** The environment where your collector runs depends on the hook type:
+**Important:** The environment where your collector runs depends on the hook type, but only if there's an install.sh and if there is no default image set in the lunar-collector.yml file or the default image is set to `native`.
 
 | Hook Type | Runs In | Implications for `install.sh` |
 |-----------|---------|-------------------------------|
@@ -1284,6 +1284,12 @@ If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's correct**.
 | **Addressed** | Reply explaining what you fixed, then resolve the thread |
 | **Won't fix** | Reply with justification, then resolve the thread |
 | **False positive** | Reply explaining why, then resolve the thread |
+
+**Wait for follow-up responses.** After replying to CodeRabbit or pushing fixes:
+- Wait 2-3 minutes for CodeRabbit to process new commits and post follow-up comments
+- Check for new comments before considering the review complete
+- CodeRabbit often acknowledges your fixes or asks clarifying questions
+- Same applies to human reviewers — don't assume silence means approval
 
 **Reply and resolve commands:**
 
