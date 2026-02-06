@@ -412,8 +412,36 @@ if __name__ == "__main__":
 
 - Use `c.get_node(".path")` then `node.exists()` to check data availability
 - Never call `get_value()` without first checking `exists()`
-- **`c.skip()` raises `SkippedError`** — no `return` needed after it
+- **`c.skip()` raises `SkippedError`** — no `return` needed after it (see warning below)
 - **There is no `c.succeed()` method** — checks auto-pass if no assertions fail
+
+### ⚠️ CRITICAL: `c.skip()` and `c.fail()` Raise Exceptions — NEVER Put `return` After Them
+
+**This is the single most common mistake agents make when writing policies.** It has been repeated across many PRs and always causes CodeRabbit review comments and wasted cycles.
+
+`c.skip()` raises `SkippedError` and `c.fail()` raises an internal exception. Both immediately exit the `with` block. **Any code after them is unreachable dead code.**
+
+```python
+# ❌ WRONG — return c is unreachable (c.skip raises SkippedError)
+if not is_pr_context():
+    c.skip("Not in a PR context")
+    return c  # DEAD CODE — never executes
+
+# ✅ CORRECT — nothing after c.skip()
+if not is_pr_context():
+    c.skip("Not in a PR context")
+
+# ❌ WRONG — return c is unreachable (c.fail raises exception)
+if some_condition:
+    c.fail("Something is wrong")
+    return c  # DEAD CODE — never executes
+
+# ✅ CORRECT — nothing after c.fail()
+if some_condition:
+    c.fail("Something is wrong")
+```
+
+**Why this happens:** Agents write `return c` out of habit thinking it's good practice to explicitly return. But `c.skip()` and `c.fail()` are not normal function calls — they raise exceptions that exit the `with Check(...)` block immediately.
 
 ### When to Skip vs Fail (Score Impact)
 
@@ -1489,19 +1517,19 @@ gh pr comment <PR-number> --body "@coderabbitai review"
 
 ### Known False Positives
 
-**"Missing `return` after `c.skip()`"**
-
-CodeRabbit may suggest adding `return c` after `c.skip()`. **This is wrong.** The `c.skip()` method raises a `SkippedError` exception which exits the `with` block. Ignore this suggestion.
-
 **Stale comments after force-push**
 
 If you remove files from a PR via force-push, CodeRabbit comments on those files become stale but still appear. These can be safely ignored.
 
 ### Valid Feedback to Watch For
 
+**"Unreachable `return` after `c.skip()`"**
+
+If CodeRabbit flags `return c` after `c.skip()` as dead code, **it's correct — fix it immediately.** `c.skip()` raises `SkippedError` which exits the `with` block, so `return c` never executes. Just remove the `return c`. This is the most common agent mistake — see the ⚠️ warning in Section 4.
+
 **"Unreachable skip logic"**
 
-If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
+If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's also correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
 
 ### Responding to CodeRabbit Comments
 
