@@ -368,22 +368,25 @@ The two sub-collectors write to **separate paths** under `.sbom`:
 1. Create worktree `lunar-lib-wt-syft` on branch `brandon/syft-sbom`
 2. Implement the `syft` collector (port `generate.sh` from pantalasa, write new `ci.sh`)
 3. Implement the `sbom` policy (all 5 checks + shared helpers)
-4. Test both in `pantalasa-cronos` using branch references in `lunar-config.yml`
-5. Create draft PR
+4. Test using `lunar dev` commands against pantalasa-cronos components (see Testing section)
+5. Complete the pre-push checklist (see LUNAR-PLUGIN-GUIDE.md)
+6. Create draft PR
 
 ---
 
 ## Testing
 
-Test in `pantalasa-cronos` by referencing the branch:
+### Local Dev Testing (relative paths)
+
+Use relative paths in `pantalasa-cronos/lunar/lunar-config.yml` for fast iteration:
 
 ```yaml
 collectors:
-  - uses: github://earthly/lunar-lib/collectors/syft@brandon/syft-sbom
+  - uses: ../lunar-lib-wt-syft/collectors/syft
     on: ["domain:engineering"]
 
 policies:
-  - uses: github://earthly/lunar-lib/policies/sbom@brandon/syft-sbom
+  - uses: ../lunar-lib-wt-syft/policies/sbom
     name: sbom
     initiative: security
     enforcement: block-pr
@@ -391,16 +394,50 @@ policies:
       disallowed_licenses: "GPL.*,BSL.*,AGPL.*"
       min_license_coverage: "90"
       min_components: "1"
-      # allowed_formats: "cyclonedx"  # Uncomment to enforce CycloneDX only
 ```
 
-Run dev commands:
+Run dev commands from `pantalasa-cronos/lunar`:
 
 ```bash
+# Collector (run on multiple components)
 lunar collector dev syft.generate --component github.com/pantalasa-cronos/backend
-lunar policy dev sbom.sbom-exists --component github.com/pantalasa-cronos/backend
-lunar policy dev sbom.has-licenses --component github.com/pantalasa-cronos/backend
-lunar policy dev sbom.disallowed-licenses --component github.com/pantalasa-cronos/backend
-lunar policy dev sbom.min-components --component github.com/pantalasa-cronos/backend
-lunar policy dev sbom.standard-format --component github.com/pantalasa-cronos/backend
+lunar collector dev syft.generate --component github.com/pantalasa-cronos/frontend
+lunar collector dev syft.generate --component github.com/pantalasa-cronos/auth
+
+# Policy (run on multiple components)
+for component in backend frontend auth; do
+  echo "=== $component ==="
+  lunar policy dev sbom.sbom-exists --component github.com/pantalasa-cronos/$component
+  lunar policy dev sbom.has-licenses --component github.com/pantalasa-cronos/$component
+  lunar policy dev sbom.disallowed-licenses --component github.com/pantalasa-cronos/$component
+  lunar policy dev sbom.min-components --component github.com/pantalasa-cronos/$component
+  lunar policy dev sbom.standard-format --component github.com/pantalasa-cronos/$component
+done
 ```
+
+### Demo Environment Testing (branch references)
+
+If you need to push to the demo hub, use branch references (requires pushing the branch first):
+
+```yaml
+collectors:
+  - uses: github://earthly/lunar-lib/collectors/syft@brandon/syft-sbom
+    on: ["domain:engineering"]
+```
+
+### Expected Results (pantalasa-cronos)
+
+| Component | sbom-exists | has-licenses | disallowed-licenses | min-components | standard-format |
+|-----------|-------------|--------------|---------------------|----------------|-----------------|
+| backend (Go) | PASS | PASS (Go has good license metadata) | PASS (MIT/BSD typical) | PASS | PASS (CycloneDX) |
+| frontend (Node) | PASS | PASS (npm packages have licenses) | FAIL if ISC matches `GPL.*` pattern? Verify | PASS | PASS (CycloneDX) |
+| auth (Python) | PASS (if deps installed) or SKIP (if no deps detected) | May have lower coverage (Python license detection is weaker) | PASS | PASS | PASS (CycloneDX) |
+| hadoop (Java) | PASS | PASS (Maven has good license metadata) | Verify no GPL deps | PASS | PASS (CycloneDX) |
+
+*Note: These are draft expected results. The user will verify and adjust before handing off to the implementing agent.*
+
+### Edge Cases to Test
+
+1. **Component with no dependencies** -- Syft may produce an empty SBOM (0 components). The `generate` sub-collector should skip collection. `sbom-exists` should FAIL/SKIP, `min-components` should FAIL.
+2. **Component where license detection is incomplete** -- Python projects without installed packages may have many components with no license info. `has-licenses` should report the coverage percentage and fail if below threshold.
+3. **Empty `allowed_formats` input** -- `standard-format` should auto-pass (any format accepted). Verify it doesn't error on empty string.

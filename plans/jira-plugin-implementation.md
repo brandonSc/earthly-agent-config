@@ -261,7 +261,6 @@ Asserts the same ticket hasn't been used in too many PRs. This addresses the cus
 | `ticket-reuse.py` | Ticket reuse check |
 | `helpers.py` | Shared PR-context skip logic |
 | `requirements.txt` | `lunar_policy==0.2.2` |
-| `test_policy.py` | Unit tests |
 | `README.md` | Documentation |
 | `assets/jira.svg` | Icon |
 
@@ -371,15 +370,56 @@ The query counts distinct `(component_id, pr)` pairs where `.vcs.pr.ticket.id` m
 1. Create worktree `lunar-lib-wt-jira` on branch `brandon/jira`
 2. Implement the `jira` collector (`ticket.sh` ported from pantalasa + new `ticket-history.sh`)
 3. Implement the `jira` policy (all 5 checks)
-4. Write unit tests for the policy
-5. Test in `pantalasa-cronos` using branch references in `lunar-config.yml`
+4. Test using `lunar dev` commands against pantalasa-cronos components (see Testing section)
+5. Complete the pre-push checklist (see LUNAR-PLUGIN-GUIDE.md)
 6. Create draft PR
 
 ---
 
 ## Testing
 
-Test in `pantalasa-cronos` by referencing the branch:
+### Local Dev Testing (relative paths)
+
+Use relative paths in `pantalasa-cronos/lunar/lunar-config.yml` for fast iteration:
+
+```yaml
+collectors:
+  - uses: ../lunar-lib-wt-jira/collectors/jira
+    on: ["domain:engineering"]
+    with:
+      ticket_prefix: "["
+      ticket_suffix: "]"
+      jira_base_url: "https://earthly.atlassian.net"
+      jira_user: "brandon@earthly.dev"
+
+policies:
+  - uses: ../lunar-lib-wt-jira/policies/jira
+    name: jira
+    initiative: sdlc-process
+    enforcement: report-pr
+    with:
+      disallowed_statuses: "Done,Closed"
+      max_ticket_reuse: "3"
+```
+
+Run dev commands from `pantalasa-cronos/lunar`:
+
+```bash
+# Collector
+lunar collector dev jira.ticket --component github.com/pantalasa-cronos/backend
+lunar collector dev jira.ticket-history --component github.com/pantalasa-cronos/backend
+
+# Policy
+lunar policy dev jira.ticket-present --component github.com/pantalasa-cronos/backend
+lunar policy dev jira.ticket-valid --component github.com/pantalasa-cronos/backend
+lunar policy dev jira.ticket-status --component github.com/pantalasa-cronos/backend
+lunar policy dev jira.ticket-type --component github.com/pantalasa-cronos/backend
+lunar policy dev jira.ticket-reuse --component github.com/pantalasa-cronos/backend
+```
+
+### Demo Environment Testing (branch references)
+
+If you need to push to the demo hub, use branch references (requires pushing the branch first):
 
 ```yaml
 collectors:
@@ -390,23 +430,57 @@ collectors:
       ticket_suffix: "]"
       jira_base_url: "https://earthly.atlassian.net"
       jira_user: "brandon@earthly.dev"
-
-policies:
-  - uses: github://earthly/lunar-lib/policies/jira@brandon/jira
-    name: jira
-    initiative: sdlc-process
-    enforcement: report-pr
-    with:
-      disallowed_statuses: "Done,Closed"
-      max_ticket_reuse: "3"
 ```
 
-Run dev commands:
+### Expected Results (pantalasa-cronos)
 
-```bash
-lunar collector dev jira.ticket --component github.com/pantalasa-cronos/backend
-lunar collector dev jira.ticket-history --component github.com/pantalasa-cronos/backend
-lunar policy dev jira.ticket-present --component github.com/pantalasa-cronos/backend
-lunar policy dev jira.ticket-valid --component github.com/pantalasa-cronos/backend
-lunar policy dev jira.ticket-reuse --component github.com/pantalasa-cronos/backend
-```
+**Important:** The Jira collector only runs on PRs (`runs_on: [prs]`). Default branch evaluations will not produce Jira data.
+
+**On default branch (no PR context):**
+
+| Component | Check | Expected |
+|-----------|-------|----------|
+| backend (Go) | ticket-present | SKIP (not a PR) |
+| frontend (Node) | ticket-present | SKIP (not a PR) |
+| auth (Python) | ticket-present | SKIP (not a PR) |
+| all components | ticket-valid, ticket-status, ticket-type, ticket-reuse | SKIP (no data) |
+
+**On a PR with `[ABC-123]` in the title (valid Jira ticket):**
+
+| Check | Expected |
+|-------|----------|
+| ticket-present | PASS |
+| ticket-valid | PASS (if ticket exists in Jira) |
+| ticket-status | PASS (if status is not in disallowed list) |
+| ticket-type | SKIP (if `allowed_types` is empty) |
+| ticket-reuse | PASS (if ticket used in fewer than max_ticket_reuse other PRs) |
+
+**On a PR with no ticket in title:**
+
+| Check | Expected |
+|-------|----------|
+| ticket-present | FAIL ("PRs should reference a Jira ticket") |
+| ticket-valid | SKIP (no ticket data) |
+| ticket-status | SKIP (no Jira data) |
+| ticket-type | SKIP (no Jira data) |
+| ticket-reuse | SKIP (no ticket ID to check) |
+
+**On a PR with `[INVALID-999]` (ticket doesn't exist in Jira):**
+
+| Check | Expected |
+|-------|----------|
+| ticket-present | PASS (ticket ID was parsed from title) |
+| ticket-valid | FAIL ("Ticket INVALID-999 does not exist in Jira") |
+| ticket-status | SKIP (no Jira data fetched) |
+| ticket-type | SKIP (no Jira data fetched) |
+| ticket-reuse | PASS/SKIP (reuse count may be 0 or unavailable) |
+
+*Note: These are draft expected results. The user will verify and adjust before handing off to the implementing agent.*
+
+### Edge Cases to Test
+
+1. **PR title with no ticket** -- Collector should exit cleanly writing no data. Policies should skip (not error).
+2. **Invalid ticket ID (doesn't exist in Jira)** -- Collector writes `.vcs.pr.ticket.id` and `.source` but NOT `.valid`. Policy `ticket-valid` should fail, others should skip gracefully.
+3. **Default branch evaluation (no PR context)** -- `LUNAR_COMPONENT_PR` is empty. Collector exits immediately. All policies skip.
+4. **Jira API unreachable (network error / bad token)** -- Collector should log a warning and exit 0 (not fail the pipeline). Policies see no data and skip.
+5. **ticket-history with no DB access** -- If `lunar sql connection-string` fails, the sub-collector should log a warning and exit 0. The `ticket-reuse` policy skips (no count data).
