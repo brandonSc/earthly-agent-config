@@ -736,6 +736,15 @@ export LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643
 | `github.com/pantalasa-cronos/hadoop` | Java | java, SOC2 | `pantalasa-cronos/hadoop` |
 | `github.com/pantalasa-cronos/spark` | Java | java, SOC2 | `pantalasa-cronos/spark` |
 
+**These components are sandboxes for testing.** You are free to:
+- Create PRs on any component (to test PR-context collectors/policies)
+- Modify source code, add files, change configs
+- Add or modify GitHub Actions workflows (e.g., add a syft SBOM step to test CI detection)
+- Install open-source tooling (e.g., add a `requirements.txt`, `go.mod` dependency)
+- Push changes directly to branches
+
+Don't worry about breaking them — they exist specifically to be played with. Clean up test branches when done.
+
 **Important:** All component repos are cloned in `pantalasa-cronos/`. Keep them up to date:
 
 ```bash
