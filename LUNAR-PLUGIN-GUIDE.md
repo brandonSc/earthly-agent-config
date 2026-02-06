@@ -12,6 +12,16 @@ Complete guide for AI agents building collectors and policies in lunar-lib.
 cd ~/code/earthly/earthly-agent-config && git pull
 ```
 
+### Build and Install Latest Lunar CLI
+
+Always test with the latest Lunar CLI built from source:
+
+```bash
+cd /home/brandon/code/earthly/lunar && git pull origin main
+earthly +build-cli
+sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+```
+
 ### Update lunar-lib
 
 ```bash
@@ -255,6 +265,19 @@ For example, all checks that read from `.testing.*` should be in one `testing` p
 **Why?** This creates logical groupings, simplifies configuration, and allows users to `include` specific checks from a single policy rather than managing multiple separate policies.
 
 **Anti-pattern:** Don't create separate `testing`, `coverage`, `test-results` policies if they all read `.testing.*` data.
+
+### Consolidating Existing Policies
+
+When merging an existing policy into another (e.g., moving `coverage` checks into `testing`):
+
+1. **Copy all check files** from the old policy to the new one
+2. **Add policy definitions** to the new `lunar-policy.yml`
+3. **Update collector `related` references** — Any collectors that had `related: coverage` must be updated to `related: testing`
+4. **Port README content** — Move useful examples and explanations to the new README
+5. **Delete the old policy directory** completely
+6. **Test with `lunar policy dev`** for each migrated check
+
+**Common mistake:** Forgetting to update collector `lunar-collector.yml` files that referenced the deleted policy in their `related` field. This will cause CI lint failures.
 
 ### Directory Structure
 
@@ -1144,6 +1167,18 @@ git checkout lunar/lunar-config.yml
 git push
 ```
 
+### Merging PRs from Worktrees
+
+**Important:** The standard `gh pr merge` command can fail when using worktrees because it tries to checkout main locally. Use `--auto` instead:
+
+```bash
+# This may fail with "branch already in use" error:
+gh pr merge <PR> --squash --delete-branch
+
+# Use this instead:
+gh pr merge <PR> --squash --auto
+```
+
 ### After PR Merges
 
 Once the PR is merged to main:
@@ -1154,7 +1189,12 @@ Once the PR is merged to main:
    git worktree remove ../lunar-lib-wt-<feature-name>
    ```
 
-2. **Update pantalasa-cronos to use @main:**
+2. **Pull latest main:**
+   ```bash
+   git fetch origin && git pull origin main
+   ```
+
+3. **Update pantalasa-cronos to use @main:**
    
    If you added the collector/policy to `pantalasa-cronos/lunar/lunar-config.yml` during testing, update it to point to `@main`:
    
@@ -1300,6 +1340,7 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 | Syntax error in YAML | Validate with `yq` or online tool |
 | Missing keywords | Add `keywords: []` to each sub-collector/policy |
 | Missing landing_page fields | Check required fields in reference docs |
+| `related` references non-existent policy | Update collector `lunar-collector.yml` to point to renamed/consolidated policy |
 
 ---
 

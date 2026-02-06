@@ -13,6 +13,12 @@ When the user refers to these names, use the corresponding GitHub username:
 
 ### Before Starting Any Work
 - **Pull this config repo** — Run `cd ~/code/earthly/earthly-agent-config && git pull` to get the latest workspace guidelines.
+- **Build and install the latest Lunar CLI** — Always test with the latest version:
+  ```bash
+  cd /home/brandon/code/earthly/lunar && git pull origin main
+  earthly +build-cli
+  sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+  ```
 
 ### Code Style
 - **Be concise.** Write clean, minimal code. Avoid over-engineering.
