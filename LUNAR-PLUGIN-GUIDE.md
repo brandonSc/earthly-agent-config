@@ -136,7 +136,6 @@ description: What this collector does
 author: support@earthly.dev
 
 default_image: earthly/lunar-lib:base-main
-default_image_ci_collectors: native  # Only if you have CI hooks
 
 landing_page:
   display_name: "My Collector"  # Max 50 chars
@@ -185,13 +184,18 @@ Don't over-document implementation details. Only document what is needed to unde
 
 **This is a common source of mistakes.** Follow these rules exactly:
 
-| Scenario | `default_image` value |
-|----------|----------------------|
-| No extra dependencies needed | `earthly/lunar-lib:base-main` |
-| Extra dependencies needed (e.g., Go, Python) | `earthly/lunar-lib:<collector-name>-main` (requires custom Earthfile) |
-| CI hooks only (runs on user's runner) | `native` or omit (with `default_image_ci_collectors: native`) |
+| Collector Type | `default_image` value |
+|----------------|----------------------|
+| **Code collectors** (no extra deps) | `earthly/lunar-lib:base-main` |
+| **Code collectors** (extra deps needed) | `earthly/lunar-lib:<collector-name>-main` (custom image extending base) |
+| **CI collectors** (most cases) | `earthly/lunar-lib:base-main` |
+| **CI collectors** (performance-intensive only) | `native` (only for collectors like `ci-otel` that run on every command) |
 
-**Do NOT use `earthly/lunar-scripts:1.0.0`** — that is a legacy image. Always use `earthly/lunar-lib:base-main` or a custom image built from it.
+**Key rules:**
+1. **Code collectors MUST use a Docker image** — never `native`. Use `base-main` or a custom image.
+2. **Most CI collectors should also use Docker images** — only use `native` for performance-intensive collectors that run very frequently (e.g., `ci-otel` which runs on every CI command).
+3. **`install.sh` is legacy** — do NOT use it for code collectors. If you need extra dependencies, build a custom image extending `base-main`.
+4. **Do NOT use `earthly/lunar-scripts:1.0.0`** — that is a legacy image. Always use `earthly/lunar-lib:base-main` or a custom image built from it.
 
 **For development/testing on a branch:** Build and push with a temporary tag:
 
@@ -233,16 +237,16 @@ default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
 
 ### Execution Environment Differences
 
-**Important:** The environment where your collector runs depends on the hook type, but only if there's an install.sh and if there is no default image set in the lunar-collector.yml file or the default image is set to `native`.
+| Hook Type | Default Image | Notes |
+|-----------|---------------|-------|
+| `code`, `cron` | `earthly/lunar-lib:base-main` | Always runs in container. If you need extra deps, build a custom image. |
+| `ci-*` hooks | `earthly/lunar-lib:base-main` | Most CI collectors should use container. Only use `native` for performance-intensive collectors. |
 
-| Hook Type | Runs In | Implications for `install.sh` |
-|-----------|---------|-------------------------------|
-| `code`, `cron` | Lunar's container (Debian-based) | Can assume `apt-get`, predictable environment |
-| `ci-*` hooks | User's CI runner (varies) | Must support multiple package managers (apk/apt-get/yum) |
+**Code collectors always run in a Docker container.** The base image is Alpine-based. If you need additional dependencies:
+1. **DO:** Build a custom image extending `base-main` (see "Building Custom Images" below)
+2. **DON'T:** Use `install.sh` — this is legacy and should not be used for code collectors
 
-For CI collectors with `default_image_ci_collectors: native`, the scripts run directly on the user's CI runner. This could be Ubuntu, Alpine, RHEL, or any Linux distro. Your `install.sh` must detect the available package manager.
-
-For code collectors, scripts run in the `earthly/lunar-lib:base-main` container (Alpine-based). You can use `apk add` for installing packages.
+**CI collectors with `native` image** run directly on the user's CI runner. Only use `native` for performance-sensitive collectors like `ci-otel` that run on every command and would add significant overhead if containerized.
 
 ### Separating PR vs Main Branch Logic
 
