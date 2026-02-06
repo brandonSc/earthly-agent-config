@@ -94,6 +94,25 @@ When asked to open PRs (for any repo), follow this flow:
 
 **For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 
+### Waiting for Reviewer Responses
+
+**Cursor operates request-response** — you wake up when the user messages you, not when external events happen. There's no notification system to alert you when reviewers comment.
+
+**What works:**
+- Background scripts can take automatic actions (e.g., auto-merge on approval)
+- Scripts can log events for you to check later
+- User can prompt you to check PR status
+
+**What doesn't work:**
+- No way to automatically respond to reviewer comments
+- No real-time alerts when reviews come in
+- Background polling burns no credits while sleeping, but you won't know results until prompted
+
+**Recommended workflow:**
+1. After pushing changes, ask user if they want you to monitor or just check later
+2. Don't set up elaborate background monitoring unless auto-action is needed
+3. When user prompts, check PR status and respond to any new comments
+
 ---
 
 ## Repository Layout

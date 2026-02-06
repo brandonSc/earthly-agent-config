@@ -618,15 +618,58 @@ If your icon has nested elements (e.g., a small symbol inside a larger shape), e
 ### Generating Icons
 
 For technology logos:
-1. Find the official SVG logo (check the project's brand assets or GitHub)
+1. Find the official SVG logo (check the project's brand assets, GitHub, or CNCF artwork repo)
 2. Simplify if needed (remove backgrounds, reduce complexity)
 3. Ensure transparent background
+
+```bash
+# CNCF projects have official logos at:
+curl -sL "https://raw.githubusercontent.com/cncf/artwork/master/projects/<project>/icon/color/<project>-icon-color.svg"
+```
 
 For custom icons:
 1. Use an AI image generator or icon tool to create a concept
 2. Convert to clean SVG (tools like Figma, Inkscape, or online converters)
 3. Manually clean up: remove backgrounds, ensure transparency
 4. Test on dark background before committing
+
+### Adding Overlays (Badges, Text)
+
+When adding text badges or overlays to existing logos:
+
+**Use SVG masks for transparent cutouts** (not white text):
+```svg
+<!-- ✅ GOOD: Letters cut out, showing through to background -->
+<svg viewBox="0 0 100 100">
+  <defs>
+    <mask id="badge-cutout">
+      <circle cx="15" cy="15" r="12" fill="white"/>
+      <text x="15" y="20" font-size="12" fill="black">CI</text>
+    </mask>
+  </defs>
+  <circle cx="15" cy="15" r="12" fill="#425cc7" mask="url(#badge-cutout)"/>
+</svg>
+
+<!-- ❌ BAD: White text won't work on light backgrounds -->
+<circle cx="15" cy="15" r="12" fill="#425cc7"/>
+<text x="15" y="20" fill="white">CI</text>
+```
+
+### Transforms and Centering
+
+When scaling/translating external logos, be careful not to push elements outside the viewBox:
+
+```svg
+<!-- ❌ BAD: Logo pushed below viewBox boundary (cropped) -->
+<g transform="translate(5, 20) scale(0.09)">
+  <!-- 1000px logo * 0.09 = 90px, starting at y=20 = ends at y=110, but viewBox is 100 -->
+</g>
+
+<!-- ✅ GOOD: Center first, then scale, then offset to center -->
+<g transform="translate(50, 50) scale(0.085) translate(-500, -500)">
+  <!-- Move to center, scale down, then offset by half the original size -->
+</g>
+```
 
 ### Testing Your Icon
 
