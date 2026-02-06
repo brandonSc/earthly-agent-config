@@ -394,9 +394,8 @@ Use when you need a **boolean** to decide whether to skip:
 
 ```python
 # Returns True/False without raising exceptions
-if not c.get_node(".testing").exists():
-    c.skip("No test execution data found")
-    return c
+if not c.get_node(".lang").exists():
+    c.skip("No language project detected")  # raises SkippedError, exits with block
 ```
 
 #### ❌ WRONG: Using `c.exists()` for Skip Logic
