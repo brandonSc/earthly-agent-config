@@ -72,6 +72,14 @@ git add . && git commit -m "Guide: <what you learned>" && git push
 
 This is critical for continuous improvement — each agent should leave the docs better than they found them.
 
+### Editing `ai-context/` Documentation
+
+When making changes to files in `lunar-lib/ai-context/`, keep content **concise and declarative**:
+
+- **Don't include verbose code examples** — The ai-context docs define conventions and rules, not tutorials. Reference existing implementations (e.g., "See `collectors/golang/cicd.sh`") instead of inlining full bash scripts or large JSON blocks.
+- **Prefer tables and short rules** over lengthy prose with examples.
+- **Minimal JSON snippets are OK** for schema definitions in `component-json/`, but keep them short (3-5 lines showing structure, not full realistic payloads).
+
 ---
 
 ## 2. Git Worktrees
