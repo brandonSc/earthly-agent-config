@@ -78,6 +78,9 @@ When asked to open PRs (for any repo), follow this flow:
 4. Create a **draft PR** initially
 5. Watch GitHub Actions for failures
 6. Fix CI errors automatically by pushing additional commits
+7. **Trigger CodeRabbit review** while still in draft: comment `@coderabbitai review` on the PR
+8. **Address CodeRabbit comments** — fix issues, reply to false positives, resolve threads
+9. Only mark PR as ready for human review once CI passes and CodeRabbit comments are addressed
 
 **For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 

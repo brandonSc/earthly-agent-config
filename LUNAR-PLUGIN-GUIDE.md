@@ -1199,7 +1199,12 @@ git commit -m "Add <feature-name> policy/collector"
 git push -u origin brandon/<feature-name>
 
 gh pr create --draft --title "Add <feature-name>" --body "Description..."
+
+# Trigger CodeRabbit review while still in draft
+gh pr comment <PR-number> --body "@coderabbitai review"
 ```
+
+**Important:** Always trigger CodeRabbit in draft mode so you can address its comments *before* marking the PR ready for human review. Wait ~60 seconds after commenting, then check for review comments.
 
 ### PR Descriptions (lunar-lib)
 
@@ -1274,7 +1279,12 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 
 ## 8. CodeRabbit Review Handling
 
-**Important:** CodeRabbit only reviews PRs that are **not in draft**. It will show "Review skipped" for draft PRs. Mark PR as ready (`gh pr ready <number>`) to trigger CodeRabbit review.
+**Trigger CodeRabbit on draft PRs** by commenting `@coderabbitai review`. This lets you address review comments before marking the PR ready for human review. CodeRabbit won't auto-review drafts, but it will respond to the explicit trigger.
+
+```bash
+# Trigger review on a draft PR
+gh pr comment <PR-number> --body "@coderabbitai review"
+```
 
 ### Known False Positives
 
