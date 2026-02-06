@@ -14,12 +14,16 @@ cd ~/code/earthly/earthly-agent-config && git pull
 
 ### Build and Install Latest Lunar CLI
 
-Always test with the latest Lunar CLI built from source:
+Pull and rebuild only if there are new changes:
 
 ```bash
-cd /home/brandon/code/earthly/lunar && git pull origin main
-earthly +build-cli
-sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+cd /home/brandon/code/earthly/lunar
+LOCAL_SHA=$(git rev-parse HEAD)
+git pull origin main
+if [ "$(git rev-parse HEAD)" != "$LOCAL_SHA" ]; then
+  earthly +build-cli
+  sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+fi
 ```
 
 ### Update lunar-lib
@@ -791,7 +795,17 @@ all:
 
 ### Testing Collectors
 
-#### Step 1: Copy Files to Test Directory
+**Quick dev testing (no copy needed):** For `lunar collector dev` commands, you can use relative paths directly in `lunar-config.yml`:
+
+```yaml
+collectors:
+  - uses: ../lunar-lib-wt-<feature>/collectors/<name>
+    on: ["domain:engineering"]
+```
+
+This is the fastest way to iterate locally. Only copy files when you need to push to a demo environment.
+
+#### Step 1: Copy Files to Test Directory (for demo environments only)
 
 ```bash
 # Copy collector to pantalasa-cronos
@@ -915,7 +929,19 @@ LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
 
 ### Testing Policies
 
-#### Step 1: Copy Files to Test Directory
+**Quick dev testing (no copy needed):** For `lunar policy dev` commands, you can use relative paths directly in `lunar-config.yml`:
+
+```yaml
+policies:
+  - uses: ../lunar-lib-wt-<feature>/policies/<name>
+    name: <name>
+    on: ["domain:engineering"]
+    enforcement: draft
+```
+
+This is the fastest way to iterate locally. Only copy files when you need to push to a demo environment.
+
+#### Step 1: Copy Files to Test Directory (for demo environments only)
 
 ```bash
 cp -r /home/brandon/code/earthly/lunar-lib-wt-<feature>/policies/<name>/* \

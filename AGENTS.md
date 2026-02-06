@@ -13,11 +13,15 @@ When the user refers to these names, use the corresponding GitHub username:
 
 ### Before Starting Any Work
 - **Pull this config repo** — Run `cd ~/code/earthly/earthly-agent-config && git pull` to get the latest workspace guidelines.
-- **Build and install the latest Lunar CLI** — Always test with the latest version:
+- **Build and install the latest Lunar CLI** — Pull and rebuild only if there are new changes:
   ```bash
-  cd /home/brandon/code/earthly/lunar && git pull origin main
-  earthly +build-cli
-  sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+  cd /home/brandon/code/earthly/lunar
+  LOCAL_SHA=$(git rev-parse HEAD)
+  git pull origin main
+  if [ "$(git rev-parse HEAD)" != "$LOCAL_SHA" ]; then
+    earthly +build-cli
+    sudo cp dist/lunar-linux-amd64 /usr/local/bin/lunar
+  fi
   ```
 
 ### Code Style
@@ -171,9 +175,26 @@ git worktree list
 git worktree remove ../lunar-lib-wt-<feature>
 ```
 
-### Testing with Branch References
+### Testing Locally with Relative Paths
 
-Instead of copying files, reference your branch in `lunar-config.yml`:
+For `lunar collector dev` and `lunar policy dev`, you can use relative path references in `lunar-config.yml`. This is the fastest way to iterate — no need to push or copy files:
+
+```yaml
+# Reference your local worktree directly
+- uses: ../lunar-lib-wt-<feature>/collectors/<name>
+- uses: ../lunar-lib-wt-<feature>/policies/<name>
+```
+
+Then run dev commands from the pantalasa-cronos/lunar directory:
+
+```bash
+lunar collector dev <plugin>.<sub> --component github.com/pantalasa-cronos/backend
+lunar policy dev <plugin>.<check> --component github.com/pantalasa-cronos/backend
+```
+
+### Testing with Branch References (for demo environments)
+
+If you need to push to a demo environment (not just `dev` commands), use branch references in `lunar-config.yml`. This requires pushing your branch first:
 
 ```yaml
 # Policy
@@ -183,12 +204,9 @@ Instead of copying files, reference your branch in `lunar-config.yml`:
 - uses: github://earthly/lunar-lib/collectors/<name>@brandon/<feature>
 ```
 
-Then run dev commands:
-
-```bash
-lunar policy dev <plugin>.<check> --component github.com/pantalasa-cronos/backend
-lunar collector dev <plugin>.<sub> --component github.com/pantalasa-cronos/backend
-```
+**When to use which:**
+- **Relative paths** (`../lunar-lib-wt-*/`) — for local `dev` commands during development. Fast, no push needed.
+- **Branch references** (`github://...@branch`) — when pushing config to a demo hub (e.g. cronos.demo.earthly.dev). Requires the branch to be pushed to GitHub first.
 
 ---
 
