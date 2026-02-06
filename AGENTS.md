@@ -60,7 +60,10 @@ When acting as a **planning agent** (generating plans for other agents to execut
 1. **Store plans in this repo:** `earthly-agent-config/plans/<feature-name>-implementation.md`
 2. **Include all context** — Pre-implementation steps, code templates, testing instructions, PR workflow
 3. **Reference documentation** — Point to relevant `ai-context/` docs the implementer should read
-4. **Note limitations** — Document any gaps or dependencies (e.g., "collectors don't write X yet")
+4. **Validate Component JSON paths** — Read `ai-context/component-json/conventions.md` and verify all proposed paths follow the conventions. Common mistakes:
+   - Adding boolean fields (`.ci.artifacts.sbom_generated = true`) when object presence is already the signal (`.sbom.cicd` existing)
+   - See the "Anti-Pattern: Boolean Fields Without a Failure Writer" section
+5. **Note limitations** — Document any gaps or dependencies (e.g., "collectors don't write X yet")
 5. **Include expected test results** — Draft expected outcomes per component so the implementer (and reviewer) can verify correctness. Example:
    ```
    Expected results (pantalasa-cronos):

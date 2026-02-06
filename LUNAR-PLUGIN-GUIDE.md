@@ -43,10 +43,12 @@ Before implementing, read these docs in `lunar-lib/ai-context/`:
 | `core-concepts.md` | Architecture and key entities |
 | `collector-reference.md` | How to write collectors |
 | `policy-reference.md` | How to write policies |
-| `component-json/conventions.md` | Schema design principles |
+| `component-json/conventions.md` | **Schema design principles — READ CAREFULLY.** Especially "Presence Detection" (object existence vs booleans) and the anti-pattern for redundant boolean fields. |
 | `component-json/structure.md` | Component JSON paths |
 
 Also read the Lunar docs at https://docs-lunar.earthly.dev
+
+**⚠️ When implementing a plan:** If the plan specifies Component JSON paths, validate them against `conventions.md` before implementing. Plans can have mistakes (e.g., adding `.ci.artifacts.sbom_generated = true` when `.sbom.cicd` existing is already the signal). The conventions doc is the source of truth, not the plan.
 
 ### Keep This Guide Updated (Self-Improvement)
 
