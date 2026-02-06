@@ -1091,9 +1091,9 @@ If none of the components have the data your policy needs:
 
 ---
 
-### Unit Tests (For Agent Confidence Only)
+### Unit Tests (Optional, For Agent Confidence Only)
 
-Unit tests help you validate logic before integration testing. **Do NOT commit unit tests to lunar-lib** — they are for your own confidence during development.
+Unit tests are **optional** — the primary verification method is running `lunar collector dev` / `lunar policy dev` against real components and pushing to a test environment. If you find unit tests helpful for debugging complex logic, you can write them locally, but **do NOT commit them to lunar-lib**.
 
 #### Create Temporary Test File
 
@@ -1302,21 +1302,9 @@ Once the PR is merged to main:
 
 ### Before Committing
 
-1. **Verify staged files:**
-   ```bash
-   git diff --name-only main
-   ```
-   Only intended files should be listed. Don't commit:
-   - Temporary plan files
-   - Test configs from pantalasa-cronos
-   - Unrelated changes
+1. **Complete the Pre-Push Checklist** above (tested on 3+ components, skip behavior, no hardcoded values, etc.)
 
-2. **Run unit tests (if they exist):**
-   ```bash
-   python -m pytest policies/<name>/test_*.py -v
-   ```
-
-3. **Run CI checks locally** — Same targets GitHub Actions runs:
+2. **Run CI checks locally** — Same targets GitHub Actions runs:
    ```bash
    cd /home/brandon/code/earthly/lunar-lib  # Or your worktree
    
@@ -1333,6 +1321,20 @@ Once the PR is merged to main:
    - Required fields: `display_name`, `long_description`, `category`, `status`, `keywords`
    
    Running these locally catches most CI failures before you push.
+
+### Pre-Push Checklist
+
+Before pushing your branch, verify all of the following:
+
+- [ ] **Tested on 3+ components** — Run `lunar collector dev` / `lunar policy dev` against at least 3 diverse components (e.g., Go, Node, Python). Don't just test the happy path.
+- [ ] **Results match expectations** — Compare actual output against the expected results from the implementation plan. If results differ, investigate before pushing.
+- [ ] **Skip behavior verified** — Test against a component where the collector hasn't run or the data doesn't apply. The policy should skip gracefully, not error.
+- [ ] **Collector output inspected** — For new collectors, run `lunar collector dev` with `--verbose` and verify the Component JSON paths and values are correct before writing policies against them.
+- [ ] **No hardcoded values** — `grep -r 'earthly.atlassian\|brandon@\|pantalasa' collectors/<name>/ policies/<name>/` should return nothing. Use inputs and secrets instead.
+- [ ] **Correct `lunar_policy` version** — `requirements.txt` uses the version specified in the plan or the latest stable version.
+- [ ] **README exists** — Both collectors and policies need a `README.md`.
+- [ ] **Only intended files staged** — Run `git diff --name-only main` and verify no temp files, test configs, or unrelated changes are included.
+- [ ] **Edge cases tested** — Verify the 2-3 edge cases listed in the implementation plan (e.g., empty data, missing fields, invalid input).
 
 ### Create Draft PR
 

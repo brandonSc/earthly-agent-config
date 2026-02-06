@@ -48,8 +48,9 @@ Summary of workflow:
 1. **Update main first** — Pull latest changes before starting work
 2. **Read the ai-context docs** — `lunar-lib/ai-context/` contains implementation guides
 3. **Use git worktrees** — One worktree per feature for parallel development
-4. **Test your work** — Unit tests + integration tests in `pantalasa-cronos`
-5. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
+4. **Test your work** — Run `lunar collector dev` / `lunar policy dev` against multiple components, verify results match expected outcomes
+5. **Pre-push checklist** — See [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md) for the full checklist before pushing
+6. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
 
 ### Creating Implementation Plans
 
@@ -59,7 +60,16 @@ When acting as a **planning agent** (generating plans for other agents to execut
 2. **Include all context** — Pre-implementation steps, code templates, testing instructions, PR workflow
 3. **Reference documentation** — Point to relevant `ai-context/` docs the implementer should read
 4. **Note limitations** — Document any gaps or dependencies (e.g., "collectors don't write X yet")
-5. **Commit and push** — So other agents can access the plan
+5. **Include expected test results** — Draft expected outcomes per component so the implementer (and reviewer) can verify correctness. Example:
+   ```
+   Expected results (pantalasa-cronos):
+   - backend (Go):    sbom-exists → PASS, has-licenses → PASS
+   - frontend (Node): sbom-exists → PASS, disallowed-licenses → FAIL (ISC)
+   - auth (Python):   sbom-exists → SKIP (no dependencies detected)
+   ```
+   These are drafts — the user will verify and adjust before handing off.
+6. **Include edge cases to test** — List 2-3 specific scenarios the implementer must verify (e.g., "component with no dependencies", "invalid ticket ID", "empty SBOM")
+7. **Commit and push** — So other agents can access the plan
 
 ```bash
 # Example
