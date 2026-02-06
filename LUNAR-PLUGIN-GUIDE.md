@@ -915,14 +915,16 @@ git commit -m "Add <name> collector for testing"
 git push
 ```
 
-#### Step 4: Wait for GitHub Actions
+#### Step 4: Wait for GitHub Actions — MUST PASS before continuing
 
-Check that the pantalasa-cronos CI passes:
+Check that the pantalasa-cronos CI passes. **Do not proceed to testing until the build is green.** A failing build means your config or collector has errors that will waste time debugging later.
 
 ```bash
 gh run list --repo pantalasa-cronos/lunar --limit 5
-# Wait for the run to complete successfully
+# Wait for the run to complete successfully — do NOT skip this step
 ```
+
+If the build fails, check the logs, fix the issue, and push again before moving on.
 
 #### Step 5: Wait for Collection (5 minutes)
 
@@ -1052,15 +1054,20 @@ git commit -m "Add <name> policy for testing"
 git push
 ```
 
-#### Step 4: Wait for GitHub Actions
+#### Step 4: Wait for GitHub Actions — MUST PASS before continuing
+
+**Do not proceed to testing until the build is green.** A failing build means your config or policy has errors.
 
 ```bash
 gh run list --repo pantalasa-cronos/lunar --limit 5
+# Wait for the run to complete successfully — do NOT skip this step
 ```
+
+If the build fails, check the logs, fix the issue, and push again before moving on.
 
 #### Step 5: Wait for Policy Evaluation (~5 minutes)
 
-After push, Lunar will evaluate policies on all matching components.
+After CI passes, Lunar will evaluate policies on all matching components.
 
 #### Step 6: Run Policy Dev on Each Component
 
