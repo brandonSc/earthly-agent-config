@@ -426,6 +426,8 @@ threshold = variable_or_default("threshold", "10")
 threshold_int = int(threshold)  # Inputs are always strings
 ```
 
+**⚠️ Input names must match exactly.** The name in `variable_or_default("threshold", ...)` must match exactly what's defined in `lunar-policy.yml` under `inputs:`. If your YAML has `min_go_version` but you call `variable_or_default("min_version", ...)`, the policy will use the default value silently. Similarly, when configuring in `lunar-config.yml`, the `with:` keys must match the YAML input names exactly.
+
 ### Unit Tests
 
 Create `test_<policy>.py`:
@@ -480,6 +482,8 @@ https://docs-lunar.earthly.dev/plugin-sdks/python-sdk/policy
 - ✅ GOOD: "Ensures all tests pass. Skips if project does not contain a specified language."
 
 Move implementation details (data paths, skip conditions, collector specifics) to README only.
+
+**Consistency across related checks:** When you have multiple checks that do similar things (e.g., `min-go-version` and `min-go-version-cicd` both parsing versions), keep the implementation logic consistent. Code reviewers will flag inconsistencies, and bugs are more likely when similar code behaves differently.
 
 ### Debugging Tips
 
@@ -935,6 +939,19 @@ For each component:
 # Example: Check if go.mod exists before testing go-mod-exists policy
 ls /home/brandon/code/earthly/pantalasa-cronos/backend/go.mod
 ```
+
+#### Step 8: Test Non-Matching Components Too
+
+**Critical:** Don't just test components where the policy should pass/fail. Also test components where the policy should **skip**:
+
+```bash
+# For a Go policy, test against a non-Go component
+LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643 \
+  lunar policy dev golang.go-mod-exists --component github.com/pantalasa-cronos/frontend
+# Should skip with "Not a Go project"
+```
+
+This catches bugs where `get_value()` is called on paths that don't exist when the collector hasn't run for that component.
 
 #### If No Relevant Test Components Exist
 
