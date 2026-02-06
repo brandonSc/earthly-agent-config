@@ -41,6 +41,24 @@ Summary of workflow:
 4. **Test your work** — Unit tests + integration tests in `pantalasa-cronos`
 5. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
 
+### Creating Implementation Plans
+
+When acting as a **planning agent** (generating plans for other agents to execute):
+
+1. **Store plans in this repo:** `earthly-agent-config/plans/<feature-name>-implementation.md`
+2. **Include all context** — Pre-implementation steps, code templates, testing instructions, PR workflow
+3. **Reference documentation** — Point to relevant `ai-context/` docs the implementer should read
+4. **Note limitations** — Document any gaps or dependencies (e.g., "collectors don't write X yet")
+5. **Commit and push** — So other agents can access the plan
+
+```bash
+# Example
+cd ~/code/earthly/earthly-agent-config
+mkdir -p plans
+# Write plan to plans/<feature>-implementation.md
+git add plans/ && git commit -m "Add <feature> implementation plan" && git push
+```
+
 ### Working on lunar (Core Platform)
 
 **Read the full guide:** [LUNAR-CORE-GUIDE.md](LUNAR-CORE-GUIDE.md)
