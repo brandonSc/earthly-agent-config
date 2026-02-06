@@ -60,7 +60,7 @@ Based on the existing [pantalasa prototype](pantalasa/lunar/collectors/sbom/main
     - `.sbom.auto.source.tool` = `"syft"`, `.sbom.auto.source.integration` = `"code"`, `.sbom.auto.source.version`
     - `.sbom.auto.cyclonedx` (full CycloneDX JSON)
 - **install.sh:** Installs Syft binary + Python (for license detection)
-- **default_image:** Custom image or `earthly/lunar-scripts:1.0.0`
+- **default_image:** `earthly/lunar-lib:base-main` (or custom image if extra deps needed)
 
 Key logic from existing prototype:
 
@@ -115,7 +115,7 @@ name: syft
 description: Generate or detect CycloneDX/SPDX SBOMs using Anchore Syft
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 default_image_ci_collectors: native
 
 landing_page:
@@ -277,7 +277,7 @@ name: sbom
 description: Enforces SBOM existence, license compliance, completeness, and format
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 
 landing_page:
   display_name: "SBOM Policy"

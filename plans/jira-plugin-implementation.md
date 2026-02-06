@@ -114,7 +114,7 @@ name: jira
 description: Collect Jira ticket metadata from PR titles and validate against Jira API
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 
 landing_page:
   display_name: "Jira Collector"
@@ -273,7 +273,7 @@ name: jira
 description: Enforce Jira ticket presence, validity, status, type, and reuse limits
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 
 landing_page:
   display_name: "Jira Policy"

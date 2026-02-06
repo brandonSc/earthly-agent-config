@@ -135,7 +135,7 @@ name: my-collector
 description: What this collector does
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 default_image_ci_collectors: native  # Only if you have CI hooks
 
 landing_page:
@@ -181,6 +181,34 @@ example_component_json: |
 
 Don't over-document implementation details. Only document what is needed to understand the collector. More details can be added to READMEs for the collector or policy.
 
+### Docker Image Rules
+
+**This is a common source of mistakes.** Follow these rules exactly:
+
+| Scenario | `default_image` value |
+|----------|----------------------|
+| No extra dependencies needed | `earthly/lunar-lib:base-main` |
+| Extra dependencies needed (e.g., Go, Python) | `earthly/lunar-lib:<collector-name>-main` (requires custom Earthfile) |
+| CI hooks only (runs on user's runner) | `native` or omit (with `default_image_ci_collectors: native`) |
+
+**Do NOT use `earthly/lunar-scripts:1.0.0`** — that is a legacy image. Always use `earthly/lunar-lib:base-main` or a custom image built from it.
+
+**For development/testing on a branch:** Build and push with a temporary tag:
+
+```bash
+# If using base image (no extra deps), no build needed — just use base-main
+# If using custom image:
+cd /home/brandon/code/earthly/lunar-lib-wt-<feature>/collectors/<name>
+earthly --push +image --VERSION=brandon-<feature>
+# Pushes: earthly/lunar-lib:<name>-brandon-<feature>
+```
+
+Then temporarily set that tag in `lunar-collector.yml` for testing. **Before committing, revert to `-main`:**
+
+```yaml
+default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
+```
+
 ### Categories
 
 - `devex-build-and-ci` — Build systems, CI/CD, developer experience
@@ -214,7 +242,7 @@ Don't over-document implementation details. Only document what is needed to unde
 
 For CI collectors with `default_image_ci_collectors: native`, the scripts run directly on the user's CI runner. This could be Ubuntu, Alpine, RHEL, or any Linux distro. Your `install.sh` must detect the available package manager.
 
-For code collectors, scripts run in Lunar's `earthly/lunar-scripts` container which is Debian-based. You can safely assume `apt-get` is available.
+For code collectors, scripts run in the `earthly/lunar-lib:base-main` container (Alpine-based). You can use `apk add` for installing packages.
 
 ### Separating PR vs Main Branch Logic
 
@@ -314,7 +342,7 @@ name: my-policy
 description: What this policy enforces
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 
 landing_page:
   display_name: "My Policy"
@@ -817,17 +845,16 @@ Run your tests using the temporary image.
 
 #### Step 5: Before Committing to lunar-lib — CRITICAL
 
-**Revert the image tag** in `lunar-collector.yml` before committing:
+**Revert the image tag** in `lunar-collector.yml` before committing. Use the `-main` tag — this is the tag the release workflow produces when the PR merges:
 
 ```yaml
 # In lunar-lib worktree (NOT pantalasa-cronos)
 version: 0
 name: my-collector
-default_image: earthly/lunar-lib:<collector-name>-$VERSION  # Production pattern
-# Or if using base: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:<collector-name>-main  # Release tag
 ```
 
-The CI will build and push the proper image when the PR merges.
+The CI will build and push `earthly/lunar-lib:<collector-name>-main` when the PR merges.
 
 #### Step 6: Add to Root Earthfile
 
@@ -1331,6 +1358,7 @@ Before pushing your branch, verify all of the following:
 - [ ] **Skip behavior verified** — Test against a component where the collector hasn't run or the data doesn't apply. The policy should skip gracefully, not error.
 - [ ] **Collector output inspected** — For new collectors, run `lunar collector dev` with `--verbose` and verify the Component JSON paths and values are correct before writing policies against them.
 - [ ] **No hardcoded values** — `grep -r 'earthly.atlassian\|brandon@\|pantalasa' collectors/<name>/ policies/<name>/` should return nothing. Use inputs and secrets instead.
+- [ ] **Correct Docker image** — `default_image` must be `earthly/lunar-lib:base-main` (or `earthly/lunar-lib:<name>-main` for custom images). NOT `earthly/lunar-scripts:1.0.0` and NOT a temporary test tag.
 - [ ] **Correct `lunar_policy` version** — `requirements.txt` uses the version specified in the plan or the latest stable version.
 - [ ] **README exists** — Both collectors and policies need a `README.md`.
 - [ ] **Only intended files staged** — Run `git diff --name-only main` and verify no temp files, test configs, or unrelated changes are included.

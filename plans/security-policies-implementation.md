@@ -118,7 +118,7 @@ name: {POLICY_NAME}
 description: {DESCRIPTION}
 author: support@earthly.dev
 
-default_image: earthly/lunar-scripts:1.0.0
+default_image: earthly/lunar-lib:base-main
 
 landing_page:
   display_name: "{DISPLAY_NAME} Guardrails"  # Must end with "Guardrails" per conventions
