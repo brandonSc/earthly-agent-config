@@ -1172,9 +1172,12 @@ class TestMyCheck(PolicyTestCase):
 cd /home/brandon/code/earthly/lunar-lib-wt-<feature>
 python -m pytest policies/<name>/test_*.py -v
 
-# Delete test file before committing
+# IMPORTANT: Delete test files IMMEDIATELY after running tests
+# If you forget, "git add ." or "git add -A" will commit them
 rm policies/<name>/test_*.py
 ```
+
+**⚠️ Common mistake:** Forgetting to delete test files, then using `git add .` which stages them. Always delete test files right after running, and always use specific paths with `git add` (e.g., `git add collectors/<name> policies/<name>`).
 
 ---
 
@@ -1387,7 +1390,9 @@ Before pushing your branch, verify all of the following:
 ### Create Draft PR
 
 ```bash
-git add .
+# NEVER use "git add ." or "git add -A" — always add specific directories
+git add collectors/<name> policies/<name>
+git diff --cached --name-only  # Verify only intended files are staged
 git commit -m "Add <feature-name> policy/collector"
 git push -u origin brandon/<feature-name>
 
