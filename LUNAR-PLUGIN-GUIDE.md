@@ -1366,6 +1366,39 @@ gh api repos/earthly/lunar-lib/pulls/<PR>/comments --jq '.[] | "\(.id) | \(.path
 
 The thread ID is in the comment's `node_id` field (for GraphQL) or can be found in the PR review threads.
 
+### Self-Review Before Opening/Updating PR
+
+**Always do a self-review** before opening a PR or after making extensive changes. This catches inconsistencies that CodeRabbit and CI won't detect.
+
+**Self-Review Checklist:**
+
+| Check | What to Look For |
+|-------|------------------|
+| **README ↔ Code consistency** | Do examples show realistic data? Do failure messages match the code? |
+| **lunar-policy.yml descriptions** | Are all descriptions consistent in style? Do they accurately describe behavior? |
+| **Skip vs Fail behavior** | Is it documented correctly? Do examples show when each happens? |
+| **Examples include required data** | If checks require `.lang.*`, do examples show it? |
+| **Inputs documentation** | Are all inputs documented with defaults and descriptions? |
+
+**What to re-read:**
+1. Your code files — look for patterns you repeated that might be inconsistent
+2. README.md — read every example and failure message against the code
+3. lunar-policy.yml or lunar-collector.yml — check descriptions match actual behavior
+4. Related ai-context docs — ensure you followed the conventions
+
+**Common issues self-review catches:**
+- Documentation saying "skips" when code actually "fails"
+- Examples missing required fields (e.g., `.lang` for language-aware policies)
+- Inconsistent descriptions between policies in the same plugin
+- Unreachable code after `c.skip()` (the `return c` pattern)
+- `int()` vs `float()` for numeric inputs that could be decimals
+
+**When to self-review:**
+- Before creating a draft PR
+- After addressing multiple CodeRabbit comments
+- After any refactor that changed behavior
+- Before marking PR ready for human review
+
 ### Making PR Ready for Review
 
 When user says "make PR ready for review":
