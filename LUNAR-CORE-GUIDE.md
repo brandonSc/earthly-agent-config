@@ -122,6 +122,26 @@ go test ./...
 
 Use the pantalasa test environments to validate changes work end-to-end.
 
+### QA Testing Discipline
+
+When QA-ing a feature, follow these rules:
+
+1. **Test both positive AND negative cases.** If a command can return pass/fail, you MUST verify both outcomes with real data. Never declare a feature working after only seeing one outcome.
+
+2. **Test with appropriate inputs.** If a feature differentiates between branch types (PR vs main), test with both PR-branch SHAs and main-branch SHAs. Get real SHAs from `gh api repos/<org>/<repo>/pulls` and `gh api repos/<org>/<repo>/commits/main`.
+
+3. **Verify results are correct for the right reason.** When a test passes, ask: *why* did it pass? If a command returns "blocked", is it because it actually evaluated failing policies, or because it found zero data? Check the code path.
+
+4. **If two commands share code, test both.** A bug in `ok-release` likely exists in `ok-pr` since they use the same evaluation logic. Don't assume one works because the other appears to.
+
+5. **Set up failing test scenarios first.** Before testing enforcement/blocking features, configure a policy that is *known to fail* for a test component (e.g., set `block-pr-and-release` with a disallowed license that exists in the SBOM). Confirm the failure shows in the UI, then verify the CLI catches it.
+
+6. **Build a test matrix.** For features with multiple dimensions, enumerate all combinations:
+   ```
+   {ok-release, ok-pr} × {main SHA, PR SHA} × {passing policy, failing policy}
+   ```
+   Don't skip combinations — the bugs hide in the ones you skip.
+
 ---
 
 ## After Merge
