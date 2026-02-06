@@ -342,10 +342,37 @@ if __name__ == "__main__":
 ### Key Points
 
 - Use `c.get_node(".path")` then `node.exists()` to check data availability
-- Skip gracefully when data isn't available (collector may not have run)
 - Never call `get_value()` without first checking `exists()`
 - **`c.skip()` raises `SkippedError`** — no `return` needed after it
 - **There is no `c.succeed()` method** — checks auto-pass if no assertions fail
+
+### When to Skip vs Fail (Score Impact)
+
+**This is critical for accurate compliance scores.**
+
+**✅ GOOD place to skip:** When the policy doesn't apply to the component
+```python
+# Skip if not a language project (docs-only repos, infrastructure, etc.)
+if not c.get_node(".lang").exists():
+    c.skip("No language project detected")
+```
+
+**❌ BAD place to skip:** When data is missing that the policy expects
+```python
+# DON'T skip when coverage is missing - FAIL instead
+# This ensures the score reflects missing coverage
+if not c.get_node(".testing.coverage").exists():
+    c.skip("No coverage data")  # ❌ Wrong - hides the problem
+
+# DO use assert_exists - score correctly reflects failure
+c.assert_exists(".testing.coverage", "No coverage data collected")  # ✅ Correct
+```
+
+**Why this matters:**
+- **Skipped checks don't affect the compliance score** — the problem is hidden
+- **Failed checks lower the score** — accurately reflects missing data
+- If a component IS a valid language project but lacks test/coverage data, all related checks should FAIL
+- This gives users accurate feedback: "You have 5 failing checks related to testing"
 
 ### Data Existence Checks (Common Bug Source)
 
@@ -388,7 +415,7 @@ if not c.exists(".testing"):
 | `c.get_node(path).exists()` | `True`/`False` | Conditional logic - skip if missing |
 | `c.exists(path)` | Raises `NoDataError` if missing | **Avoid** - confusing behavior |
 
-**Good example:** See `lunar-lib/policies/testing/passing.py` — uses `get_node().exists()` for skip logic, then `assert_true()` for the actual check.
+**Good example:** See `lunar-lib/policies/testing/executed.py` — uses `get_node().exists()` for language detection (valid skip), then `assert_exists()` for required data (fail if missing).
 
 ### Available Assertions
 
