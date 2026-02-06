@@ -26,6 +26,7 @@ When the user refers to these names, use the corresponding GitHub username:
 
 ### Code Style
 - **Be concise.** Write clean, minimal code. Avoid over-engineering.
+- **Ask, don't assume.** If you're unsure about something important (architecture, naming, image tags, Component JSON paths, etc.), stop and ask the user for clarification. A wrong assumption that gets committed is much more expensive than a quick question.
 
 ### Improving This Document (Self-Improvement)
 - **Always refine these instructions.** When something doesn't work as documented, fix it immediately. This is critical for self-improvement over time.
