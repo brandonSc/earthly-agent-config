@@ -190,12 +190,12 @@ Don't over-document implementation details. Only document what is needed to unde
 |----------------|----------------------|
 | **Code collectors** (no extra deps) | `earthly/lunar-lib:base-main` |
 | **Code collectors** (extra deps needed) | `earthly/lunar-lib:<collector-name>-main` (custom image extending base) |
-| **CI collectors** (most cases) | `earthly/lunar-lib:base-main` |
-| **CI collectors** (performance-intensive only) | `native` (only for collectors like `ci-otel` that run on every command) |
+| **CI collectors** (most cases) | `native` — runs directly on user's CI runner |
+| **CI collectors** (heavy 3rd-party deps) | `earthly/lunar-lib:base-main` (rare — only if collector requires deps not expected in CI) |
 
 **Key rules:**
 1. **Code collectors MUST use a Docker image** — never `native`. Use `base-main` or a custom image.
-2. **Most CI collectors should also use Docker images** — only use `native` for performance-intensive collectors that run very frequently (e.g., `ci-otel` which runs on every CI command).
+2. **CI collectors should almost always use `native`** — this gives them access to the traced command environment and avoids container overhead. Only use a container image if the collector requires heavy 3rd-party dependencies not expected in a typical CI runner.
 3. **`install.sh` is legacy** — do NOT use it for code collectors. If you need extra dependencies, build a custom image extending `base-main`.
 4. **Do NOT use `earthly/lunar-scripts:1.0.0`** — that is a legacy image. Always use `earthly/lunar-lib:base-main` or a custom image built from it.
 
@@ -242,13 +242,57 @@ default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
 | Hook Type | Default Image | Notes |
 |-----------|---------------|-------|
 | `code`, `cron` | `earthly/lunar-lib:base-main` | Always runs in container. If you need extra deps, build a custom image. |
-| `ci-*` hooks | `earthly/lunar-lib:base-main` | Most CI collectors should use container. Only use `native` for performance-intensive collectors. |
+| `ci-*` hooks | `native` | Runs directly on CI runner. Use container only if heavy deps needed. |
 
 **Code collectors always run in a Docker container.** The base image is Alpine-based. If you need additional dependencies:
 1. **DO:** Build a custom image extending `base-main` (see "Building Custom Images" below)
 2. **DON'T:** Use `install.sh` — this is legacy and should not be used for code collectors
 
-**CI collectors with `native` image** run directly on the user's CI runner. Only use `native` for performance-sensitive collectors like `ci-otel` that run on every command and would add significant overhead if containerized.
+**CI collectors run `native` by default** on the user's CI runner. This gives them:
+- Access to the traced command's environment
+- No container startup overhead
+- Access to tools already installed in the CI environment
+
+Write CI collectors using minimal bash without `jq` or other dependencies that may not exist on all runners. See "CI Collector Best Practices" above.
+
+### CI Collector Best Practices
+
+**CI collectors should be minimal and native-bash.** Since they run `native` on user CI runners, avoid dependencies that may not exist.
+
+**Key principles:**
+1. **Avoid `jq` when possible** — not all CI runners have it installed
+2. **Collect fields individually** — use `lunar collect` with multiple key-value pairs instead of piping JSON
+3. **Keep scripts simple** — native bash, basic string manipulation
+4. **Minimize external dependencies** — only use tools guaranteed to exist (bash, curl, grep, sed, awk)
+
+**Bad (uses jq for JSON construction):**
+```bash
+# ❌ Requires jq, builds complex JSON
+jq -n \
+  --arg cmd "$CMD" \
+  --argjson exit_code "$EXIT_CODE" \
+  '{cli_command: $cmd, exit_code: $exit_code}' | \
+  lunar collect -j ".sast.native.semgrep" -
+```
+
+**Good (collects fields individually):**
+```bash
+# ✅ No jq needed, collects each field separately
+lunar collect ".sast.native.semgrep.cli_command" "$CMD" \
+              ".sast.native.semgrep.exit_code" "$EXIT_CODE"
+```
+
+**For boolean/numeric values, use `-j` flag:**
+```bash
+# String values (no -j)
+lunar collect ".sast.source.tool" "semgrep"
+
+# JSON values (with -j)
+lunar collect -j ".sast.native.semgrep.exit_code" "$EXIT_CODE"
+lunar collect -j ".sast.run" true
+```
+
+**Exception:** If the CI collector needs to do heavy processing requiring 3rd-party dependencies (e.g., OTLP JSON payload construction in ci-otel), then use a container image. But this should be rare.
 
 ### Separating PR vs Main Branch Logic
 
