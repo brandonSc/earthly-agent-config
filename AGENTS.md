@@ -10,6 +10,7 @@ Personal workspace notes for AI agents working on Lunar collectors and policies.
 When the user refers to these names, use the corresponding GitHub username:
 - **Vlad** → `vladaionescu`
 - **Mike** → `mikejholly`
+- **Corey** → `dchw`
 
 ### Before Starting Any Work
 - **Pull this config repo** — Run `cd ~/code/earthly/earthly-agent-config && git pull` to get the latest workspace guidelines.
