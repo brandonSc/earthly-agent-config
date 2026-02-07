@@ -96,19 +96,84 @@ Fixes [ENG-XXX](https://linear.app/earthly-technologies/issue/ENG-XXX)
 
 ---
 
+## Architecture Notes
+
+### CLI vs Hub
+
+The lunar binary serves **two roles** — the CLI (`cmd/lunar`) and the Hub server (`cmd/lunar-hub`). When fixing bugs, understand which side your change affects:
+
+- **CLI-side** changes (in `cmd/lunar/`) take effect when users install the new binary.
+- **Hub-side** changes (in `hub/`) only take effect after the Hub server is redeployed. You cannot test Hub-side fixes locally — you need a deployed environment.
+- **Shared code** (in `snippets/`, `hubapi/`) may affect both sides.
+
+When testing, always ask: "Does this fix run in the CLI or on the Hub?" If it's Hub-side, you need a deploy before you can verify end-to-end.
+
+### SQL Queries
+
+- SQL queries live in `hub/store/sql/` and are embedded via `//go:embed`.
+- **Use parameterized queries** — always `$1`, `$2`, etc. Never hardcode values, even for testing. Hardcoded values in SQL files will get committed and break production.
+- **LEFT JOINs produce NULLs** — if your query LEFT JOINs a table, the Go scan code must handle NULL columns using `sql.NullString`, `sql.NullTime`, `uuid.NullUUID`, etc.
+- **Prefer pre-computed tables** — The `policy_run_rollups` table stores pre-derived status (`pass`/`fail`/`no-data`/`unknown`). Prefer reading from rollups over re-deriving status from raw `policy_assertions`. This keeps the CLI consistent with the UI (which also reads rollups via the `checks` view).
+
+### Command Registration
+
+CLI commands are defined in `cmd/lunar/main.go` (a large single file — this is intentional). Key patterns:
+- Commands are `cobra.Command` vars registered in `setupFlags()` via `AddCommand()`.
+- The `--help` text becomes user-facing documentation. Keep it accurate — no typos, match the docs site.
+- The docs site at `docs-lunar.earthly.dev` is powered by `docs/lunar-cli/lunar-cli.md` via GitBook. When adding/renaming commands, update both the code AND the docs.
+
+### Enforcement Levels
+
+Policy enforcement levels control what gets blocked:
+
+| Level | Blocks PR | Blocks Release |
+|-------|-----------|----------------|
+| `draft` | No | No |
+| `score` | No | No |
+| `report-pr` | No | No |
+| `block-pr` | **Yes** | No |
+| `block-release` | No | **Yes** |
+| `block-pr-and-release` | **Yes** | **Yes** |
+
+Enforcement is stored on the `snippets` table, not on policy results. When querying enforcement status, always join `snippets` to get the current enforcement level.
+
+---
+
 ## Common Directories
 
 | Directory | Purpose |
 |-----------|---------|
 | `snippets/fetch/` | Manifest fetching and caching |
 | `hub/` | Hub server implementation |
-| `cmd/` | CLI commands |
-| `collector/` | Collector runtime |
-| `policy/` | Policy runtime |
+| `hub/store/` | Database layer — SQL queries, store interfaces |
+| `hub/store/sql/` | Embedded SQL query files |
+| `hub/server.go` | gRPC server — handles CLI-to-Hub RPCs |
+| `hub/webhook/` | GitHub webhook handling |
+| `hub/queue/workers/` | Async job processing (policies, collectors) |
+| `hub/migrations/` | Numbered SQL migration files (auto-run on startup) |
+| `cmd/lunar/` | CLI binary (single large `main.go`) |
+| `cmd/lunar-hub/` | Hub server binary |
+| `snippets/` | Snippet execution engine |
+| `hubapi/` | gRPC protobuf definitions |
+| `docs/` | GitBook documentation source |
 
 ---
 
 ## Testing
+
+### Building Locally
+
+Go is not installed in this workspace. Use Earthly to build:
+```bash
+cd /home/brandon/code/earthly/lunar
+earthly +build-cli    # builds dist/lunar-linux-amd64
+earthly +build-hub    # builds the hub server
+```
+
+The built CLI binary can be used directly for testing:
+```bash
+./dist/lunar-linux-amd64 policy ok-release --help
+```
 
 ### Local Testing
 
@@ -141,6 +206,18 @@ When QA-ing a feature, follow these rules:
    {ok-release, ok-pr} × {main SHA, PR SHA} × {passing policy, failing policy}
    ```
    Don't skip combinations — the bugs hide in the ones you skip.
+
+---
+
+## Known Quirks
+
+- **`gh pr edit` fails** with a GraphQL "Projects (classic)" deprecation error. Use `gh api` instead:
+  ```bash
+  gh api repos/earthly/lunar/pulls/<number> -X PATCH -f title="..." -f body="..." --jq '.html_url'
+  ```
+- **CI `build-cli-mac` and `ci-images`** run on self-hosted runners that occasionally hit disk space or Docker issues. These failures are infra-related, not code-related.
+- **CodeRabbit may skip draft PRs.** It often only reviews once the PR is marked ready, or after you comment `@coderabbitai review`.
+- **Hub deploys are manual.** After merging Hub-side changes, someone needs to deploy to the demo environments (cronos, etc.). The deploy is done via deploy PRs like `Deploy cronos (#929)`.
 
 ---
 
