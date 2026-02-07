@@ -459,11 +459,11 @@ if __name__ == "__main__":
 - **`c.skip()` raises `SkippedError`** — no `return` needed after it (see warning below)
 - **There is no `c.succeed()` method** — checks auto-pass if no assertions fail
 
-### ⚠️ CRITICAL: `c.skip()` and `c.fail()` Raise Exceptions — NEVER Put `return` After Them
+### ⚠️ CRITICAL: `c.skip()` Raises an Exception — NEVER Put `return` After It
 
 **This is the single most common mistake agents make when writing policies.** It has been repeated across many PRs and always causes CodeRabbit review comments and wasted cycles.
 
-`c.skip()` raises `SkippedError` and `c.fail()` raises an internal exception. Both immediately exit the `with` block. **Any code after them is unreachable dead code.**
+`c.skip()` raises `SkippedError` which immediately exits the `with` block. **Any code after `c.skip()` is unreachable dead code.**
 
 ```python
 # ❌ WRONG — return c is unreachable (c.skip raises SkippedError)
@@ -474,18 +474,25 @@ if not is_pr_context():
 # ✅ CORRECT — nothing after c.skip()
 if not is_pr_context():
     c.skip("Not in a PR context")
-
-# ❌ WRONG — return c is unreachable (c.fail raises exception)
-if some_condition:
-    c.fail("Something is wrong")
-    return c  # DEAD CODE — never executes
-
-# ✅ CORRECT — nothing after c.fail()
-if some_condition:
-    c.fail("Something is wrong")
 ```
 
-**Why this happens:** Agents write `return c` out of habit thinking it's good practice to explicitly return. But `c.skip()` and `c.fail()` are not normal function calls — they raise exceptions that exit the `with Check(...)` block immediately.
+**`c.fail()` does NOT raise** — it records the failure and continues execution. `return c` after `c.fail()` IS valid for early-returning:
+
+```python
+# ✅ OK — c.fail() records failure but continues, return c is valid early-return
+if some_condition:
+    c.fail("Something is wrong")
+    return c  # This IS reached — valid early-return pattern
+```
+
+**Why this happens:** Agents write `return c` after `c.skip()` out of habit thinking it's good practice to explicitly return. But `c.skip()` raises `SkippedError` that exits the `with Check(...)` block immediately.
+
+**Quick reference:**
+| Method | Raises? | `return c` after it? |
+|--------|---------|---------------------|
+| `c.skip("reason")` | Yes (`SkippedError`) | ❌ Dead code |
+| `c.fail("reason")` | No (records failure) | ✅ Valid early-return |
+| `c.assert_true(...)` | No (records result) | ✅ Valid early-return |
 
 ### When to Skip vs Fail (Score Impact)
 
