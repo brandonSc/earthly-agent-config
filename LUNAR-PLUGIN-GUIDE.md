@@ -244,10 +244,15 @@ default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
 | `code`, `cron` | `earthly/lunar-lib:base-main` | Always runs in container. If you need extra deps, build a custom image. |
 | `ci-*` hooks | `native` | Runs directly on CI runner. Use container only if heavy deps needed. |
 
-**Code collectors always run in a Docker container.** The base image is Alpine-based. If you need additional dependencies:
+**Code collectors always run in a disposable Docker container.** The container is created, the script runs, and the container is destroyed. This means:
+- **The filesystem is throwaway** — write temp files wherever you want (`/tmp/sbom.json`), install packages, create directories. It all disappears when the collector finishes.
+- **No cleanup needed** — don't add `trap`, `rm`, or temp file cleanup. It's wasted code.
+- **No `mktemp` needed** — use fixed paths like `/tmp/output.json` instead. There's no concurrency risk in a single-use container.
+- **No `install.sh`** — pre-install dependencies in a custom Docker image (see "Building Custom Images" below).
+
+If you need additional dependencies beyond the base image:
 1. **DO:** Build a custom image extending `base-main` (see "Building Custom Images" below)
-2. **DON'T:** Use `install.sh` — this is legacy and should not be used for code collectors
-3. **DON'T** add cleanup code (trap, rm temp files) — the container is discarded after execution. Temp files, installed packages, etc. are all gone automatically.
+2. **DON'T:** Use `install.sh` — this is legacy and should not be used
 
 **CI collectors run `native` by default** on the user's CI runner. This gives them:
 - Access to the traced command's environment
