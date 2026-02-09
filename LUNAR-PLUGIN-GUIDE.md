@@ -249,6 +249,7 @@ default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
 - **No cleanup needed** — don't add `trap`, `rm`, or temp file cleanup. It's wasted code.
 - **No `mktemp` needed** — use fixed paths like `/tmp/output.json` instead. There's no concurrency risk in a single-use container.
 - **No `install.sh`** — pre-install dependencies in a custom Docker image (see "Building Custom Images" below).
+- **No dependency guards** — don't check `command -v syft` or `which jq` if you built the image with those tools in the Earthfile. You control the image, so you know what's in it.
 
 If you need additional dependencies beyond the base image:
 1. **DO:** Build a custom image extending `base-main` (see "Building Custom Images" below)
