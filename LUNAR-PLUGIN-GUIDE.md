@@ -903,6 +903,8 @@ image:
     SAVE IMAGE --push earthly/lunar-lib:<collector-name>-$VERSION
 ```
 
+**⚠️ Always use the latest stable version** of any dependency you add. Check the project's GitHub releases page (e.g., `curl -sS "https://api.github.com/repos/<owner>/<repo>/releases/latest" | grep tag_name`) rather than copying a version from a plan or prototype — those may be outdated.
+
 **Reference examples:**
 - `lunar-lib/collectors/golang/Earthfile` — Go + golangci-lint
 - `lunar-lib/collectors/ast-grep/Earthfile` — ast-grep CLI
