@@ -247,6 +247,7 @@ default_image: earthly/lunar-lib:<name>-main  # Always -main in committed code
 **Code collectors always run in a Docker container.** The base image is Alpine-based. If you need additional dependencies:
 1. **DO:** Build a custom image extending `base-main` (see "Building Custom Images" below)
 2. **DON'T:** Use `install.sh` — this is legacy and should not be used for code collectors
+3. **DON'T** add cleanup code (trap, rm temp files) — the container is discarded after execution. Temp files, installed packages, etc. are all gone automatically.
 
 **CI collectors run `native` by default** on the user's CI runner. This gives them:
 - Access to the traced command's environment
