@@ -23,15 +23,15 @@ Guide for AI agents contributing to the [earthly/lunar](https://github.com/earth
 
 ### PR Title Format
 
-**Always include the Linear ticket number in the PR title:**
+**Always include the Linear ticket number in square brackets in the PR title:**
 
 ```
-ENG-XXX: Short description of the change
+[ENG-XXX] Short description of the change
 ```
 
 Examples:
-- `ENG-379: Fix agents getting stuck on 'configuration already exists' error`
-- `ENG-456: Add retry logic for manifest fetching`
+- `[ENG-379] Fix agents getting stuck on 'configuration already exists' error`
+- `[ENG-456] Add retry logic for manifest fetching`
 
 ### PR Description Template
 
@@ -68,12 +68,12 @@ Fixes [ENG-XXX](https://linear.app/earthly-technologies/issue/ENG-XXX)
    ```
 5. **Commit with ticket reference:**
    ```bash
-   git commit -m "ENG-XXX: Description"
+   git commit -m "[ENG-XXX] Description"
    ```
 6. **Push and create draft PR:**
    ```bash
    git push -u origin brandon/<feature-name>
-   gh pr create --draft --title "ENG-XXX: Description" --body "..."
+   gh pr create --draft --title "[ENG-XXX] Description" --body "..."
    ```
 7. **Monitor CI** — Watch GitHub Actions for failures
 8. **Open PR for review** — After CI passes:
