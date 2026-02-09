@@ -667,7 +667,7 @@ Move implementation details (data paths, skip conditions, collector specifics) t
 
 ### Debugging Tips
 
-- **Branch refs may cache** — If `@brandon/branch` shows stale behavior, copy to `./policies/<name>-test/` instead
+- **Branch refs are cached** — Lunar only re-fetches branch references when `lunar-config.yml` itself changes. If you push new commits to your branch but don't change the config, Lunar will keep using the old cached version. To force a re-fetch, make any change to `lunar-config.yml` (even a comment) and push.
 - **Debug prints** — Add to the test copy, not the source
 - **Docker required** — `lunar policy dev` needs Docker Desktop running
 
