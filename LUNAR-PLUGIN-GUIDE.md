@@ -802,6 +802,28 @@ echo '<html><body style="background:#1e1e1e;padding:20px">
 # Open /tmp/icon-test.html in browser
 ```
 
+**For a realistic preview on the actual website**, use the `earthly-website` repo:
+
+```bash
+cd ~/Documents/Code/earthly/earthly-website
+
+# Sync latest icons and data from lunar-lib (uses GitHub main by default)
+earthly +update-lunar-lib
+
+# Or sync from a local lunar-lib checkout (faster for iteration)
+earthly +update-lunar-lib --LUNAR_LIB=../lunar-lib
+
+# Start local dev server
+npm install  # first time only
+npm start    # serves at http://localhost:8080
+
+# Check your icon at:
+#   http://localhost:8080/lunar/guardrails/          (all icons grid)
+#   http://localhost:8080/lunar/guardrails/<policy>/  (detail page hero)
+```
+
+The `earthly +update-lunar-lib` target copies icons into `src/assets/guardrails/lunar-lib-icons/` and plugin data into `src/_data/guardrails/lunar-lib-data/`. These directories are auto-generated — don't edit them manually.
+
 ---
 
 ## 6. Testing in pantalasa-cronos
