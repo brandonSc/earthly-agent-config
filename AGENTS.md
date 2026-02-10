@@ -120,6 +120,7 @@ After opening a PR or responding to review comments, **actively monitor** using 
 3. **Reset to frequent** whenever you push new code or reply to a comment
 4. **Stop monitoring** if no new activity for ~2 hours
 5. **Only monitor between 7AM–9PM** (Brandon's local time) — the PC is off overnight
+6. **Tool call timeout:** Sleep calls longer than ~10 minutes will time out. For longer intervals, chain shorter sleeps or just do a quick check when the user prompts
 
 **What to check each cycle:**
 - `gh pr checks` — CI status
