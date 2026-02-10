@@ -110,24 +110,32 @@ When asked to open PRs (for any repo), follow this flow:
 
 **For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 
-### Waiting for Reviewer Responses
+### PR Monitoring
 
-**Cursor operates request-response** — you wake up when the user messages you, not when external events happen. There's no notification system to alert you when reviewers comment.
+After opening a PR or responding to review comments, **actively monitor** using a background polling loop with exponential backoff:
 
-**What works:**
-- Background scripts can take automatic actions (e.g., auto-merge on approval)
-- Scripts can log events for you to check later
-- User can prompt you to check PR status
+1. **After pushing code or replying to a comment:** Check every 2–3 minutes initially
+2. **Gradually slow down:** 5min → 10min → 15min → 30min as activity dies down
+3. **Reset to frequent** whenever you push new code or reply to a comment
+4. **Stop monitoring** if no new activity for ~1 hour
+5. **Only monitor between 7AM–9PM** (Brandon's local time) — the PC is off overnight
 
-**What doesn't work:**
-- No way to automatically respond to reviewer comments
-- No real-time alerts when reviews come in
-- Background polling burns no credits while sleeping, but you won't know results until prompted
+**What to check each cycle:**
+- `gh pr checks` — CI status
+- `gh api repos/.../pulls/N/reviews` — new approvals or change requests
+- `gh api repos/.../pulls/N/comments` — new inline review comments
+- `gh pr view N --comments` — new PR-level comments
 
-**Recommended workflow:**
-1. After pushing changes, ask user if they want you to monitor or just check later
-2. Don't set up elaborate background monitoring unless auto-action is needed
-3. When user prompts, check PR status and respond to any new comments
+**When new comments appear:**
+- Read them carefully, think before responding
+- Don't blindly make code changes — reply honestly with your reasoning
+- If a code change is warranted, push it and reset the monitoring frequency
+
+**What to do with results:**
+- Fix CI failures automatically
+- Reply to reviewer questions thoughtfully
+- Resolve CodeRabbit threads after addressing them
+- When approved, ask user if they want to merge or wait
 
 ---
 
