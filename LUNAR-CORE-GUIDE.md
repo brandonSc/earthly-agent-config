@@ -103,7 +103,7 @@ Fixes [ENG-XXX](https://linear.app/earthly-technologies/issue/ENG-XXX)
 The lunar binary serves **two roles** — the CLI (`cmd/lunar`) and the Hub server (`cmd/lunar-hub`). When fixing bugs, understand which side your change affects:
 
 - **CLI-side** changes (in `cmd/lunar/`) take effect when users install the new binary.
-- **Hub-side** changes (in `hub/`) only take effect after the Hub server is redeployed. You cannot test Hub-side fixes locally — you need a deployed environment.
+- **Hub-side** changes (in `hub/`) only take effect after the Hub server is redeployed. Use the **localdev** stack (see Testing section) to test hub-side changes locally without deploying to a remote environment.
 - **Shared code** (in `snippets/`, `hubapi/`) may affect both sides.
 
 When testing, always ask: "Does this fix run in the CLI or on the Hub?" If it's Hub-side, you need a deploy before you can verify end-to-end.
@@ -183,9 +183,82 @@ cd /home/brandon/code/earthly/lunar
 go test ./...
 ```
 
-### Integration Testing
+### Localdev Testing (Preferred)
 
-Use the pantalasa test environments to validate changes work end-to-end.
+The **localdev** stack deploys hub, postgres, grafana, and supporting services locally via Docker Compose. This is the fastest way to test hub-side changes — no need to deploy to cronos or other demo environments.
+
+**One-time setup:**
+
+1. Create `localdev/.arg` with secrets (gitignored). Run this in a terminal where 1Password is authenticated:
+   ```bash
+   cat > /home/brandon/code/earthly/lunar/localdev/.arg <<EOF
+   GITHUB_TOKEN=$(op item get lunar/localdev-github-token --reveal --vault cloud --fields password)
+   NGROK_AUTHTOKEN=$(op item get ngrok/brandon-token --reveal --vault Employee --fields password)
+   HUB_LOGS_AWS_ACCESS_KEY_ID=$(op item get lunar/localdev-logs-aws-access-key-id --reveal --vault cloud --fields password)
+   HUB_LOGS_AWS_SECRET_ACCESS_KEY=$(op item get lunar/localdev-logs-aws-secret-access-key --reveal --vault cloud --fields password)
+   LUNAR_MANIFEST_URL=github://pantalasa/lunar@localdev-brandon-main
+   EOF
+   chmod 600 /home/brandon/code/earthly/lunar/localdev/.arg
+   ```
+
+2. Install `yq` (required by the Earthfile):
+   ```bash
+   wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ~/.local/bin/yq && chmod +x ~/.local/bin/yq
+   ```
+
+**Starting the stack:**
+
+```bash
+cd /home/brandon/code/earthly/lunar/localdev
+export PATH="$HOME/.local/bin:$PATH"
+earthly +localdev
+```
+
+This builds all images from source (including your local changes) and starts the compose stack. First run takes ~5-10 minutes; subsequent runs use caches.
+
+**Connecting to the local hub:**
+
+```bash
+export LUNAR_HUB_HOST=localhost
+export LUNAR_HUB_GRPC_PORT=8000
+export LUNAR_HUB_HTTP_PORT=8001
+export LUNAR_HUB_TOKEN=token
+export LUNAR_HUB_INSECURE=true
+```
+
+**Testing SQL API:**
+
+```bash
+lunar sql connection-string
+lunar sql refresh --full --overlap 48
+# Connect to Postgres directly (from host, use localhost instead of postgres):
+docker exec localdev-postgres-1 psql "postgres://sqlapi_user:testpassword@localhost:5432/hub?sslmode=disable" -c "\dt"
+```
+
+**Tearing down:**
+
+```bash
+earthly +localdev-down
+```
+
+**Localdev defaults:**
+
+| Config | Value |
+|--------|-------|
+| `LUNAR_HUB_TOKEN` | `token` |
+| `HUB_SQLAPI_USER_NAME` | `sqlapi_user` (default) |
+| `HUB_SQLAPI_PASSWORD` | `testpassword` |
+| `POSTGRES_USER` | `testuser` |
+| `POSTGRES_PASSWORD` | `testpassword` |
+| `POSTGRES_DB` | `hub` |
+| Hub gRPC | `localhost:8000` |
+| Hub HTTP | `localhost:8001` |
+| Postgres | `localhost:5432` |
+| Grafana | `localhost:3000` |
+
+### Integration Testing (Demo Environments)
+
+Use the pantalasa test environments to validate changes work end-to-end. Localdev is preferred for faster iteration; demo environments are for final verification before merge.
 
 ### QA Testing Discipline
 
