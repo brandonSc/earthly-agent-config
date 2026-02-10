@@ -131,6 +131,12 @@ After opening a PR or responding to review comments, **actively monitor** using 
 - Don't blindly make code changes — reply honestly with your reasoning
 - If a code change is warranted, push it and reset the monitoring frequency
 
+**Handling reviewer feedback (important):**
+- **Questions ≠ change requests.** If a reviewer asks "should this be X?" or "do we want Y?", that's a discussion — reply with your reasoning, don't just change the code. They may be thinking out loud or checking your understanding.
+- **Use your judgment.** If you disagree with a suggestion, say so respectfully and explain why. Brandon's peers are collaborators, not authorities you must obey.
+- **Only make code changes when:** the reviewer clearly requests a change (e.g. "please change X to Y"), you agree the change is correct, or it's a clear bug/typo they've pointed out.
+- **When in doubt, reply first.** It's better to have a conversation and then make the right change than to silently implement something you're not sure about.
+
 **What to do with results:**
 - Fix CI failures automatically
 - Reply to reviewer questions thoughtfully
