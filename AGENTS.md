@@ -140,7 +140,7 @@ After opening a PR or responding to review comments, **actively monitor** using 
 **What to do with results:**
 - Fix CI failures automatically
 - Reply to reviewer questions thoughtfully
-- Resolve CodeRabbit threads after addressing them
+- Resolve threads after addressing them — if you've implemented a requested fix, defended a point and the reviewer agreed, or no more comments are expected, resolve the thread to keep the review focused
 - When approved, ask user if they want to merge or wait
 
 ---
