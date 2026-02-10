@@ -112,7 +112,7 @@ When asked to open PRs (for any repo), follow this flow:
 
 ### PR Monitoring
 
-After opening a PR or responding to review comments, **actively monitor** using a background polling loop with exponential backoff:
+After opening a PR or responding to review comments, **actively monitor** using a polling loop with exponential backoff:
 
 1. **After pushing code or replying to a comment:** Check every 2–3 minutes initially
 2. **Gradually slow down:** 5min → 10min → 15min → 30min → 60min as activity dies down
