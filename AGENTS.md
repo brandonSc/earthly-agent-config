@@ -108,6 +108,7 @@ When asked to open PRs (for any repo), follow this flow:
 7. **Trigger CodeRabbit review** while still in draft: comment `@coderabbitai review` on the PR
 8. **Address CodeRabbit comments** — fix issues, reply to false positives, resolve threads
 9. Only mark PR as ready for human review once CI passes and CodeRabbit comments are addressed
+10. **Immediately start the PR monitoring loop** (see [PR Monitoring](#pr-monitoring) below) — do NOT wait for the user to remind you. This is mandatory after every PR is opened or marked ready for review.
 
 **For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 
