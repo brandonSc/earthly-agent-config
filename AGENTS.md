@@ -143,8 +143,12 @@ After opening a PR or responding to review comments, **actively monitor** using 
 **What to do with results:**
 - Fix CI failures automatically
 - Reply to reviewer questions thoughtfully
-- Resolve threads after addressing them — if you've implemented a requested fix, defended a point and the reviewer agreed, or no more comments are expected, resolve the thread to keep the review focused
-- When approved, ask user if they want to merge or wait
+- **Resolve threads proactively** after addressing them — if you've implemented a requested fix, defended a point and the reviewer agreed, or no more comments are expected, resolve the thread via the GraphQL `resolveReviewThread` mutation to keep the review focused. Don't wait to be reminded.
+- When approved, merge if the user pre-authorized it, otherwise ask
+
+**Monitoring must be foreground, not background:**
+- Do NOT use background commands (`is_background: true`) for monitoring — they don't wake you up when they complete. Use foreground `sleep N && check` loops so you can act on results immediately.
+- Keep individual sleep intervals under ~10 minutes to avoid tool call timeouts.
 
 ---
 
