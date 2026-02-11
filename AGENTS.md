@@ -217,6 +217,133 @@ export LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643
 # Hub: cronos.demo.earthly.dev
 ```
 
+### Demo Environment Web Access
+
+Both demo environments use Grafana as the web UI, fronted by a Caddy reverse proxy.
+
+| Environment | URL | Grafana User | Grafana Password | Hub Token |
+|-------------|-----|-------------|-----------------|-----------|
+| **pantalasa** (lunar) | `https://lunar.demo.earthly.dev` | `lunar` | `910vfBf` | `df11a0951b7c2c6b9e2696c048576643` |
+| **pantalasa-cronos** (cronos) | `https://cronos.demo.earthly.dev` | `lunar` | `910vfBf` | `df11a0951b7c2c6b9e2696c048576643` |
+
+**Architecture:** Caddy proxies gRPC (`:443 /hubapi.Hub*` → hub:8000), webhooks/logs → hub:8001, everything else → Grafana:3000. The Grafana login uses the same web credentials above.
+
+### Accessing Demo Data via Grafana API (No Browser Needed)
+
+When you don't have browser tools available, you can query the demo environment directly using Grafana's HTTP API with curl. This is the most reliable way to check collector runs, component data, and policy results.
+
+**Authentication:** Use the Grafana credentials with HTTP Basic Auth:
+```bash
+curl -s -u "lunar:910vfBf" "https://cronos.demo.earthly.dev/api/..."
+```
+
+**List dashboards:**
+```bash
+curl -s -u "lunar:910vfBf" \
+  "https://cronos.demo.earthly.dev/api/search?type=dash-db" | jq '.[] | {title, uid, url}'
+```
+
+**Key dashboards:**
+| Dashboard | UID | URL |
+|-----------|-----|-----|
+| Collectors listing | `zzznoc11btoga` | `/d/zzznoc11btoga/collectors-listing` |
+| Collector details | `aepjhg9he4wlcc` | `/d/aepjhg9he4wlcc/collector-details?var-id=<collector-name>` |
+| Components listing | `decnmi0dtoef4a` | `/d/decnmi0dtoef4a/components-listing` |
+| Component details | `aecnnrn714em8d` | `/d/aecnnrn714em8d/component-details?var-component=<component>` |
+| Component JSON | `lujsqdc` | `/d/lujsqdc/component-json` |
+| Runs listing | `den5tflglaolcd` | `/d/den5tflglaolcd/runs-listing` |
+| Run details | `fen4vhrvim4u8b` | `/d/fen4vhrvim4u8b/run-details` |
+| Policies listing | `aeiynoc11btoga` | `/d/aeiynoc11btoga/policies-listing` |
+
+**Run SQL queries against the hub database via Grafana's datasource proxy:**
+```bash
+# PostgreSQL datasource UID: PCC52D03280B7034C
+curl -s -u "lunar:910vfBf" \
+  -X POST "https://cronos.demo.earthly.dev/api/ds/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "queries": [{
+      "refId": "A",
+      "datasource": {"uid": "PCC52D03280B7034C", "type": "grafana-postgresql-datasource"},
+      "rawSql": "YOUR SQL HERE",
+      "format": "table"
+    }],
+    "from": "now-30d",
+    "to": "now"
+  }'
+```
+
+**Useful SQL queries:**
+
+```sql
+-- List recent collector runs (with name, component, status, timing)
+SELECT s.name as collector, r.component_name, r.status, r.exit_code,
+       to_char(r.started_at, 'YYYY-MM-DD HH24:MI:SS') as started,
+       (r.finished_at - r.started_at)::text as elapsed
+FROM hub.snippet_runs r
+INNER JOIN hub.snippets s ON s.id = r.snippet_id
+WHERE s.name LIKE 'semgrep%'  -- change filter as needed
+ORDER BY r.started_at DESC LIMIT 20;
+
+-- Summary: collector run counts and data records
+SELECT s.name as collector,
+       COUNT(*) as run_count,
+       COUNT(cr.id) as record_count,
+       COUNT(CASE WHEN cr.blob IS NOT NULL THEN 1 END) as data_records
+FROM hub.snippet_runs sr
+INNER JOIN hub.snippets s ON s.id = sr.snippet_id
+LEFT JOIN hub.collection_records cr ON cr.snippet_run_id = sr.id
+WHERE s.name LIKE 'semgrep%'
+GROUP BY s.name ORDER BY s.name;
+
+-- Check collected data blobs for a specific collector
+SELECT c.name as component, cr.collection_source,
+       cr.blob::text as data,
+       to_char(cr.created_at, 'YYYY-MM-DD HH24:MI') as created
+FROM hub.collection_records cr
+INNER JOIN hub.snippet_runs sr ON sr.id = cr.snippet_run_id
+INNER JOIN hub.snippets s ON s.id = sr.snippet_id
+LEFT JOIN hub.components c ON c.id = cr.component_id
+WHERE s.name = 'semgrep.github-app' AND cr.blob IS NOT NULL
+ORDER BY cr.created_at DESC LIMIT 10;
+
+-- Check merged component JSON (what get-json returns)
+SELECT c.name, (mcb.merged_blob->'sast')::text as sast
+FROM hub.merged_collection_blobs mcb
+INNER JOIN hub.components c ON c.id = mcb.component_id
+WHERE mcb.merged_blob->'sast' IS NOT NULL
+  AND (mcb.merged_blob->'sast')::text != 'null'
+ORDER BY mcb.last_record_at DESC LIMIT 10;
+```
+
+**Key database tables:**
+| Table | Purpose |
+|-------|---------|
+| `hub.snippets` | Registered collectors, policies, catalogers (name, type, language) |
+| `hub.snippet_runs` | Execution history (status, exit_code, started_at, dimensions) |
+| `hub.collection_records` | Data blobs written by collectors (blob, component_id) |
+| `hub.merged_collection_blobs` | Merged per-component JSON (what `lunar component get-json` returns) |
+| `hub.components` | Component registry (name, id) |
+| `hub.policy_runs` | Policy execution results |
+| `hub.policy_assertions` | Individual policy check pass/fail |
+| `public.materialized_components` | Materialized view for Grafana dashboards |
+
+**Note on SQL escaping in curl:** Single quotes in SQL must be escaped as `'\''` in bash shell strings (end string, literal quote, resume string).
+
+**Python helper for parsing Grafana query results:**
+```python
+# Pipe curl output to this:
+import json, sys
+data = json.load(sys.stdin)
+frame = data['results']['A']['frames'][0]
+fields = frame['schema']['fields']
+values = frame['data']['values']
+names = [f['name'] for f in fields]
+rows = list(zip(*values))
+for row in rows:
+    print(' | '.join(str(v) for v in row))
+```
+
 ### Git Worktrees
 
 ```bash
