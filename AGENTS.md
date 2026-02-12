@@ -404,6 +404,8 @@ The hub resolves branch references (e.g. `@brandon/feature`) to a git SHA at man
 
 4. **Wait for CI to finish** on the component repo, then check for a recent run of the CI collector.
 
+**Important:** Code collector re-runs triggered by manifest updates only run on **default branches**, NOT on PRs. If you need to test a PR-context code collector after a manifest/plugin code change, you must push a new commit to the component repo's PR branch to trigger a fresh PR-context run.
+
 **Key takeaway:** Don't repeatedly trigger `run-code-collectors` expecting new plugin code — the hub uses cached code until a new manifest is pulled. Push manifest changes and wait.
 
 ---
