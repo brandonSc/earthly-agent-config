@@ -392,6 +392,20 @@ If you need to push to a demo environment (not just `dev` commands), use branch 
 - **Relative paths** (`../lunar-lib-wt-*/`) — for local `dev` commands during development. Fast, no push needed.
 - **Branch references** (`github://...@branch`) — when pushing config to a demo hub (e.g. cronos.demo.earthly.dev). Requires the branch to be pushed to GitHub first.
 
+### How Hub Picks Up Changes (Important!)
+
+The hub resolves branch references (e.g. `@brandon/feature`) to a git SHA at manifest pull time and caches them. Understanding the refresh flow is critical to avoid spinning wheels:
+
+1. **If a manifest change is required** (e.g. new `lunar-config.yml` inputs, new plugin reference) → push to the manifest repo (e.g. `pantalasa/lunar@main`), then **wait for the hub to build/pull** the new manifest. Code collectors will re-run automatically with the new config, but CI collectors will NOT re-run on their own.
+
+2. **If only code collectors changed** (e.g. you pushed a fix to `@brandon/feature`) → the hub re-resolves branch refs when it pulls a new manifest. Wait for a recent run of the collector — you can check results once the collector run finishes. If the hub hasn't picked up new code yet, push a new manifest commit to force a re-resolve.
+
+3. **If CI collectors are of interest** → after the manifest build finishes, push a commit to the component repo you're watching (e.g. `pantalasa/backend`). This triggers CI on that repo.
+
+4. **Wait for CI to finish** on the component repo, then check for a recent run of the CI collector.
+
+**Key takeaway:** Don't repeatedly trigger `run-code-collectors` expecting new plugin code — the hub uses cached code until a new manifest is pulled. Push manifest changes and wait.
+
 ---
 
 ## Reference Documentation
