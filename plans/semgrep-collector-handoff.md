@@ -78,7 +78,7 @@ collectors:
 
 ## Known Issues / Context
 
-1. **`LUNAR_COMPONENT_ID` bug** - Was fixed in `brandon/collector-missing-env-vars` branch of `lunar` repo (now merged to main)
+1. **`LUNAR_COMPONENT_ID` bug** - Fixed and verified. `lunar collector dev` now correctly sets `LUNAR_COMPONENT_ID`, `LUNAR_COMPONENT_GIT_SHA`, and all other env vars.
 2. **`LUNAR_HUB_HOST` for SQL** - User configured Cronos to pass this to collectors, should work now
 3. **`running-in-prs` depends on PR data** - This collector queries DB for Semgrep check-runs on PRs. If no PRs have been scanned with Semgrep GitHub App, it won't find data.
 
