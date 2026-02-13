@@ -151,6 +151,23 @@ After opening a PR or responding to review comments, **actively monitor** using 
 - Do NOT use background commands (`is_background: true`) for monitoring — they don't wake you up when they complete. Use foreground `sleep N && check` loops so you can act on results immediately.
 - Keep individual sleep intervals under ~10 minutes to avoid tool call timeouts.
 
+### Reviewing PRs
+
+When asked to review a PR (lunar-lib, lunar, or any repo):
+
+1. **Use inline review comments on specific files/lines** — don't post PR-level comments. Inline comments let the author resolve each thread as they address it. Use the GitHub API to submit a review with inline comments:
+   ```bash
+   gh api repos/OWNER/REPO/pulls/N/reviews \
+     -f event=COMMENT \
+     -f 'comments[][path]=path/to/file.py' \
+     -f 'comments[][line]=42' \
+     -f 'comments[][body]=Your comment here' \
+     # Repeat for each comment
+   ```
+2. **Check against conventions** — For lunar-lib, read `ai-context/component-json/conventions.md` and compare the PR's schema choices (boolean fields, presence detection, naming). For lunar core, check the patterns in `LUNAR-CORE-GUIDE.md`.
+3. **Compare with existing implementations** — Look at how similar plugins/features handle the same patterns (e.g., how does the README collector/policy handle "file not found" vs how this PR does it).
+4. **Sign comments with 🤖** — So people know it was written by AI.
+
 ---
 
 ## Repository Layout
