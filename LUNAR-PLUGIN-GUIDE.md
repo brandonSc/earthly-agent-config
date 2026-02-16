@@ -934,8 +934,11 @@ image:
 
 **⚠️ Always use the latest stable version** of any dependency you add. Check the project's GitHub releases page (e.g., `curl -sS "https://api.github.com/repos/<owner>/<repo>/releases/latest" | grep tag_name`) rather than copying a version from a plan or prototype — those may be outdated.
 
+**⚠️ Download language runtimes from official sources** — do NOT use OS package managers (`apk add`, `apt-get install`) for language runtimes like Node.js, Go, Python, etc. Package manager versions lag behind and may not match what users expect. Instead, download directly from the official project (e.g., `nodejs.org/dist/`, `go.dev/dl/`, `python.org/ftp/`). This ensures maximum compatibility with the collector's version detection and users' code.
+
 **Reference examples:**
-- `lunar-lib/collectors/golang/Earthfile` — Go + golangci-lint
+- `lunar-lib/collectors/golang/Earthfile` — Go + golangci-lint (downloads from go.dev)
+- `lunar-lib/collectors/nodejs/Earthfile` — Node.js (downloads from nodejs.org)
 - `lunar-lib/collectors/ast-grep/Earthfile` — ast-grep CLI
 - `lunar-lib/collectors/dockerfile/Earthfile` — Dockerfile tools
 
