@@ -411,19 +411,20 @@ If you need to push to a demo environment (not just `dev` commands), use branch 
 
 ### How Hub Picks Up Changes (Important!)
 
-The hub resolves branch references (e.g. `@brandon/feature`) to a git SHA at manifest pull time and caches them. Understanding the refresh flow is critical to avoid spinning wheels:
+The hub resolves branch references (e.g. `@brandon/feature`) to a git SHA at manifest pull time and caches them. **Code collectors do NOT re-run automatically on manifest changes** — the `sync-manifest` action only pulls the config, it doesn't trigger re-runs (the `rerun-code-collectors` flag defaults to `false`).
 
-1. **If a manifest change is required** (e.g. new `lunar-config.yml` inputs, new plugin reference) → push to the manifest repo (e.g. `pantalasa/lunar@main`), then **wait for the hub to build/pull** the new manifest. Code collectors will re-run automatically with the new config, but CI collectors will NOT re-run on their own.
+**To test code collector changes on the live demo:**
 
-2. **If only code collectors changed** (e.g. you pushed a fix to `@brandon/feature`) → the hub re-resolves branch refs when it pulls a new manifest. Wait for a recent run of the collector — you can check results once the collector run finishes. If the hub hasn't picked up new code yet, push a new manifest commit to force a re-resolve.
+1. **Push manifest changes** (e.g. new plugin reference in `lunar-config.yml`) → push to the manifest repo (e.g. `pantalasa-cronos/lunar@main`), wait for the `sync-manifest` CI to pass.
+2. **Push a commit to the component repo** you want to test (e.g. `pantalasa-cronos/frontend`). This triggers that repo's CI, which triggers the hub to run code collectors against that component with the latest manifest.
+3. **Wait for CI to finish** on the component repo (~30 seconds typically).
+4. **Wait ~1 minute**, then check the hub for collector run results.
 
-3. **If CI collectors are of interest** → after the manifest build finishes, push a commit to the component repo you're watching (e.g. `pantalasa/backend`). This triggers CI on that repo.
+**If only plugin code changed** (e.g. you pushed a fix to `@brandon/feature` but didn't change the manifest) → the hub re-resolves branch refs when the manifest is next pulled. Push a no-op manifest commit to force a re-resolve, then push a commit to the component repo to trigger collectors.
 
-4. **Wait for CI to finish** on the component repo, then check for a recent run of the CI collector.
+**For CI collectors** → same flow: after the manifest is updated, push a commit to the component repo. The CI pipeline triggers CI hooks.
 
-**Important:** Code collector re-runs triggered by manifest updates only run on **default branches**, NOT on PRs. If you need to test a PR-context code collector after a manifest/plugin code change, you must push a new commit to the component repo's PR branch to trigger a fresh PR-context run.
-
-**Key takeaway:** Don't repeatedly trigger `run-code-collectors` expecting new plugin code — the hub uses cached code until a new manifest is pulled. Push manifest changes and wait.
+**Key takeaway:** Code collectors only run when a component repo gets a new commit. Pushing to the manifest repo or plugin branch alone is NOT enough — you must also push to a component repo to trigger collector execution.
 
 ---
 
