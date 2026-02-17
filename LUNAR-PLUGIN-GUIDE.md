@@ -1519,6 +1519,41 @@ gh pr comment <PR-number> --body "@coderabbitai review"
 
 **Important:** Always trigger CodeRabbit in draft mode so you can address its comments *before* marking the PR ready for human review. Wait ~60 seconds after commenting, then check for review comments.
 
+### Post Testing Results Comment
+
+After creating the PR, **always post a PR comment** documenting what was tested and the results. This is mandatory — reviewers need to see evidence that the plugin was tested, not just trust the description.
+
+**Template:**
+
+```markdown
+## Testing Results
+
+### Local Testing (`lunar collector dev` / `lunar policy dev`)
+
+| Sub-collector | Components Tested | Result |
+|---|---|---|
+| `<name>` | comp1, comp2, comp3 | ✅ All correct |
+
+### Live Demo (hub runs after component commit)
+
+| Collector/Policy | Status | Exit Code |
+|---|---|---|
+| `<name>.<sub>` | ✅ finished | 0 |
+
+**Live collected data (<component>):**
+\```json
+{ ... actual JSON from hub ... }
+\```
+
+🤖
+```
+
+**What to include:**
+- Which components were tested (at least 3, including non-matching ones for skip behavior)
+- Actual output snippets (JSON blobs from `--verbose` or hub queries)
+- Policy pass/fail/skip results per component
+- Live demo results if tested on cronos (collector runs, exit codes, collected data)
+
 ### PR Descriptions (lunar-lib)
 
 Focus on **architecture and design decisions**, not file lists or code examples.
