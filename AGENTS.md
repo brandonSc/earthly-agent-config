@@ -99,17 +99,21 @@ Summary of workflow:
 ### PR Workflow (General)
 
 When asked to open PRs (for any repo), follow this flow:
+
+**Draft phase (autonomous):**
 1. **Verify staged files** before committing (`git diff --name-only main`)
 2. **Run unit tests locally** before pushing (if tests exist)
 3. Commit and push changes
 4. Create a **draft PR** initially
-5. Watch GitHub Actions for failures
-6. Fix CI errors automatically by pushing additional commits
-7. **Trigger CodeRabbit review** while still in draft: comment `@coderabbitai review` on the PR
-8. **Address CodeRabbit comments** — fix issues, reply to false positives, resolve threads
-9. Only mark PR as ready for human review once CI passes and CodeRabbit comments are addressed
-10. **Add reviewers** — When the user says "assign" someone to a PR, add them as **reviewers** (`gh pr edit --add-reviewer`), not assignees. We don't use the assignee field.
-11. **Immediately start the PR monitoring loop** (see [PR Monitoring](#pr-monitoring) below) — do NOT wait for the user to remind you. This is mandatory after every PR is opened or marked ready for review.
+5. Watch GitHub Actions for failures — fix CI errors automatically
+6. **Trigger CodeRabbit review** while still in draft: comment `@coderabbitai review` on the PR
+7. **Address CodeRabbit comments** — fix issues, reply to false positives, resolve threads
+8. Only mark PR as ready for human review once CI passes and CodeRabbit comments are addressed
+
+**Open phase (user approval required):**
+9. **Add reviewers** — When the user says "assign" someone to a PR, add them as **reviewers** (`gh pr edit --add-reviewer`), not assignees. We don't use the assignee field.
+10. **Start the PR monitoring loop** (see [PR Monitoring](#pr-monitoring) below)
+11. **Do NOT push commits or reply to reviewers** without the user's approval — present feedback to the user, propose changes, and wait for the go-ahead. The only exception is fixing CI failures.
 
 **For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 
@@ -132,19 +136,20 @@ After opening a PR or responding to review comments, **actively monitor** using 
 
 **When new comments appear:**
 - Read them carefully, think before responding
-- Don't blindly make code changes — reply honestly with your reasoning
-- If a code change is warranted, push it and reset the monitoring frequency
+- **Present findings to the user** — summarize what reviewers said and propose how to address it, but do NOT push code or reply on the PR without the user's approval (see below)
+
+**⚠️ Draft vs Open PR — different rules:**
+- **While PR is in draft:** You may freely push commits, reply to CodeRabbit, resolve threads, and fix CI failures without asking. This is the iteration phase.
+- **Once PR is marked ready for review (open):** You must **NOT** push commits, reply to reviewer comments, or resolve threads without the user reviewing and approving first. Present the reviewer's feedback to the user, propose your changes, and wait for the go-ahead. The only exception is fixing CI failures (e.g. flaky tests, rate limits).
 
 **Handling reviewer feedback (important):**
-- **Questions ≠ change requests.** If a reviewer asks "should this be X?" or "do we want Y?", that's a discussion — reply with your reasoning, don't just change the code. They may be thinking out loud or checking your understanding.
-- **Use your judgment.** If you disagree with a suggestion, say so respectfully and explain why. Brandon's peers are collaborators, not authorities you must obey.
-- **Only make code changes when:** the reviewer clearly requests a change (e.g. "please change X to Y"), you agree the change is correct, or it's a clear bug/typo they've pointed out.
-- **When in doubt, reply first.** It's better to have a conversation and then make the right change than to silently implement something you're not sure about.
+- **Questions ≠ change requests.** If a reviewer asks "should this be X?" or "do we want Y?", that's a discussion — don't just change the code.
+- **Always present feedback to the user first.** Summarize what the reviewer said, explain your understanding, and propose a fix. Let the user decide before you act.
+- **When in doubt, ask.** It's better to ask the user for clarification than to guess wrong and push a bad commit to an open PR.
 
 **What to do with results:**
-- Fix CI failures automatically
-- Reply to reviewer questions thoughtfully
-- **Resolve threads proactively** after addressing them — if you've implemented a requested fix, defended a point and the reviewer agreed, or no more comments are expected, resolve the thread via the GraphQL `resolveReviewThread` mutation to keep the review focused. Don't wait to be reminded.
+- Fix CI failures automatically (even on open PRs — this is the one exception)
+- **Present reviewer feedback to the user** — summarize comments, propose responses, wait for approval before replying or pushing
 - When approved, merge if the user pre-authorized it, otherwise ask
 
 **Monitoring must be foreground, not background:**

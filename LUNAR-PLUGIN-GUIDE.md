@@ -1754,6 +1754,26 @@ When user says "make PR ready for review":
    gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "<id>"}) { thread { isResolved } } }'
    ```
 
+### ⚠️ Draft vs Open PR — Autonomy Rules
+
+**While the PR is in draft**, the agent may act autonomously:
+- Push commits to fix CI, address CodeRabbit, iterate on code
+- Reply to CodeRabbit comments and resolve threads
+- Test, refactor, and improve without asking
+
+**Once the PR is marked ready for review (open)**, the agent must get user approval before:
+- Pushing any commits (code changes, fixes, refactors)
+- Replying to reviewer comments on the PR
+- Resolving review threads
+
+**What the agent should do instead:**
+- Monitor for new comments and CI status
+- **Present reviewer feedback to the user** — summarize what was said, explain your understanding, propose changes
+- **Wait for the user to approve** before pushing code or replying
+- The only exception is fixing CI failures (flaky tests, rate limits, infra issues)
+
+**Why:** Reviewer comments on open PRs often need human judgment to interpret correctly. Pushing wrong fixes wastes reviewer time and creates noise. It's better to discuss first, then act.
+
 ### People Aliases for Reviewers
 
 - **Vlad** → `vladaionescu`
