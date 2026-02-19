@@ -29,6 +29,7 @@ When the user refers to these names, use the corresponding GitHub username:
 ### Code Style
 - **Be concise.** Write clean, minimal code. Avoid over-engineering.
 - **Ask, don't assume.** If you're unsure about something important (architecture, naming, image tags, Component JSON paths, etc.), stop and ask the user for clarification. A wrong assumption that gets committed is much more expensive than a quick question.
+- **Answer before implementing.** If the user asks a question or seems to want your opinion, **respond with your thoughts first** — don't just silently implement something. Discuss the approach, then implement after alignment.
 - **Question the plan.** Implementation plans can have mistakes. If something feels wrong — a default that could mislabel data, a redundant boolean field, a questionable architecture choice — don't implement it blindly. Proceed with your best judgment, but **collect your doubts as a list of questions at the end of your response** so the user can review and course-correct during the same session. Don't silently implement something you have second thoughts about.
 
 ### Improving This Document (Self-Improvement)
