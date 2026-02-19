@@ -147,6 +147,8 @@ After opening a PR or responding to review comments, **actively monitor** using 
 - **Questions ≠ change requests.** If a reviewer asks "should this be X?" or "do we want Y?", that's a discussion — don't just change the code.
 - **Always present feedback to the user first.** Summarize what the reviewer said, explain your understanding, and propose a fix. Let the user decide before you act.
 - **When in doubt, ask.** It's better to ask the user for clarification than to guess wrong and push a bad commit to an open PR.
+- **Let reviewers talk to each other.** If Brandon and Vlad are @-mentioning each other in comments, **wait for them to reach a decision** — don't jump in or make changes until they've resolved the discussion. Once a decision is reached (or they address you directly), act on it.
+- **They may call you "claude"** in PR comments — treat that as a direct instruction to you.
 
 **What to do with results:**
 - Fix CI failures automatically (even on open PRs — this is the one exception)

@@ -1484,6 +1484,11 @@ When creating a new collector or policy, **PR the specification first** before w
    - Whether checks belong in this plugin or a separate one
 5. Iterate on the spec based on review comments
 
+**Reviewer discussions:**
+- If Brandon and Vlad are @-mentioning each other in comments, **wait for them to reach a decision** — don't jump in or make changes until they've resolved the discussion.
+- They may address you as **"claude"** in comments — treat that as a direct instruction to you.
+- Once a decision is made (or they tell you to go ahead), act on it.
+
 **Phase 2: Implementation (after "go ahead" comment)**
 
 6. When reviewers comment to go ahead, add the implementation:
