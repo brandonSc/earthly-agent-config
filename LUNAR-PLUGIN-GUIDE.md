@@ -503,31 +503,78 @@ if some_condition:
 
 ### When to Skip vs Fail (Score Impact)
 
-**This is critical for accurate compliance scores.**
+**This is critical for accurate compliance scores.** There are two distinct patterns for handling missing data, and confusing them is one of the most common policy bugs.
 
-**✅ GOOD place to skip:** When the policy doesn't apply to the component
+#### Pattern 1: Applicability Gate → `c.skip()`
+
+**Use when the entire guardrail category is not relevant to this component.** The component shouldn't be penalized for something that doesn't apply to it.
+
 ```python
-# Skip if not a language project (docs-only repos, infrastructure, etc.)
+# SAST policy on a docs-only repo — no code to scan
 if not c.get_node(".lang").exists():
     c.skip("No language project detected")
+
+# Container scan on a repo with no containers
+if not c.get_node(".containers").exists():
+    c.skip("No container images detected")
+
+# IaC policy on a repo with no infrastructure
+if not c.get_node(".iac").exists():
+    c.skip("No IaC files detected")
 ```
 
-**❌ BAD place to skip:** When data is missing that the policy expects
+**The test:** "Does this guardrail *category* apply to this component at all?" If no → skip.
+
+#### Pattern 2: Prerequisite Chain → let it fail
+
+**Use when the guardrail IS relevant, but upstream data is missing because a sibling requirement within the same family isn't met.** The component SHOULD be penalized — the missing data reflects a real standards gap.
+
+**Example:** Consider an `ai-use` policy family with two checks:
+- `instruction-file-exists` — does the AI instruction file exist?
+- `instruction-file-sections` — does it have the required sections?
+
+If the instruction file doesn't exist, **both checks should fail**. Don't skip `instruction-file-sections` just because `instruction-file-exists` already failed. The component genuinely doesn't meet either requirement, and its compliance score should reflect both gaps.
+
 ```python
-# DON'T skip when coverage is missing - FAIL instead
-# This ensures the score reflects missing coverage
-if not c.get_node(".testing.coverage").exists():
-    c.skip("No coverage data")  # ❌ Wrong - hides the problem
+# ❌ WRONG — hides the problem, inflates the score
+with c:
+    if not c.get_node(".ai_use.instruction_files").exists():
+        c.skip("No instruction file data")  # Score only reflects 1 failure instead of 2
 
-# DO use assert_exists - score correctly reflects failure
-c.assert_exists(".testing.coverage", "No coverage data collected")  # ✅ Correct
+# ✅ CORRECT — let get_value() raise, which records a failure
+with c:
+    sections = c.get_value(".ai_use.instruction_files.root.sections")
+    # If path doesn't exist, ValueError is raised → check becomes ERROR/FAIL
+    # This accurately reflects that the component doesn't meet this standard
 ```
 
-**Why this matters:**
+**The test:** "Is upstream data missing because another requirement in this family isn't met?" If yes → fail (not skip).
+
+#### Rule of Thumb
+
+Ask yourself: **"If this data is missing, is the component off the hook?"**
+
+| Question | Answer | Action |
+|----------|--------|--------|
+| Is this *category* irrelevant? (e.g., SAST on a docs repo) | Yes, off the hook | `c.skip()` |
+| Is a *sibling check* in the same family also failing? | No, not off the hook | Let it fail |
+| Is the *collector* not configured for this component? | Depends on context | Usually fail — it means a gap in the setup |
+
+**Why this matters for scoring:**
 - **Skipped checks don't affect the compliance score** — the problem is hidden
-- **Failed checks lower the score** — accurately reflects missing data
-- If a component IS a valid language project but lacks test/coverage data, all related checks should FAIL
-- This gives users accurate feedback: "You have 5 failing checks related to testing"
+- **Failed checks lower the score** — accurately reflects the gap
+- If a component has 2 checks that should both fail but one is skipped, the score shows 50% instead of the accurate 0%
+
+#### Debugging "No data found" Errors
+
+When you see a policy fail with `ValueError: No data found at path ...`:
+
+1. **Check if the collector has run** — Query the hub for recent runs of the relevant collector on that component
+2. **Check the component JSON** — Does the expected data path exist?
+3. **Determine which pattern applies:**
+   - If the category doesn't apply (docs repo, wrong language) → the policy needs an applicability gate
+   - If the category DOES apply but a prerequisite isn't met → this is correct behavior, the failure is intentional
+4. **If the failure is intentional** — no code change needed. The traceback in logs is noise from the exception handling, but the assertion result is correctly recorded as a failure
 
 ### Data Existence Checks (Common Bug Source)
 
