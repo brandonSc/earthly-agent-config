@@ -730,7 +730,7 @@ If your icon has nested elements (e.g., a small symbol inside a larger shape), e
 ### SVG Specifications
 
 - **Size**: 64x64 viewBox recommended
-- **Colors**: Use white (`#ffffff`) or light colors for outer shapes on dark backgrounds
+- **Colors**: Use black (`#000000`) or dark fills/strokes — the website converts them to white automatically. Using black makes icons visible in GitHub PR diffs (which have a white background), unlike white-on-white which is invisible during review.
 - **Embedded elements**: Use dark colors (`#333333`) or cutouts for inner icons/symbols
 - **Background**: Transparent (no `<rect>` filling the viewBox)
 - **Format**: Clean, minified SVG without embedded fonts or images
