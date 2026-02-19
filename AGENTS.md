@@ -52,9 +52,10 @@ Summary of workflow:
 1. **Update main first** — Pull latest changes before starting work
 2. **Read the ai-context docs** — `lunar-lib/ai-context/` contains implementation guides
 3. **Use git worktrees** — One worktree per feature for parallel development
-4. **Test your work** — Run `lunar collector dev` / `lunar policy dev` against multiple components, verify results match expected outcomes
-5. **Pre-push checklist** — See [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md) for the full checklist before pushing
-6. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
+4. **Spec-first PR** — PR the YAML manifest + README + example Component JSON first. Brandon and Vlad review the spec, comment, and iterate. Only add implementation code after they say "go ahead."
+5. **Test your work** — Run `lunar collector dev` / `lunar policy dev` against multiple components, verify results match expected outcomes
+6. **Pre-push checklist** — See [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md) for the full checklist before pushing
+7. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
 
 ### Creating Implementation Plans
 

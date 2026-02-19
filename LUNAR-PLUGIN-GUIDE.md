@@ -1465,6 +1465,40 @@ Once the PR is merged to main:
 
 ## 7. PR Workflow
 
+### Spec-First Process (Required for New Plugins)
+
+When creating a new collector or policy, **PR the specification first** before writing implementation code. This catches schema and design issues early — before time is spent on bash/Python.
+
+**Phase 1: Spec PR**
+
+1. Create the branch and worktree
+2. Add only these files:
+   - `lunar-collector.yml` or `lunar-policy.yml` — Full manifest with `landing_page`, `inputs`, `example_component_json` (for collectors)
+   - `README.md` — Standard README with collected data paths, installation, examples
+   - `assets/<name>.svg` — Grayscale icon
+3. Push and open a **draft PR**
+4. Brandon and Vlad review the spec — they'll comment on:
+   - Component JSON paths and schema design
+   - Naming choices
+   - Missing or redundant fields
+   - Whether checks belong in this plugin or a separate one
+5. Iterate on the spec based on review comments
+
+**Phase 2: Implementation (after "go ahead" comment)**
+
+6. When reviewers comment to go ahead, add the implementation:
+   - `main.sh` for collectors
+   - `*.py` check files for policies
+   - `Earthfile` if a custom image is needed
+   - `requirements.txt` for policies
+   - `helpers.py` if needed
+7. Push the implementation as new commits on the same PR
+8. Test with `lunar collector dev` / `lunar policy dev`
+9. Post testing results as a PR comment
+10. Address review comments, then merge when approved
+
+**Why spec-first?** The YAML manifest and README define the contract — what data is collected, what paths are used, what checks exist. Getting this right first prevents rework. Implementation is mechanical once the spec is agreed upon.
+
 ### Before Committing
 
 1. **Complete the Pre-Push Checklist** above (tested on 3+ components, skip behavior, no hardcoded values, etc.)
