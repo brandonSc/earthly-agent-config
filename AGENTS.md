@@ -420,10 +420,11 @@ The hub resolves branch references (e.g. `@brandon/feature`) to a git SHA at man
 
 **To test code collector changes on the live demo:**
 
-1. **Push manifest changes** (e.g. new plugin reference in `lunar-config.yml`) → push to the manifest repo (e.g. `pantalasa-cronos/lunar@main`), wait for the `sync-manifest` CI to pass.
-2. **Push a commit to the component repo** you want to test (e.g. `pantalasa-cronos/frontend`). This triggers that repo's CI, which triggers the hub to run code collectors against that component with the latest manifest.
-3. **Wait for CI to finish** on the component repo (~30 seconds typically).
-4. **Wait ~1 minute**, then check the hub for collector run results.
+1. **Push manifest changes** (e.g. new plugin reference in `lunar-config.yml`) → push to the manifest repo (e.g. `pantalasa-cronos/lunar@main`).
+2. **Wait for `sync-manifest` CI to pass** before doing anything else. The hub must pull and process the new manifest before component commits will use the updated config. Check with `gh run list --repo <org>/lunar --limit 3` or watch GitHub Actions. Do NOT push to component repos until this completes successfully.
+3. **Push a commit to the component repo** you want to test (e.g. `pantalasa-cronos/frontend`). This triggers that repo's CI, which triggers the hub to run code collectors against that component with the latest manifest.
+4. **Wait for CI to finish** on the component repo (~30 seconds typically).
+5. **Wait ~1 minute**, then check the hub for collector run results.
 
 **If only plugin code changed** (e.g. you pushed a fix to `@brandon/feature` but didn't change the manifest) → the hub re-resolves branch refs when the manifest is next pulled. Push a no-op manifest commit to force a re-resolve, then push a commit to the component repo to trigger collectors.
 
