@@ -1587,6 +1587,34 @@ Before pushing your branch, verify all of the following:
 - [ ] **README exists** — Both collectors and policies need a `README.md`.
 - [ ] **Only intended files staged** — Run `git diff --name-only main` and verify no temp files, test configs, or unrelated changes are included.
 - [ ] **Edge cases tested** — Verify the 2-3 edge cases listed in the implementation plan (e.g., empty data, missing fields, invalid input).
+- [ ] **Cross-references updated** — Check if existing collectors/policies need their `requires` or `related` fields updated (see [Cross-Referencing Dependencies](#cross-referencing-dependencies) below).
+
+### Cross-Referencing Dependencies
+
+When adding or modifying a collector or policy, **always check whether existing plugins need their `requires` or `related` fields updated.** Stale cross-references cause incorrect dependency information on the landing page.
+
+**When adding a NEW collector:**
+- Search all `lunar-policy.yml` files for policies that read from the Component JSON paths your collector writes to. Those policies should list your collector in `requires`.
+  ```bash
+  # Example: new collector writes to .container_scan
+  grep -rl "container_scan" lunar-lib/policies/*/lunar-policy.yml
+  grep -rl "container_scan" lunar-lib/policies/*/*.py
+  ```
+
+**When adding a NEW policy:**
+- Search all `lunar-collector.yml` files for collectors that write to the Component JSON paths your policy reads from. Those collectors should list your policy in `related`.
+  ```bash
+  # Example: new policy reads from .sast
+  grep -rl "\.sast" lunar-lib/collectors/*/lunar-collector.yml
+  ```
+
+**When renaming or consolidating a collector/policy:**
+- Search all manifests for references to the old slug and update them.
+  ```bash
+  grep -rl "old-slug" lunar-lib/collectors/*/lunar-collector.yml lunar-lib/policies/*/lunar-policy.yml
+  ```
+
+**Common mistake:** Adding a new collector that writes to `.sca` but forgetting to add it to the `sca` policy's `requires` list. Or adding a new policy but forgetting to update the corresponding collector's `related` list.
 
 ### Create Draft PR
 
