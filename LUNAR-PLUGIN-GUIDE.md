@@ -1300,6 +1300,37 @@ If none of the components have the data your policy needs:
 
 ---
 
+### Testing Policies with Collector Output (`--component-json`)
+
+When the collector hasn't been deployed to a live hub yet, you can chain collector + policy testing locally:
+
+1. **Run the collector** and capture its JSON output:
+   ```bash
+   lunar collector dev <plugin>.<sub> --component <component> 2>&1 | python3 -c "
+   import json, sys
+   merged = {}
+   for line in sys.stdin:
+       line = line.strip()
+       if not line.startswith('{'): continue
+       try:
+           d = json.loads(line)
+           def dm(b, o):
+               for k, v in o.items():
+                   if k in b and isinstance(b[k], dict) and isinstance(v, dict): dm(b[k], v)
+                   else: b[k] = v
+           dm(merged, d)
+       except: pass
+   json.dump(merged, sys.stdout)
+   " > /tmp/component.json
+   ```
+
+2. **Feed it to policies** via `--component-json`:
+   ```bash
+   lunar policy dev <policy>.<check> --component <component> --component-json /tmp/component.json
+   ```
+
+This lets you test the full collector → policy pipeline without deploying to a hub.
+
 ### Unit Tests (Optional, For Agent Confidence Only)
 
 Unit tests are **optional** — the primary verification method is running `lunar collector dev` / `lunar policy dev` against real components and pushing to a test environment. If you find unit tests helpful for debugging complex logic, you can write them locally, but **do NOT commit them to lunar-lib**.
@@ -1737,6 +1768,13 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 | Missing keywords | Add `keywords: []` to each sub-collector/policy |
 | Missing landing_page fields | Check required fields in reference docs |
 | `related` references non-existent policy | Update collector `lunar-collector.yml` to point to renamed/consolidated policy |
+| `requires[1].type 'policy' not allowed` | Add a blank line between `requires:` and `related:` in the YAML — the lint script's regex merges them otherwise |
+
+### Gotchas
+
+- **Always check latest tool versions.** When adding dependencies to Earthfiles, check the GitHub releases API: `curl -sS "https://api.github.com/repos/<owner>/<repo>/releases/latest" | grep tag_name`. Plans and prototypes may have stale versions.
+- **Complex jq in collectors is fragile.** If a collector needs to do resource classification or analysis, keep the jq simple (extract + group) and test against real data early. Complex inline jq with multiple functions is hard to debug — test the jq expression standalone before putting it in `main.sh`.
+- **GitHub API can lag behind the UI.** Commits may not show on a PR even after `git push` succeeds. If the PR's `head_sha` is stale, force-push (`git commit --amend --no-edit && git push --force-with-lease`) to kick GitHub into updating. Similarly, the reviews API may not show approvals that the UI shows — this is a known GitHub issue.
 
 ---
 
