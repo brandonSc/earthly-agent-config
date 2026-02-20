@@ -54,9 +54,10 @@ Summary of workflow:
 2. **Read the ai-context docs** — `lunar-lib/ai-context/` contains implementation guides
 3. **Use git worktrees** — One worktree per feature for parallel development
 4. **Spec-first PR** — PR the YAML manifest + README + example Component JSON first. Brandon and Vlad review the spec, comment, and iterate. Only add implementation code after they say "go ahead."
-5. **Test your work** — Run `lunar collector dev` / `lunar policy dev` against multiple components, verify results match expected outcomes
-6. **Pre-push checklist** — See [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md) for the full checklist before pushing
-7. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
+5. **SVG icons must use black fills** — Use `fill="black"` (NOT `fill="white"`). The website converts to white automatically, but black is visible in GitHub PR diffs. See [LUNAR-PLUGIN-GUIDE.md § SVG Specifications](LUNAR-PLUGIN-GUIDE.md#svg-specifications).
+6. **Test your work** — Run `lunar collector dev` / `lunar policy dev` against multiple components, verify results match expected outcomes
+7. **Pre-push checklist** — See [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md) for the full checklist before pushing
+8. **Create draft PRs** — Push, create draft PR, monitor GitHub Actions, fix errors automatically
 
 ### Creating Implementation Plans
 
