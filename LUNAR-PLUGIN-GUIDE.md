@@ -1048,6 +1048,13 @@ all:
 
 ### Testing Collectors
 
+> **Minimum test coverage — REQUIRED for every collector:**
+>
+> 1. **Positive case (data exists):** Test against a component that HAS the relevant data (e.g., a repo with Dockerfiles, k8s manifests, .tf files). Verify the collector writes correct, non-empty data to Component JSON.
+> 2. **Negative case (no data):** Test against a component that does NOT have the relevant data. The collector should **write nothing** — no empty arrays, no source metadata, no placeholder objects. If there's nothing to collect, the Component JSON key should simply not exist.
+>
+> **Why this matters:** Collectors that write empty data (e.g., `{"manifests": [], "workloads": []}`) pollute Component JSON for every component, cause policies to evaluate against meaningless empty arrays instead of skipping, and make the data harder to reason about. The principle is: **absence of a key means the feature doesn't apply; presence of a key means there's real data.**
+
 **Quick dev testing (no copy needed):** For `lunar collector dev` commands, you can use relative paths directly in `lunar-config.yml`:
 
 ```yaml
@@ -1610,6 +1617,7 @@ Before pushing your branch, verify all of the following:
 
 - [ ] **Tested on 3+ components** — Run `lunar collector dev` / `lunar policy dev` against at least 3 diverse components (e.g., Go, Node, Python). Don't just test the happy path.
 - [ ] **Results match expectations** — Compare actual output against the expected results from the implementation plan. If results differ, investigate before pushing.
+- [ ] **Positive AND negative cases tested (collectors)** — Test against a component WITH the relevant data (verify correct output) AND a component WITHOUT the relevant data (verify **nothing is written** — no empty arrays, no source metadata). If there's nothing to collect, the collector must not write to Component JSON at all.
 - [ ] **Skip behavior verified** — Test against a component where the collector hasn't run or the data doesn't apply. The policy should skip gracefully, not error.
 - [ ] **Collector output inspected** — For new collectors, run `lunar collector dev` with `--verbose` and verify the Component JSON paths and values are correct before writing policies against them.
 - [ ] **No hardcoded values** — `grep -r 'earthly.atlassian\|brandon@\|pantalasa' collectors/<name>/ policies/<name>/` should return nothing. Use inputs and secrets instead.
