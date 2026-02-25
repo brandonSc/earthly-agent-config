@@ -48,6 +48,7 @@ When the user refers to these names, use the corresponding GitHub username:
 ### Working on lunar-lib (Collectors & Policies)
 
 **Read the full guide:** [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md)
+**End-to-end PR playbook:** [LUNAR-PLUGIN-PLAYBOOK.md](LUNAR-PLUGIN-PLAYBOOK.md) — For autonomous agents (Devin, etc.) running the full spec → implement → merge cycle.
 
 Summary of workflow:
 1. **Update main first** — Pull latest changes before starting work
