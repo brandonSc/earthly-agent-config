@@ -34,7 +34,7 @@ System design for **Bender**, the Lunar AI agent. Runs on a dedicated AWS machin
 | Hosting | AWS EC2 (persistent VM) | Warm filesystem (repos, CLI, worktrees), simple ops |
 | Task source | Linear tickets assigned to Bender | Single backlog, status tracking, familiar to the team |
 | PR communication | GitHub PR comments | Reviewers see questions in context; webhook-driven resume |
-| Concurrency | Park-and-resume with priority queue | Multiple PRs in flight, one active worker at a time |
+| Concurrency | Worker pool (max N concurrent) with priority queue | Multiple PRs active simultaneously, bounded by worker limit |
 | Sessions | Persistent per ticket via `claude --resume` | Full conversational memory within a ticket lifecycle |
 | Learning | Global journal + per-ticket notes | Cross-ticket learning, self-improvement over time |
 | Secrets | `~/.lunar-agent/secrets.env` on the VM | Simple, rotatable, not in repo |
@@ -70,17 +70,22 @@ System design for **Bender**, the Lunar AI agent. Runs on a dedicated AWS machin
                    ▼
 ┌──────────────────────────────────────┐
 │          Task Manager                │
-│  Priority queue (single worker)      │
+│  Priority queue + worker pool (N)    │
 │  Park/resume logic                   │
 │  Retry budget + circuit breaker      │
-└──────────────┬──────┬────────────────┘
-               │      │
-               ▼      ▼
-┌──────────────┐  ┌────────────────────┐
-│ Session      │  │  Claude Executor   │
-│ Store        │  │  Invokes claude    │
-│ (JSON files) │  │  CLI with context  │
-└──────────────┘  └────────────────────┘
+└──────┬──────────┬──────────┬─────────┘
+       │          │          │
+       ▼          ▼          ▼
+┌──────────┐┌──────────┐┌──────────┐
+│ Worker 1 ││ Worker 2 ││ Worker N │
+│ (Claude) ││ (Claude) ││ (Claude) │
+└────┬─────┘└────┬─────┘└────┬─────┘
+     │           │           │
+     ▼           ▼           ▼
+┌──────────────────────────────────────┐
+│          Session Store               │
+│  (JSON files, one per ticket)        │
+└──────────────────────────────────────┘
 ```
 
 ---
@@ -197,9 +202,18 @@ When a reviewer replies to the blocking comment, the webhook unblocks the task a
 
 ---
 
-## Priority Queue
+## Worker Pool & Priority Queue
 
-Single worker processes events by priority:
+Bender runs up to **N concurrent workers** (configurable, default 3). Each worker handles one task at a time. Each task has its own git worktree and Claude Code session, so there's no filesystem or context contention.
+
+### How it works
+
+1. Events arrive via webhooks and land in a **priority queue**
+2. If a free worker exists, it picks up the highest-priority event immediately
+3. If all workers are busy, the event waits in the queue
+4. When a worker finishes (task parks, blocks, or completes), it picks up the next queued event
+
+### Priority levels
 
 | Priority | Event Type | Rationale |
 |----------|-----------|-----------|
@@ -209,7 +223,13 @@ Single worker processes events by priority:
 | 4 | New Linear ticket assigned | Start new work |
 | 5 (lowest) | Informational (e.g. CodeRabbit comment) | Handle when idle |
 
-If Claude is mid-task and a higher-priority event arrives, it finishes the current atomic step (commit, push, or comment), parks the current task with a summary, and switches.
+### Preemption
+
+No preemption. If all workers are busy and a priority-1 event arrives, it waits at the front of the queue. Workers finish their current atomic step quickly (commit, push, comment, or park), so the wait is short. Preemption adds complexity with minimal benefit — Claude Code sessions can't be interrupted mid-tool-call cleanly.
+
+### Scaling the worker count
+
+The bottleneck is the Anthropic API rate limit, not the VM. Start with 3 workers — if tasks consistently queue up, increase to 5. Monitor via the status script. Memory usage per Claude Code process is ~200-400 MB, so a `t3.large` (8 GB) handles 5 comfortably.
 
 ---
 
@@ -460,7 +480,7 @@ Index files for fast lookup:
 
 ### Machine
 
-- **Instance type:** `t3.medium` or `t3.large` (2-4 vCPU, 4-8 GB RAM). Claude Code itself is lightweight; `earthly` builds are the main resource consumer.
+- **Instance type:** `t3.large` or `t3.xlarge` (4-8 vCPU, 8-16 GB RAM). Each Claude Code worker uses ~200-400 MB; with 3-5 concurrent workers plus `earthly` builds, 8 GB is the minimum.
 - **Storage:** 50-100 GB EBS (repos, worktrees, Docker images for earthly)
 - **OS:** Ubuntu 22.04 or Amazon Linux 2023
 - **Elastic IP:** Stable IP for webhook URLs (or use a domain)
@@ -511,7 +531,7 @@ Index files for fast lookup:
     │   │   ├── github.ts        # GitHub event parsing + validation
     │   │   └── linear.ts        # Linear event parsing + validation
     │   ├── router.ts            # Event → task routing
-    │   ├── task-manager.ts      # Priority queue, park/resume
+    │   ├── task-manager.ts      # Worker pool, priority queue, park/resume
     │   ├── session-store.ts     # Read/write session JSON
     │   ├── claude-executor.ts   # Invoke Claude Code CLI
     │   ├── context-builder.ts   # Assemble prompt from playbook + session + event
@@ -564,19 +584,21 @@ A small script `status.sh` that reads session files and prints a table:
 $ ./status.sh
 
 Lunar Agent Status — 2026-03-12 14:35 UTC
+Workers: 2/3 active
 
 ACTIVE TASKS:
-  Ticket     Phase          Status   PR    Last Activity
-  ENG-500    spec_review    parked   #42   2h ago (waiting for Vlad)
-  ENG-501    implementing   active   #45   now (running tests)
-  ENG-502    blocked        blocked  #47   1d ago (Q: nested module handling)
+  Ticket     Phase          Status   PR    Worker  Last Activity
+  ENG-501    implementing   active   #45   W1      now (running tests)
+  ENG-503    spec_review    active   #49   W2      now (writing README)
+  ENG-500    spec_review    parked   #42   —       2h ago (waiting for Vlad)
+  ENG-502    blocked        blocked  #47   —       1d ago (Q: nested module handling)
 
 COMPLETED (last 7 days):
   ENG-498    done           merged   #40   3d ago
   ENG-499    done           merged   #41   2d ago
 
 QUEUE:
-  1 event pending (priority 4: new ticket ENG-503)
+  1 event pending (priority 5: CodeRabbit comment on #45)
 ```
 
 ### Per-invocation logs
@@ -628,7 +650,7 @@ Things explicitly deferred to v2+:
 
 - **Slack notifications** — escalation channel for blocked tasks, daily digest
 - **Web dashboard** — real-time view of task status, queue, logs, journal
-- **Parallel Claude sessions** — multiple workers for concurrent tasks
+- **Dynamic worker scaling** — auto-scale worker count based on queue depth and API rate limits
 - **Auto-assign tickets** — Bender picks up unassigned tickets from a "Bot Queue" label/project
 - **Cost tracking** — log token usage per task, per ticket, per day
 - **MCP browser** — Playwright MCP server for testing web UIs, checking Grafana dashboards
