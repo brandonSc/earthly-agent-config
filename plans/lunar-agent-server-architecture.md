@@ -504,7 +504,7 @@ Index files for fast lookup:
 ├── .lunar-agent/
 │   ├── secrets.env              # All secrets (sourced by the server)
 │   ├── github-app-private-key.pem
-│   ├── config.json              # Server configuration
+│   ├── config.json              # Runtime config (model, workers, limits)
 │   ├── sessions/                # One JSON file per task
 │   │   ├── ENG-500.json
 │   │   └── ENG-501.json
@@ -560,6 +560,38 @@ LUNAR_HUB_TOKEN=df11a0951b7c2c6b9e2696c048576643
 # Anthropic
 ANTHROPIC_API_KEY=sk-ant-...
 ```
+
+### Config file
+
+`~/.lunar-agent/config.json` — runtime settings that don't contain secrets. Edit and restart the server (or hot-reload if supported). When new models come out, just change `claude.model` here.
+
+```json
+{
+  "claude": {
+    "model": "claude-sonnet-4-20250514",
+    "max_turns": 50
+  },
+  "workers": {
+    "max_concurrent": 3
+  },
+  "circuit_breaker": {
+    "max_duration_minutes": 30,
+    "max_tokens": 100000
+  },
+  "retry": {
+    "max_retries": 3
+  }
+}
+```
+
+| Field | What it does | When to change |
+|-------|-------------|----------------|
+| `claude.model` | Model passed to `claude --model` | New model release (e.g. `claude-opus-4-20250514`) |
+| `claude.max_turns` | Max tool-call turns per invocation | If tasks are hitting the limit prematurely |
+| `workers.max_concurrent` | Worker pool size | Scale up if tasks queue; scale down to reduce API cost |
+| `circuit_breaker.max_duration_minutes` | Kill invocation after N minutes | Implementation phases may need more; review responses less |
+| `circuit_breaker.max_tokens` | Kill invocation after N tokens | Cost control |
+| `retry.max_retries` | Times to retry a failing step before marking `error` | Lower = faster escalation to human |
 
 ---
 
