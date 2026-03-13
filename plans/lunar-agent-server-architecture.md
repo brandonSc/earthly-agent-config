@@ -545,7 +545,7 @@ Index files for fast lookup:
 
 ```bash
 # GitHub App
-GITHUB_APP_ID=123456
+GITHUB_APP_ID=3075428
 GITHUB_APP_PRIVATE_KEY_PATH=/home/bender/.lunar-agent/github-app-private-key.pem
 GITHUB_WEBHOOK_SECRET=<random string>
 
