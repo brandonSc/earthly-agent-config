@@ -91,3 +91,31 @@
 - **Self-improvement** — Bender edits his own server code
 - **Session phase advancement** — still stuck at "starting"
 - **Linear status sync** — phase changes → Linear ticket status
+
+## Session 3 Updates (2026-03-30 continued)
+
+### Slack Integration — Live
+- Webhook endpoint verified, DMs and @mentions working
+- Unified Slack handler: single Sonnet call classifies chat vs work + responds naturally
+- Work requests dispatch to full Opus CLI with --resume
+- Persistent cross-channel memory (per-user + per-channel JSON files)
+- Thread tracking: @mention once, Bender follows the thread for 24 hours
+- Event dedup: app_mention + message don't double-fire
+- stream-json output: real-time tool call logging, no more buffered blindness
+- Worker status in Slack prompt: Bender knows if Opus is running or idle
+- Natural ack messages for work requests via Haiku
+- JSON response format (no more WORK: prefix leaking)
+
+### Issues Found
+- GitHub App needs Administration read/write permission to create repos
+- GitHub App pushes don't trigger Actions by default
+- stream-json requires --verbose with --print
+- Keyword classifier too aggressive (matched "check" in status questions) → replaced with unified AI handler
+- --resume causes stale context bleed for chat → disabled for chat, kept for code work
+- extractSummary was returning raw JSON stream → fixed parser to extract from message.content blocks
+
+### Remaining
+- Lurk mode not yet tested in channels (evaluator built but untested)
+- Slack emoji reactions not yet triggered
+- Bender sometimes still goes down rabbit holes instead of reporting back when stuck
+- Need to add the pantalasa-cronos GitHub App installation permissions (Administration)
