@@ -65,3 +65,29 @@
 - **ENG-478**: Phase 1 parent (12 sub-tasks for Starter tier)
 - **ENG-491**: Phase 2 parent (10 sub-tasks for Starter+ tier)
 - **ENG-486**: .NET/C# collector + policy (test ticket, PR #94 open)
+
+## Session 2 Updates (2026-03-30)
+
+### Changes Made
+- **Opus 4.6 max for code, Sonnet for chat** — smart model selection per event type
+- **Session resume working** — `--output-format json` captures session_id, `--resume` used on subsequent runs
+- **10s debounce with message accumulation** — rapid-fire messages merged into one invocation
+- **Events queue instead of drop** — messages for busy tickets wait and replay
+- **No more double-posting** — server doesn't post summary after normal runs
+- **CLAUDE.md operational rules** — always commit, read all PR threads, verify before exiting, check CI after pushing
+- **BENDER-IDENTITY.md** — external personality file, editable without redeploy
+- **BENDER-JOURNAL.md** — learning journal, Bender writes after PR merges
+- **Post-merge cleanup** — Bender cleans worktrees and writes learnings
+- **Commit avatar** — shows as me-bender[bot] on GitHub
+- **Linear token auto-refresh** — refresh token stored and used on 401
+- **Re-assignment aware** — reuses session, tells Claude about existing PR
+- **In-thread PR replies** — passes comment_id with in_reply_to
+- **Doc reading only for code** — chat replies skip the doc-reading step
+- **Personality tuned** — consistently Bender, not Claude-default, concise, quips when appropriate
+
+### Remaining for Next Session
+- **Parallel chat + work** — answer questions while code task is running (separate paths per ticket)
+- **Slack integration** — plan saved in plans/bender-slack-integration.md
+- **Self-improvement** — Bender edits his own server code
+- **Session phase advancement** — still stuck at "starting"
+- **Linear status sync** — phase changes → Linear ticket status
