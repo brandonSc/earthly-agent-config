@@ -37,10 +37,27 @@ npm run build
 sudo systemctl restart bender
 ```
 
-**IMPORTANT:** Check if workers are busy before restarting:
+**IMPORTANT:** Check for running work before restarting. There are TWO things to check:
+
+1. **Server worker slots** (fast Sonnet chat — OK to interrupt):
 ```bash
 curl -s localhost:3000/status | jq '.workers[] | select(.busy)'
 ```
+
+2. **Background Claude processes** (long-running work — DO NOT interrupt):
+```bash
+ps aux | grep claude | grep -v grep
+ls -la ~/.bender/workers/*.json | tail -5
+# Check status of each worker file:
+for f in ~/.bender/workers/*.json; do python3 -c "import json; s=json.load(open('$f')); print(f\"{s['status']:10} pid={s['pid']} desc={s['description'][:60]}\")"; done
+```
+
+If background Claude processes are running, **do NOT restart**. The restart kills the Node server but orphans the Claude processes — they keep running but the server loses the completion callback, so session state (claude_session_id, PR tracking) won't be updated. The worker will still post to Slack via curl, but the server won't know it finished.
+
+**Safe restart procedure:**
+1. Check both worker slots AND `ps aux | grep claude`
+2. If Claude processes are running, wait for them to finish (check the log file size — if it stops growing, it's done)
+3. Only restart when both are clear
 
 ## Key Directories on VM
 
