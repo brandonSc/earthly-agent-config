@@ -468,7 +468,7 @@ if __name__ == "__main__":
 
 ### ⚠️ CRITICAL: `c.skip()` Raises an Exception — NEVER Put `return` After It
 
-**This is the single most common mistake agents make when writing policies.** It has been repeated across many PRs and always causes CodeRabbit review comments and wasted cycles.
+**This is the single most common mistake agents make when writing policies.** It has been repeated across many PRs and always causes review comments and wasted cycles.
 
 `c.skip()` raises `SkippedError` which immediately exits the `with` block. **Any code after `c.skip()` is unreachable dead code.**
 
@@ -1666,11 +1666,9 @@ git push -u origin brandon/<feature-name>
 
 gh pr create --draft --title "Add <feature-name>" --body "Description..."
 
-# Trigger CodeRabbit review while still in draft
-gh pr comment <PR-number> --body "@coderabbitai review"
 ```
 
-**Important:** Always trigger CodeRabbit in draft mode so you can address its comments *before* marking the PR ready for human review. Wait ~60 seconds after commenting, then check for review comments.
+**Important:** Claude will automatically review the PR when it's opened or updated. Address its inline comments before marking the PR ready for human review. You can also `@claude` in a PR comment to ask questions or request deeper analysis.
 
 ### Post Testing Results Comment
 
@@ -1786,46 +1784,29 @@ If the change affects multiple checks/sub-collectors, test each one. Don't skip 
 
 ---
 
-## 8. CodeRabbit Review Handling
+## 8. Claude Code Review Handling
 
-**Trigger CodeRabbit on draft PRs** by commenting `@coderabbitai review`. This lets you address review comments before marking the PR ready for human review. CodeRabbit won't auto-review drafts, but it will respond to the explicit trigger.
-
-```bash
-# Trigger review on a draft PR
-gh pr comment <PR-number> --body "@coderabbitai review"
-```
-
-### Known False Positives
-
-**Stale comments after force-push**
-
-If you remove files from a PR via force-push, CodeRabbit comments on those files become stale but still appear. These can be safely ignored.
+Claude automatically reviews PRs via the `claude-code-action` GitHub Action when they are opened, updated, or marked ready for review. You can also `@claude` in any PR comment to ask questions or request deeper analysis.
 
 ### Valid Feedback to Watch For
 
 **"Unreachable `return` after `c.skip()`"**
 
-If CodeRabbit flags `return c` after `c.skip()` as dead code, **it's correct — fix it immediately.** `c.skip()` raises `SkippedError` which exits the `with` block, so `return c` never executes. Just remove the `return c`. This is the most common agent mistake — see the ⚠️ warning in Section 4.
+If Claude flags `return c` after `c.skip()` as dead code, **it's correct — fix it immediately.** `c.skip()` raises `SkippedError` which exits the `with` block, so `return c` never executes. Just remove the `return c`. This is the most common agent mistake — see the ⚠️ warning in Section 4.
 
 **"Unreachable skip logic"**
 
-If CodeRabbit says `skip()` is unreachable after `c.exists()`, **it's also correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
+If Claude says `skip()` is unreachable after `c.exists()`, **it's also correct**. This is a real bug — see "Data Existence Checks" in Section 4. The fix is to use `c.get_node(path).exists()` instead.
 
-### Responding to CodeRabbit Comments
+### Responding to Review Comments
 
-**Always reply to CodeRabbit comments** — it learns from feedback, so keeping it updated improves future reviews.
+**Always reply to review comments** — address or acknowledge every one.
 
 | Outcome | Action |
 |---------|--------|
 | **Addressed** | Reply explaining what you fixed, then resolve the thread |
 | **Won't fix** | Reply with justification, then resolve the thread |
 | **False positive** | Reply explaining why, then resolve the thread |
-
-**Wait for follow-up responses.** After replying to CodeRabbit or pushing fixes:
-- Wait 2-3 minutes for CodeRabbit to process new commits and post follow-up comments
-- Check for new comments before considering the review complete
-- CodeRabbit often acknowledges your fixes or asks clarifying questions
-- Same applies to human reviewers — don't assume silence means approval
 
 **Reply and resolve commands:**
 
@@ -1851,7 +1832,7 @@ The thread ID is in the comment's `node_id` field (for GraphQL) or can be found 
 
 ### Self-Review Before Opening/Updating PR
 
-**Always do a self-review** before opening a PR or after making extensive changes. This catches inconsistencies that CodeRabbit and CI won't detect.
+**Always do a self-review** before opening a PR or after making extensive changes. This catches inconsistencies that automated reviews and CI won't detect.
 
 **Self-Review Checklist:**
 
@@ -1878,7 +1859,7 @@ The thread ID is in the comment's `node_id` field (for GraphQL) or can be found 
 
 **When to self-review:**
 - Before creating a draft PR
-- After addressing multiple CodeRabbit comments
+- After addressing multiple review comments
 - After any refactor that changed behavior
 - Before marking PR ready for human review
 
@@ -1897,7 +1878,7 @@ When user says "make PR ready for review":
      -X POST -f 'reviewers[]=<username>'
    ```
 
-3. **Wait for CodeRabbit:** ~60 seconds for review
+3. **Wait for Claude review:** Claude will automatically review when the PR is updated
 
 4. **Present comments to user:**
    - 🔴 Critical — Must fix
@@ -1917,8 +1898,8 @@ When user says "make PR ready for review":
 ### ⚠️ Draft vs Open PR — Autonomy Rules
 
 **While the PR is in draft**, the agent may act autonomously:
-- Push commits to fix CI, address CodeRabbit, iterate on code
-- Reply to CodeRabbit comments and resolve threads
+- Push commits to fix CI, address Claude review comments, iterate on code
+- Reply to review comments and resolve threads
 - Test, refactor, and improve without asking
 
 **Once the PR is marked ready for review (open)**, the agent must get user approval before:

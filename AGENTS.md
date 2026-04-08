@@ -119,9 +119,9 @@ You're pair-programming with the user in Cursor. The user reviews your work befo
 3. Commit and push changes
 4. Create a **draft PR** initially
 5. Watch GitHub Actions for failures — fix CI errors automatically
-6. **Trigger CodeRabbit review** while still in draft: comment `@coderabbitai review` on the PR
-7. **Address CodeRabbit comments** — fix issues, reply to false positives, resolve threads
-8. Only mark PR as ready for human review once CI passes and CodeRabbit comments are addressed
+6. **Claude auto-reviews** when the PR is opened or updated — address its inline comments, fix real issues, reply to false positives, resolve threads
+7. You can also `@claude` in a PR comment to ask questions or request deeper analysis
+8. Only mark PR as ready for human review once CI passes and Claude review comments are addressed
 
 **Open phase (user approval required):**
 9. **Add reviewers** — When the user says "assign" someone to a PR, add them as **reviewers** (`gh pr edit --add-reviewer`), not assignees. We don't use the assignee field.
@@ -147,7 +147,7 @@ You're working independently — the user does **not** have access to this chat 
 
 **Switching modes:** The user can switch at any time. "Stop bot mode" or "run this by me first" switches back to interactive. "Handle it" or "work autonomously" switches to bot mode.
 
-**For lunar-lib PRs:** See detailed PR description guidelines, CodeRabbit handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
+**For lunar-lib PRs:** See detailed PR description guidelines, Claude review handling, and testing in [LUNAR-PLUGIN-GUIDE.md](LUNAR-PLUGIN-GUIDE.md).
 
 ### PR Monitoring
 

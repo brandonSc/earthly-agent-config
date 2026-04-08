@@ -291,7 +291,7 @@ When QA-ing a feature, follow these rules:
 - **CI `build-cli-mac` and `ci-images`** run on self-hosted runners that occasionally hit disk space or Docker issues. These failures are infra-related, not code-related.
 - **CI "cache key" or "inconsistent graph state" errors** are Earthly bugs, not code issues. Re-run the failed CI job — it usually passes on retry. May need 2-3 attempts.
 - **CI `hub-integration` Docker Hub timeouts** — The self-hosted runner sometimes can't pull images from Docker Hub (e.g., `net/http: timeout awaiting response headers`). Re-run the job.
-- **CodeRabbit may skip draft PRs.** It often only reviews once the PR is marked ready, or after you comment `@coderabbitai review`.
+- **Claude reviews PRs automatically** when they are opened or updated via the `claude-code-action` GitHub Action. You can also `@claude` in a PR comment to ask questions.
 - **Hub deploys are manual.** After merging Hub-side changes, someone needs to deploy to the demo environments (cronos, etc.). The deploy is done via deploy PRs like `Deploy cronos (#929)`.
 
 ---
