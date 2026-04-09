@@ -128,6 +128,44 @@ Reach out to a focused list of attendees via cold email or LinkedIn DM in the da
 
 ---
 
+## Full Speaker List (for Sales Navigator lookup)
+
+| Name | Title | Company | Company Description |
+|------|-------|---------|---------------------|
+| Jennifer St Pierre | SVP, ISG Transformation | Dell Technologies | Global enterprise tech: servers, storage, networking, PCs, IT services |
+| Nancy Wang | CTO | 1Password | Password management and secrets management platform |
+| Tim Bozarth | CVP, CoreAI Engineering | Microsoft | Global tech company, cloud (Azure), developer tools, OS, productivity |
+| Taroon Mandhana | CTO, AI & Teamwork | Atlassian | Collaboration and developer tools: Jira, Confluence, Bitbucket |
+| Praveena Patchipulusu | VP of Engineering | Hewlett Packard Enterprise | Enterprise IT infrastructure, hybrid cloud, networking, edge computing |
+| Uma Namasivayam | Senior Director, Engineering Productivity | Dropbox | Cloud file storage, sync, and collaboration platform |
+| Jesse Adametz | Senior Director, Platform Engineering | Twilio | Cloud communications APIs: SMS, voice, video, email (EXISTING USER) |
+| Nidhi Allipuram | VP, Enterprise Developer Experience & Platform | Nationwide | Insurance and financial services company |
+| Rafe Colburn | Chief Product and Technology Officer | Etsy | Online marketplace for handmade, vintage, and unique goods |
+| Brent Foster | VP, Engineering Practices | TD Bank | Top 10 North American bank, retail and commercial banking |
+| Kelly Anne Pipe | Head of Developer Experience | Vanguard | Investment management, mutual funds, ETFs, brokerage services |
+| Nicole Scribner | Director, Engineering Enablement and Advancement | Vanguard | Investment management, mutual funds, ETFs, brokerage services |
+| Jai Schniepp | Sr Director of DevX Product Management | Comcast | Telecom, cable, broadband, media conglomerate (NBCUniversal parent) |
+| Jason Valentino | Head of Software Engineering Discipline | BNY | Oldest US bank, custody/asset servicing, investment management, $46T AUC |
+| Stewart Reichling | Product Manager, Developer Platform | Netflix | Global streaming entertainment service, ~270M subscribers |
+| Abhishek Tibrewal | Senior Data Scientist, Platform Engineering | Uber | Ride-hailing, delivery, freight, mobility platform |
+| Ty Smith | Principal Engineer, AI & Developer Productivity | Uber | Ride-hailing, delivery, freight, mobility platform |
+| Michael Galloway | VP, Platform Engineering | Mercari | Japanese C2C marketplace app, expanding globally |
+| Snehal Shinde | Director, Platform Engineering | Mercari | Japanese C2C marketplace app, expanding globally |
+| Brian Scanlan | Senior Principal Systems Engineer, Developer Productivity | Intercom | Customer messaging platform for sales, marketing, support |
+| Mina Tawadrous | Associate Director, Product Management | SiriusXM | Satellite and streaming audio entertainment |
+| Eleanor Millman | Senior Staff Product Manager, Platform Engineering | SiriusXM | Satellite and streaming audio entertainment |
+| Christopher Sanson | Principal Product Manager, AI & Developer Productivity | Airbnb | Online marketplace for short-term rentals and experiences |
+| Madison Capps | Engineering Manager, Infrastructure | Airbnb | Online marketplace for short-term rentals and experiences |
+| Michael Redding | Product Director | Indeed | Job search engine and employment platform, ~350M monthly visitors |
+| Jeff Davis | VP Core Infrastructure | Indeed | Job search engine and employment platform, ~350M monthly visitors |
+| Abi Noda | CEO | DX | Developer experience measurement platform (conference organizer) |
+| Brian Houck | Senior Principal Applied Scientist | Microsoft | Global tech company, cloud (Azure), developer tools, OS, productivity |
+| Eirini Kalliamvakou | Research Advisor | GitHub | Code hosting, collaboration, CI/CD, Copilot (owned by Microsoft) |
+| Collin Green | Senior Staff UX Researcher | Google | Search, cloud, Android, ads, AI/ML, productivity tools |
+| Rebecca Fitzhugh | Lead Principal Engineer | Atlassian | Collaboration and developer tools: Jira, Confluence, Bitbucket |
+
+---
+
 ## Open Questions
 
 - [ ] Does Vlad want to do LinkedIn DMs, email, or both? LinkedIn is more natural for conference-adjacent outreach; email is more direct if we can find addresses.
