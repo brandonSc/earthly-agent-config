@@ -8,7 +8,7 @@
 
 ## Strategy
 
-Reach out to a focused list of attendees via cold email or LinkedIn DM in the days leading up to the conference (April 9-15). The goal is to set up informal 1:1 coffee or small-group conversations while they're in SF, not a sales pitch at the conference itself.
+Reach out to a focused list of attendees via LinkedIn DM in the days leading up to the conference (April 9-15). The goal is to set up informal 1:1 coffee or small-group conversations while they're in SF, not a sales pitch at the conference itself.
 
 **Angles:**
 - Vlad is Earthly's CEO and will be in SF the week of the conference
@@ -54,65 +54,23 @@ Reach out to a focused list of attendees via cold email or LinkedIn DM in the da
 
 ---
 
-## Message Templates
+## LinkedIn DM Templates
 
-### Template A - AI-focused, no name-drop
+### Template A - AI angle
 
-> Subject: Guardrails for AI-generated code - coffee in SF?
->
-> Hi [Name],
->
-> I saw you're speaking at DX Annual on the 16th, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit.
->
-> I'll be in SF that week and would love to grab a quick coffee if you have 20 minutes. Curious how [Company] is thinking about maintaining standards as AI-written code ramps up.
->
-> Either way, enjoy the conference.
->
-> Vlad
+> Hi [Name], I see you're speaking at DX Annual next week, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit. I'll be in SF and would love to grab a quick coffee. Curious how [Company] is thinking about maintaining standards as AI-written code ramps up. 20 min?
 
-### Template B - AI-focused, with Twilio name-drop (get Jesse's okay first)
+### Template B - AI angle, with Twilio name-drop (get Jesse's okay first)
 
-> Subject: Guardrails for AI-generated code - coffee in SF?
->
-> Hi [Name],
->
-> I saw you're speaking at DX Annual, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit. Twilio's platform engineering team has been using it as their AI adoption scales.
->
-> I'll be in SF that week and would love to grab a quick coffee if you have 20 minutes, curious how [Company] is approaching this.
->
-> Vlad
+> Hi [Name], I see you're speaking at DX Annual next week, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit. Twilio's platform engineering team has been using it as their AI adoption scales. I'll be in SF and would love to grab a quick coffee, curious how [Company] is approaching this. 20 min?
 
-### Template C - Engineering standards, no AI lead (for platform eng leaders)
+### Template C - Standards angle (for platform eng leaders)
 
-> Subject: Automated engineering standards - coffee in SF?
->
-> Hi [Name],
->
-> I saw you're speaking at DX Annual on the 16th, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which turns engineering standards (testing requirements, security policies, infra conventions, operational readiness) into automated guardrails enforced in every PR. Define your standards once, enforce them across every repo and team automatically, no migration required.
->
-> I'll be in SF that week and would love to grab a quick coffee if you have 20 minutes. Curious how [Company] handles standards enforcement across your platform today.
->
-> Vlad
+> Hi [Name], I see you're speaking at DX Annual next week, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which turns engineering standards (testing requirements, security policies, infra conventions, operational readiness) into automated guardrails enforced in every PR. Define once, enforce everywhere, no migration required. I'll be in SF and would love to grab a quick coffee. Curious how [Company] handles standards enforcement today. 20 min?
 
 ### Template D - Regulated industries (for BNY, TD, Vanguard, Nationwide)
 
-> Subject: Engineering guardrails for regulated teams - coffee in SF?
->
-> Hi [Name],
->
-> I noticed you're at DX Annual on the 16th. I'm Vlad, CEO of Earthly. We build Lunar, which turns engineering standards into automated guardrails enforced in every PR and AI coding workflow. Security policies, compliance requirements, operational readiness checks, all defined once, enforced everywhere, continuously audit-ready.
->
-> For teams in regulated industries, the challenge is moving faster with AI without losing the compliance and audit visibility you need. That's exactly what we solve. Would love to grab coffee while you're in SF.
->
-> Vlad
-
-### Template E - LinkedIn DM, AI angle (shorter)
-
-> Hi [Name], I see you're speaking at DX Annual next week. I'm Vlad, CEO of Earthly. We build Lunar, automated engineering guardrails enforced via AI hooks and PR gates across every commit. Helps teams move faster with AI-generated code without losing control. I'll be in SF and would love to grab a quick coffee. 20 min?
-
-### Template F - LinkedIn DM, standards angle (shorter)
-
-> Hi [Name], I see you're speaking at DX Annual next week. I'm Vlad, CEO of Earthly. We build Lunar, which turns your engineering standards (security, testing, infra, compliance) into automated guardrails enforced in every PR. Define once, enforce everywhere. I'll be in SF and would love to grab a quick coffee. 20 min?
+> Hi [Name], I see you're at DX Annual on the 16th. I'm Vlad, CEO of Earthly. We build Lunar, which turns engineering standards into automated guardrails enforced in every PR and AI coding workflow. Security policies, compliance requirements, operational readiness, all defined once, enforced everywhere, continuously audit-ready. For regulated teams the challenge is moving faster with AI without losing compliance visibility. That's what we solve. Would love to grab coffee while you're in SF. 20 min?
 
 ---
 
@@ -168,7 +126,6 @@ Reach out to a focused list of attendees via cold email or LinkedIn DM in the da
 
 ## Open Questions
 
-- [ ] Does Vlad want to do LinkedIn DMs, email, or both? LinkedIn is more natural for conference-adjacent outreach; email is more direct if we can find addresses.
 - [ ] Are we comfortable name-dropping Twilio/Jesse? Need to check with Jesse.
 - [ ] Is there anyone on this list Vlad already knows or has a connection to?
 - [ ] Do we want to try to organize a small dinner/drinks instead of individual coffees?
