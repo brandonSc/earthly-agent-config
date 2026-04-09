@@ -58,7 +58,7 @@ Reach out to a focused list of attendees via LinkedIn DM in the days leading up 
 
 ### Template A - AI angle
 
-> Hi [Name], I see you're speaking at DX Annual next week, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit. I'll be in SF and would love to grab a quick coffee. Curious how [Company] is thinking about maintaining standards as AI-written code ramps up. 20 min?
+> Hi [Name], I see you're speaking at DX Annual next week, great lineup. I'm Vlad, CEO of Earthly. We build Lunar, which helps engineering teams move faster with AI-generated code by using AI hooks and PR gates to automatically enforce engineering standards, like security and compliance requirements, across every commit. I'll be in SF and would love to grab a quick coffee. Curious how [Company] is thinking about maintaining standards as AI-written code ramps up.
 
 ### Template B - AI angle, with Twilio name-drop (get Jesse's okay first)
 
