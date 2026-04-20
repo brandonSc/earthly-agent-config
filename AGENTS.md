@@ -283,7 +283,9 @@ Both demo environments use Grafana as the web UI, fronted by a Caddy reverse pro
 | Environment | URL | Grafana User | Grafana Password | Hub Token |
 |-------------|-----|-------------|-----------------|-----------|
 | **pantalasa** (lunar) | `https://lunar.demo.earthly.dev` | `lunar` | `910vfBf` | `df11a0951b7c2c6b9e2696c048576643` |
-| **pantalasa-cronos** (cronos) | `https://cronos.demo.earthly.dev` | `lunar` | `910vfBf` | `df11a0951b7c2c6b9e2696c048576643` |
+| **pantalasa-cronos** (cronos) | `https://cronos.demo.earthly.dev` | `lunar` | *password rotated \u2014 ask Brandon* | `df11a0951b7c2c6b9e2696c048576643` |
+
+**Note:** Both envs share the same hub token, but Grafana web passwords are per-environment. The pantalasa (`lunar.demo.earthly.dev`) password is stable. The cronos password was rotated at some point and `910vfBf` no longer works there.
 
 **Architecture:** Caddy proxies gRPC (`:443 /hubapi.Hub*` → hub:8000), webhooks/logs → hub:8001, everything else → Grafana:3000. The Grafana login uses the same web credentials above.
 
