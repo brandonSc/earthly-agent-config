@@ -243,9 +243,39 @@ When the sets don't match, Grafana's `timeSeriesTable` transform crashes on `.tr
 
 **Proper fix:** PR against `earthly/lunar` modifying [`lunar/grafana/sql/components/score_history.sql`](lunar/grafana/sql/components/score_history.sql) with the same change. Will roll out via the normal dashboard build + ansible deploy. Cronos needs the same hotfix applied (creds weren't in `AGENTS.md` — stale).
 
-### Asymmetric check materialization for subdir components
+### SHA-only policy_run / collection_record joins cause cross-attribution
 
-Only `services/api-python` got check rows after the push; `services/backend-go` and `compliance` didn't, despite identical tag sets and filter conditions. Root cause not fully determined but likely involves the `MatchStar` filter interacting with some ordering or dedup stage non-deterministically. This is subtle and hard to reproduce reliably — worth investigating separately.
+**Symptom observed on pantalasa live:** after pushes to `github.com/pantalasa/monorepo` (with 4 declared components: the bare repo plus three subdir components), `hub.policy_runs` correctly recorded ~200 runs all against the bare-repo component (the only one the webhook's `MatchStar` filter matched). But `public.checks_latest` showed 53 checks attributed to `services/api-python`. The subdir component appeared to have checks — but the underlying policy runs were never recorded against it.
+
+**Root cause:** the `checks_latest` and `component_deltas` SQL join chains originally matched policy runs / collection records to components by **git SHA alone**:
+
+```sql
+LEFT JOIN hub.policy_runs pol_r ON (pol_r.dimensions ->> 'head_sha') = gc.sha::text
+```
+
+Any component that (a) shared the git repo and (b) had a row in `git_repository_components` for the same `repository_id` would join against every policy run on that SHA, regardless of which component the run was actually recorded for. In a monorepo this is strictly wrong: sibling subdir components phantom-inherit each other's checks.
+
+**Why it only surfaced for one of the three subdir components:** `components_latest` also filters by the presence of a `components_latest` row (via `checks_latest`'s `JOIN public.components_latest AS d ON c.component_id = d.component_id AND d.pr IS NULL`). Only `services/api-python` had an entry in `materialized_components` (from an earlier materialization); the others were filtered out at a different stage. That staleness masked the bug for two of the three subdir components but left it exposed for the third.
+
+**Status:**
+
+- [`hub/migrations/01_sqlapi/checks_join_chain.sql:95-96`](lunar/hub/migrations/01_sqlapi/checks_join_chain.sql) — **already fixed on main** (lands via Corey's #1340 driver-based dirty_pairs perf refactor, merged 2026-04-20). Adds `AND pol_r.component_id = dp.component_pk` to the join.
+- [`hub/migrations/01_sqlapi/component_deltas.sql:31`](lunar/hub/migrations/01_sqlapi/component_deltas.sql) — **still broken on main**. Same SHA-only pattern on the `collection_records` join. Feeds `materialized_component_deltas` and any dashboards built on `public.component_deltas`.
+- [`hub/migrations/110_grafana_schema_5.sql:132`](lunar/hub/migrations/110_grafana_schema_5.sql), [`112_grafana_schema_6.sql:140`](lunar/hub/migrations/112_grafana_schema_6.sql) — older grafana layer SQL with the same pattern, but those are superseded by the 01_sqlapi/ definitions so the live behavior follows the 01_sqlapi version.
+
+**Scaffolded follow-up:** branch `brandon/monorepo-view-fix` on the `earthly/lunar` repo (not yet pushed). Contains:
+
+- Fix to [`component_deltas.sql`](lunar/hub/migrations/01_sqlapi/component_deltas.sql): add `AND cr.component_id = c.id` to the collection_records join, mirroring the fix that already landed for checks.
+- Regression test in [`hub/sqlapi/join_chain_torture_test.go`](lunar/hub/sqlapi/join_chain_torture_test.go) (`TestChecksJoinChainBranches`, new subtest "policy_result for one component does not leak to sibling on same repo"): arranges two components sharing one repo, records a policy_result against only one, asserts the other does not phantom-inherit the check.
+
+**Rollout sequence (if you want to actually ship the fix):**
+
+1. Land the branch as a PR against `earthly/lunar`, including the existing `component_deltas` fix and the regression test.
+2. Deploy the hub so the view is re-created via `CREATE OR REPLACE FUNCTION`.
+3. Run a materialized-view refresh (`lunar sql refresh --full`) to rebuild `materialized_component_deltas` without the leaked rows.
+4. Verify on pantalasa live that the previously phantom-attributed checks no longer appear against sibling subdir components.
+
+**Implication for the webhook fix (Axis 2a) sequencing:** the view fix by itself makes the dashboard look *emptier* (honestly empty instead of accidentally populated) because subdir components will stop inheriting the bare-repo's checks without yet getting their own. Deploy the webhook filter fix first so subdir components produce real, correctly-attributed data; then deploy the view fix as tidy-up. Otherwise customers running monorepos will see a regression.
 
 ### Auto-cataloged components collide with declared subdir components
 
@@ -262,14 +292,15 @@ The `lunar/910vfBf` combo in `earthly-agent-config/AGENTS.md` works on pantalasa
 1. **Fix the webhook filter (Axis 2a)** — single-function change in `filter.go`, unblocks code-collector fanout for subdir components. Includes a small test.
 2. **Fix the cron `ParseOwnerRepo` bug** — one-line change, use `fetch.ParseComponentName` instead. Includes a test.
 3. **Add `LUNAR_COMPONENT_REPO_ROOT` env var** to the executor (always populated; no behavioral change for non-subdir components).
-4. **Implement `scope: subdir` hook flag (Axis 3a)** behind an opt-in so we can migrate stock collectors incrementally.
-5. **Land the dashboard SQL fix** (Axis 4 dashboard section above) as a lunar PR.
-6. **First-class `path:` field on components (Axis 1a)** — schema migration + fetcher changes + store changes. Moderate size but bounded.
-7. **Migrate stock collectors to `scope: subdir`**: start with `readme`, `codeowners`, `docker`, `k8s`, `terraform`, `syft`, `trivy` — they all make more sense at subdir scope for subdir components.
-8. **Implement `lunar.yml` for per-subdir config** (Axis 1 follow-up). Good monorepo UX; lower priority than the correctness fixes.
-9. **Design the ordering primitive (Axis 4)** once collector behavior is solid — start with 4c (retry loop in the pulling collector), then evaluate 4b.
+4. **Close the cross-attribution leak in `component_deltas`** (branch `brandon/monorepo-view-fix` already has this scaffolded). The `checks_latest` leg already landed via #1340; the deltas leg is still outstanding. **Deploy after fix #1** so the net user-visible effect is "subdir components got their own data" rather than "subdir components went from accidentally-populated to empty."
+5. **Land the dashboard SQL fix** (score_history.sql / listing.sql set-mismatch) as a lunar PR. Flows through the normal dashboard build + ansible deploy.
+6. **Implement `scope: subdir` hook flag (Axis 3a)** behind an opt-in so we can migrate stock collectors incrementally.
+7. **First-class `path:` field on components (Axis 1a)** — schema migration + fetcher changes + store changes. Moderate size but bounded.
+8. **Migrate stock collectors to `scope: subdir`**: start with `readme`, `codeowners`, `docker`, `k8s`, `terraform`, `syft`, `trivy` — they all make more sense at subdir scope for subdir components.
+9. **Implement `lunar.yml` for per-subdir config** (Axis 1 follow-up). Good monorepo UX; lower priority than the correctness fixes.
+10. **Design the ordering primitive (Axis 4)** once collector behavior is solid — start with 4c (retry loop in the pulling collector), then evaluate 4b.
 
-Fixes 1-3 together should unblock most of the realistic monorepo story on the existing demo envs. They're also the smallest and safest patches.
+Fixes 1-3 together should unblock most of the realistic monorepo story on the existing demo envs. They're also the smallest and safest patches. Fixes 4 and 5 clean up downstream dashboards so the improved behavior actually surfaces correctly to users.
 
 ---
 
@@ -289,7 +320,7 @@ These need the component/path first-class model (Axis 1) before they can be desi
 
 ## Open questions
 
-- **Is the asymmetric behavior we saw (only api-python got checks) deterministic or a race?** Worth a targeted reproduction with detailed logging to understand whether the `MatchStar` filter is actually as strict as the code reads, or whether there's a code path we haven't found that bypasses it.
+- **Why was only one of the three subdir components showing phantom data?** Answered during investigation: the `MatchStar` filter is as strict as the code reads (the *bare* repo component is the only webhook match). The reason api-python alone appeared with check data is the SHA-only cross-attribution bug in `checks_latest` combined with `components_latest` filtering to components that already had a `materialized_components` row. api-python happened to be in `materialized_components` from an earlier materialization run; the other two weren't. Fixing the SHA-only join (already done for `checks_latest` on main, still outstanding for `component_deltas`) removes the cross-attribution entirely; `components_latest` filtering is a separate issue of stale materialization data.
 - **Should `lunar.yml` complement or replace central component declaration?** Product-level question for monorepo teams — would a team rather declare all 30 services in one central file or 30 `lunar.yml` files next to each service?
 - **How does the catalog reconcile per-subdir `lunar.yml` with central `lunar-config.yml`?** If both declare `github.com/org/mono/svc-a`, who wins? The docs say "lunar-config.yml takes precedence for scalars, arrays merge" — but that needs to be verified against a real implementation.
 - **What's the right `scope: subdir` default?** Opt-in is safer but means existing stock collectors stay broken for monorepos until migrated. Opt-out is cleaner but breaks non-monorepo use of those same collectors where repo-root access is actually intended.
@@ -314,5 +345,8 @@ Code-level citations (for authors of the actual fix PRs):
 - CI observer matching components: [`lunar/ci/observe.go:819-874`](lunar/ci/observe.go)
 - Dashboard panel source: [`lunar/grafana/dashboards/components.json:300-460`](lunar/grafana/dashboards/components.json)
 - Broken SQL: [`lunar/grafana/sql/components/score_history.sql`](lunar/grafana/sql/components/score_history.sql) (vs [`lunar/grafana/sql/components/listing.sql`](lunar/grafana/sql/components/listing.sql))
+- Checks-layer SHA-only join (fixed on main by #1340): [`lunar/hub/migrations/01_sqlapi/checks_join_chain.sql:95-96`](lunar/hub/migrations/01_sqlapi/checks_join_chain.sql)
+- Deltas-layer SHA-only join (still broken on main): [`lunar/hub/migrations/01_sqlapi/component_deltas.sql:31`](lunar/hub/migrations/01_sqlapi/component_deltas.sql)
+- Scaffolded fix + regression test: branch `brandon/monorepo-view-fix` in a local worktree at `~/code/earthly/lunar-wt-monorepo-fix/` (not pushed; see commit `7d37af6a` locally).
 - Test-env collector (reference pattern): [`pantalasa/lunar collectors/terraform-internal/main.sh`](https://github.com/pantalasa/lunar/blob/main/collectors/terraform-internal/main.sh)
 - Our test-env `release-bundle` collector: `pantalasa/lunar/collectors/release-bundle/` and `pantalasa-cronos/lunar/collectors/release-bundle/` (same source)
