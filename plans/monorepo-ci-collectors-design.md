@@ -23,9 +23,67 @@ Everything else (CI attribution, per-service file discovery, cross-component pul
 
 ## Test environments
 
-- **`pantalasa-cronos/monorepo`** (cronos hub, `cronos.demo.earthly.dev`) — primary test repo.
-- **`pantalasa/monorepo`** (pantalasa hub, `lunar.demo.earthly.dev`) — mirror, used because the cronos Grafana password from `AGENTS.md` is stale.
-- Both have 3 or 4 declared components (`services/backend-go`, `services/api-python`, `compliance`, plus a bare-repo entry on pantalasa) and a new local `release-bundle` collector modeled on the `terraform-internal` cross-component pull pattern.
+- **`pantalasa-cronos/monorepo`** (cronos hub, `cronos.demo.earthly.dev`) — **primary monorepo test environment**. Declares 4 components under `github.com/pantalasa-cronos/monorepo` (the bare repo + `services/backend-go`, `services/api-python`, `compliance`) and wires a local `release-bundle` collector. Exercises every latent subdir-component bug.
+- **`pantalasa/monorepo`** (GitHub repo) — previously mirrored the cronos setup on the pantalasa hub. Removed from `pantalasa/lunar/lunar-config.yml` on 2026-04-20 (commit `580eaff`) to free the pantalasa demo env for the polyrepo shape below. The GitHub repo itself is left alive; the hub ignores its webhooks now that the components are gone.
+- **`pantalasa/compliance-docs` + `pantalasa/<services>`** (pantalasa hub, `lunar.demo.earthly.dev`) — **polyrepo compliance-pull demo**. See dedicated section below. This is the shape we'd put in front of a prospect because it exercises Lunar's cross-component pull primitive without triggering any of the monorepo bugs.
+
+---
+
+## Polyrepo compliance-pull demo (shipping today, prospect-ready)
+
+### Shape
+
+One producer component, many consumer components:
+
+- **Producer:** [`github.com/pantalasa/compliance-docs`](https://github.com/pantalasa/compliance-docs) — standalone repo in `engineering.compliance` domain, tagged `[compliance, docs]`. Contains `docs/dr-plan.md`, `docs/dr-exercises/*.md`, `docs/policies/*.md`. The `dr-docs` collector runs on it (via `on: [SOC2, compliance]`) and populates `.oncall.disaster_recovery.{plan,exercises,...}` on the producer's Component JSON.
+
+- **Consumers:** every SOC2-tagged service in the pantalasa manifest (currently 6: `backend`, `auth`, `inventory`, `rust-service`, `spring-petclinic`, `dotnet-service`). A local `compliance-bundle` collector fires `on: [SOC2]` and pulls the producer's Component JSON via `lunar component get-json`.
+
+### What each consumer ends up with
+
+```json
+{
+  "compliance": {
+    "source_component": "github.com/pantalasa/compliance-docs",
+    "bundled_at": "2026-04-20T21:02:39Z",
+    "imported": true,
+    "disaster_recovery": {
+      "plan_exists": true,
+      "rto_minutes": 60,
+      "rpo_minutes": 15,
+      "last_reviewed": "2026-02-10",
+      "approver": "brandon@pantalasa.org",
+      "latest_exercise_date": "2026-03-15",
+      "exercise_count": 2
+    }
+  }
+}
+```
+
+Flat scalar executive-summary. No internal arrays (so idempotent under Lunar's recursive-merge). Attribution preserved.
+
+### Why this works today with no hub changes
+
+The pattern only uses primitives that already exist and work correctly:
+
+- `lunar component get-json <component-id>` — CLI already ships in the lunar binary, RPC already supported by the hub ([`cmd/lunar/component.go`](lunar/cmd/lunar/component.go) → [`hub/server.go:GetComponentJson`](lunar/hub/server.go)).
+- `lunar collect -j ".compliance" -` — standard collector primitive.
+- `on: [SOC2]` tag matching — standard manifest primitive.
+- Domain cascade (`domain:engineering` matching components in `engineering.compliance`) — works correctly ([`filter.go:getDomainHierarchy`](lunar/hub/filter/filter.go)).
+
+The collector itself is 11 lines of bash. See [`pantalasa/lunar/collectors/compliance-bundle/`](https://github.com/pantalasa/lunar/tree/main/collectors/compliance-bundle).
+
+### Why this is the right demo (vs monorepo)
+
+- It tells a clear audit-evidence story: "every SOC2 service carries the organization's compliance posture as part of its release record."
+- It exercises the cross-component pull pattern that prospects will ask about ("can I combine data across services?").
+- It doesn't hit any of the monorepo-path bugs catalogued below, so it's stable and reproducible.
+- The same pattern works in a real customer environment without waiting for any of the monorepo fixes.
+
+### Known trade-offs worth mentioning if the prospect asks
+
+- The consumer pulls whatever the producer's latest Component JSON looks like at the moment it runs. If the producer hasn't been collected for the same commit yet, the consumer pulls stale data. In steady state (producer and consumers committing at typical rates) this is fine; bootstrap is the only awkward moment. The demo env handles this by collecting the producer before triggering consumers.
+- Array fields in the producer get auto-concatenated if the consumer writes them directly under a known path across multiple collector runs. The bundle schema deliberately uses scalar summary fields to avoid this; richer slices (e.g. full exercise list) need to be object-keyed by a unique identifier (date, SHA, etc.) to stay idempotent.
 
 ---
 
