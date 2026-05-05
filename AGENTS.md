@@ -481,6 +481,22 @@ For detailed implementation guides:
 - **lunar-lib:** `ai-context/` — Platform documentation
 - **Skills:** `SKILL.md` files in skills repos
 
+### Fetching External Docs as Markdown (Tip)
+
+Many modern dev tool documentation sites (including ours) expose a markdown version of each page by appending `.md` to the URL. Use this when you need to read external docs — markdown is much easier to consume than scraping HTML, and avoids token waste on navigation/styling.
+
+**Lunar docs (always available):**
+- Page as markdown: `https://docs-lunar.earthly.dev/docs/lunar-cli.md` (just add `.md` to any docs URL)
+- Full sitemap for LLMs: `https://docs-lunar.earthly.dev/llms.txt` — lists every page so you can pick the right one to fetch
+
+**Try it on other dev tool docs too.** Many sites built with Docusaurus, Mintlify, Fumadocs, etc. support the same `.md` trick or expose an `llms.txt` (or `llms-full.txt`). When pointing yourself at unfamiliar docs, try the `.md` suffix first; if that 404s, look for `/llms.txt` at the site root. Falling back to fetching the HTML is fine but should be a last resort.
+
+```bash
+# Examples
+curl https://docs-lunar.earthly.dev/llms.txt              # find pages
+curl https://docs-lunar.earthly.dev/docs/lunar-cli.md     # fetch one as markdown
+```
+
 ---
 
 ## Creating Linear Tickets
