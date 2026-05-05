@@ -282,10 +282,10 @@ Both demo environments use Grafana as the web UI, fronted by a Caddy reverse pro
 
 | Environment | URL | Grafana User | Grafana Password | Hub Token |
 |-------------|-----|-------------|-----------------|-----------|
-| **pantalasa** (lunar) | `https://lunar.demo.earthly.dev` | `lunar` | `910vfBf` | `df11a0951b7c2c6b9e2696c048576643` |
+| **pantalasa** (lunar) | `https://lunar.demo.earthly.dev` | `admin` | `cqmAKK1BmX59dr7g` | `df11a0951b7c2c6b9e2696c048576643` |
 | **pantalasa-cronos** (cronos) | `https://cronos.demo.earthly.dev` | `lunar` | *password rotated \u2014 ask Brandon* | `df11a0951b7c2c6b9e2696c048576643` |
 
-**Note:** Both envs share the same hub token, but Grafana web passwords are per-environment. The pantalasa (`lunar.demo.earthly.dev`) password is stable. The cronos password was rotated at some point and `910vfBf` no longer works there.
+**Note:** Both envs share the same hub token, but Grafana web credentials are per-environment and have both been rotated from the original `lunar`/`910vfBf` defaults. The pantalasa (`lunar.demo.earthly.dev`) creds were updated to `admin`/`cqmAKK1BmX59dr7g`. The cronos password was rotated at some point and is currently unknown — ask Brandon.
 
 **Architecture:** Caddy proxies gRPC (`:443 /hubapi.Hub*` → hub:8000), webhooks/logs → hub:8001, everything else → Grafana:3000. The Grafana login uses the same web credentials above.
 
@@ -293,15 +293,15 @@ Both demo environments use Grafana as the web UI, fronted by a Caddy reverse pro
 
 When you don't have browser tools available, you can query the demo environment directly using Grafana's HTTP API with curl. This is the most reliable way to check collector runs, component data, and policy results.
 
-**Authentication:** Use the Grafana credentials with HTTP Basic Auth:
+**Authentication:** Use the Grafana credentials with HTTP Basic Auth (examples below use the pantalasa env; swap creds + host for cronos):
 ```bash
-curl -s -u "lunar:910vfBf" "https://cronos.demo.earthly.dev/api/..."
+curl -s -u "admin:cqmAKK1BmX59dr7g" "https://lunar.demo.earthly.dev/api/..."
 ```
 
 **List dashboards:**
 ```bash
-curl -s -u "lunar:910vfBf" \
-  "https://cronos.demo.earthly.dev/api/search?type=dash-db" | jq '.[] | {title, uid, url}'
+curl -s -u "admin:cqmAKK1BmX59dr7g" \
+  "https://lunar.demo.earthly.dev/api/search?type=dash-db" | jq '.[] | {title, uid, url}'
 ```
 
 **Key dashboards:**
@@ -319,8 +319,8 @@ curl -s -u "lunar:910vfBf" \
 **Run SQL queries against the hub database via Grafana's datasource proxy:**
 ```bash
 # PostgreSQL datasource UID: PCC52D03280B7034C
-curl -s -u "lunar:910vfBf" \
-  -X POST "https://cronos.demo.earthly.dev/api/ds/query" \
+curl -s -u "admin:cqmAKK1BmX59dr7g" \
+  -X POST "https://lunar.demo.earthly.dev/api/ds/query" \
   -H "Content-Type: application/json" \
   -d '{
     "queries": [{
