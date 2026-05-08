@@ -61,9 +61,18 @@ op item get lunar/localdev-pantalasa-local-token --reveal --vault cloud --fields
 
 ## Open PR on earthly/lunar
 
-**PR**: see <PR URL placeholder — link returned at PR-creation time>
+**PR**: https://github.com/earthly/lunar/pull/1482 (draft, base `main`)
 
 **Branch**: `brandon/localdev-pantalasa-local-defaults`
+
+**To check it out on the linux box:**
+
+```bash
+cd ~/code/earthly/lunar
+git fetch origin brandon/localdev-pantalasa-local-defaults
+git worktree add ../lunar-wt-localdev-defaults brandon/localdev-pantalasa-local-defaults
+cd ../lunar-wt-localdev-defaults/localdev
+```
 
 **Diff** (on `localdev/Earthfile`):
 
@@ -100,13 +109,28 @@ Against `pantalasa-local` directly via `gh api`:
 
 ### What still needs testing on the Linux box
 
-1. `op item get lunar/localdev-pantalasa-local-token --reveal --vault cloud --fields password` returns a non-empty value (proves the 1Password item is reachable from `op` CLI in your environment).
+**Important:** test from the PR branch, not from `main`. `main` does not have the new defaults yet.
+
+```bash
+cd ~/code/earthly/lunar
+git fetch origin brandon/localdev-pantalasa-local-defaults
+git worktree add ../lunar-wt-localdev-defaults brandon/localdev-pantalasa-local-defaults
+cd ../lunar-wt-localdev-defaults/localdev
+```
+
+Then:
+
+1. `op item get lunar/localdev-pantalasa-local-token --reveal --vault cloud --fields password | head -c 8 && echo "..."` — should print a token prefix (proves the 1Password item is reachable from `op` CLI in your environment).
 2. `earthly +create-custom-branch` (no flags). Should iterate the 12 components + the manifest repo, creating `localdev-<whoami>-main` branches across them.
-3. `earthly +localdev` (no flags). Brings up the stack:
+3. `earthly +localdev` (no flags). Brings up the kind/k8s stack:
     - registers a runner labeled `localdev-<whoami>-main` on pantalasa-local org
     - registers webhooks on each component repo (visible at `https://github.com/organizations/pantalasa-local/settings/hooks` and per-repo webhook page)
     - hub starts, ngrok URL resolves, agents come up
 4. (Optional) push a commit to one of the `localdev-<whoami>-main` component branches and confirm the hub processes the webhook event.
+
+**Note on the localdev refactor:** `+localdev` is now kind/Helm-based on `main` (was docker-compose at the time pantalasa-local was created). Make sure `kind` and `kubectl` are installed on the linux box and port 5000 is free. If you hit unrelated infra issues, those are separate from this PR — the PR only changes ARG defaults.
+
+**Reporting back:** add a comment on https://github.com/earthly/lunar/pull/1482 with the result. If everything works, mark the PR ready for review. If something fails, the relevant logs + the comment will give context for fixing it.
 
 ### Verification commands
 
