@@ -187,21 +187,39 @@ go test ./...
 
 The **localdev** stack deploys hub, postgres, grafana, and supporting services locally via Docker Compose. This is the fastest way to test hub-side changes — no need to deploy to cronos or other demo environments.
 
+**Sandbox org:** Localdev runs against `pantalasa-local` — a private sandbox org that mirrors a subset of `pantalasa` repos. Use this org so localdev branch/webhook/runner churn does NOT pollute the live demos (`pantalasa`, `pantalasa-cronos`).
+
 **One-time setup:**
 
-1. Create `localdev/.arg` with secrets (gitignored). Run this in a terminal where 1Password is authenticated:
+1. Mint a classic PAT for `pantalasa-local`:
+   - https://github.com/settings/tokens/new
+   - Scopes: `admin:org`, `repo`, `workflow`
+   - No SSO authorization needed — `pantalasa-local` is on the free GitHub plan.
+   - Save it in 1Password as **`lunar/localdev-pantalasa-local-token`** (cloud vault).
+
+2. Create `localdev/.arg` with secrets (gitignored). Run this in a terminal where 1Password is authenticated:
    ```bash
    cat > /home/brandon/code/earthly/lunar/localdev/.arg <<EOF
-   GITHUB_TOKEN=$(op item get lunar/localdev-github-token --reveal --vault cloud --fields password)
+   GITHUB_TOKEN=$(op item get lunar/localdev-pantalasa-local-token --reveal --vault cloud --fields password)
    NGROK_AUTHTOKEN=$(op item get ngrok/brandon-token --reveal --vault Employee --fields password)
    HUB_LOGS_AWS_ACCESS_KEY_ID=$(op item get lunar/localdev-logs-aws-access-key-id --reveal --vault cloud --fields password)
    HUB_LOGS_AWS_SECRET_ACCESS_KEY=$(op item get lunar/localdev-logs-aws-secret-access-key --reveal --vault cloud --fields password)
-   LUNAR_MANIFEST_URL=github://pantalasa/lunar@localdev-brandon-main
+   LUNAR_MANIFEST_URL=github://pantalasa-local/lunar@localdev-brandon-main
    EOF
    chmod 600 /home/brandon/code/earthly/lunar/localdev/.arg
    ```
 
-2. Install `yq` (required by the Earthfile):
+3. First time only — create your `localdev-brandon-main` branches across all `pantalasa-local` component repos:
+   ```bash
+   cd /home/brandon/code/earthly/lunar/localdev
+   earthly +create-custom-branch --LUNAR_MANIFEST_URL=github://pantalasa-local/lunar@main
+   ```
+   When you're done with this sandbox session, clean up with:
+   ```bash
+   earthly +delete-custom-branch --LUNAR_MANIFEST_URL=github://pantalasa-local/lunar@main
+   ```
+
+4. Install `yq` (required by the Earthfile):
    ```bash
    wget -q https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O ~/.local/bin/yq && chmod +x ~/.local/bin/yq
    ```

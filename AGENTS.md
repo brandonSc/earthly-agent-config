@@ -218,8 +218,9 @@ When asked to review a PR (lunar-lib, lunar, or any repo):
 |-----------|---------|
 | `lunar-lib/` | Main repo for open-source collectors and policies |
 | `lunar-lib-wt-*/` | Git worktrees for parallel development |
-| `pantalasa-cronos/` | **Primary test environment** (use this, not `pantalasa`) |
+| `pantalasa-cronos/` | **Primary plugin-testing environment** (live cronos demo hub) |
 | `pantalasa/` | Legacy test environment (may have demos running) |
+| `pantalasa-local/` | **Localdev sandbox org** — mirror of pantalasa subset, used by `lunar +localdev` (NOT for plugin testing) |
 | `lunar/` | Lunar CLI and core platform |
 | `skills/` | Agent skills for Lunar, Earthly, and related tools |
 | `skills-internal/` | Internal agent skills (Linear tickets, etc.) |
