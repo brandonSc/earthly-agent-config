@@ -201,7 +201,7 @@ Add to `~/.bender/config.json`:
       {
         "linear_project_id": "d613fe57-e5c0-4cf7-9e25-65c9655ea9d8",
         "slack_channel": "<TBD channel ID>",
-        "veto_window_minutes": 10
+        "veto_window_minutes": 30
       }
     ],
     "excluded_labels": ["needs-design", "needs-pm-input", "needs-discussion", "spec", "epic", "do-not-auto-pick"],
