@@ -195,7 +195,7 @@ Add to `~/.bender/config.json`:
 {
   "daily_pickup": {
     "enabled": true,
-    "schedule": "0 13 * * 1-5",
+    "schedule": "0 12 * * 1-5",
     "timezone": "America/New_York",
     "projects": [
       {
@@ -313,7 +313,7 @@ Part of the lunar-probe launch autonomy track. Companion to (TBD: live dashboard
 
 # Backlog grooming (Tuesday + Thursday)
 
-A separate cron job that runs every Tuesday and Thursday at 09:00 NYC (13:00 UTC) and:
+A separate cron job that runs every Tuesday and Thursday at 11:00 NYC (15:00 UTC) — staggered to fire after the daily-pickup veto window has resolved — and:
 
 1. Reads `~/repos/BENDER-PRIORITIES.md`.
 2. Pulls the full Lunar-lib backlog from Linear (same query as `pm-sweep.sh`, scoped to non-completed issues).
@@ -340,7 +340,7 @@ A separate cron job that runs every Tuesday and Thursday at 09:00 NYC (13:00 UTC
 {
   "grooming": {
     "enabled": true,
-    "schedule": "0 13 * * 2,4",
+    "schedule": "0 15 * * 2,4",
     "timezone": "America/New_York",
     "linear_project_id": "d613fe57-e5c0-4cf7-9e25-65c9655ea9d8",
     "slack_dm_channel": "D0APBM155CP",
