@@ -233,8 +233,6 @@ CI will run automatically. Fix any CI failures.
 
 ### Then wait for review
 
-Comment on the PR tagging `@coderabbitai review` to get automated review. Address CodeRabbit feedback.
-
 Wait for human reviewers to approve. Address their feedback. In bot mode, you may push fixes and reply directly. In interactive mode, present feedback to the user first.
 
 ---
