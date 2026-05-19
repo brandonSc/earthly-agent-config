@@ -1,0 +1,1177 @@
+Vlad :: Brandon - February 18
+VIEW RECORDING - 78 mins (No highlights): 
+
+---
+
+0:02 - Vlad A. Ionescu (Earthly Technologies)
+  Hey, Brandon. Hey.
+
+0:05 - Brandon Schurman (Earthly Technologies)
+  Oh, looks like Nacho made it. There we go.
+
+0:09 - Vlad A. Ionescu (Earthly Technologies)
+  Hey, guys.
+
+0:11 - nacho (Earthly Technologies)
+  Hey, Nacho.
+
+0:14 - Brandon Schurman (Earthly Technologies)
+  How's it going? You had a few days off, eh? Yeah, I did.
+
+0:18 - nacho (Earthly Technologies)
+  There was a lot of improvements from multiple fronts. So, yeah, it's exciting to go back and see how much things are happening.  know.
+
+0:33 - Brandon Schurman (Earthly Technologies)
+  I'm leaving next week, the end of next week, I guess. Mostly the week after for vacation. And I'm going to come back.  It's going to be like a whole different company. Things move fast here.
+
+0:46 - Vlad A. Ionescu (Earthly Technologies)
+  Are you going to leave your agent for us to get in touch with if we need anything?
+
+0:54 - Brandon Schurman (Earthly Technologies)
+  I should.
+
+0:57 - Vlad A. Ionescu (Earthly Technologies)
+  Actually, I have.
+
+0:58 - Brandon Schurman (Earthly Technologies)
+  I set up a big. Because I have these agents running on my computer, and I just leave my computer running a lot with them, I have like a remote desktop client that I found that works really well for my phone, so I can like go back and like kick them if they like messed up and stopped working on something.  No way.
+
+1:19 - Vlad A. Ionescu (Earthly Technologies)
+  I was wondering, I was actually looking on my phone, like in the Play Store app, if they have, you know, like a cursor app on the phone.  That would be actually really useful if you could connect to your cursor on your desktop. Yeah.
+
+1:34 - Brandon Schurman (Earthly Technologies)
+  Yeah. Because I also sometimes have agents running on like different computers too, because I have my laptop and my desktop.
+
+1:41 - Vlad A. Ionescu (Earthly Technologies)
+  Right. And the remote desktop thing, which is just a, it's just a Google Chrome remote desktop, like official plugin that I'm using.
+
+1:48 - Brandon Schurman (Earthly Technologies)
+  Yeah. And then I can like go to each, you know, check on or poke the agents on either of my computers from the other one.  But it does feel like something like should just be built into cursor like remote.
+
+2:01 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah.
+
+2:02 - Brandon Schurman (Earthly Technologies)
+  That you could just keep the same one open, the same session open and access it from different devices.
+
+2:09 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah. Yeah. Something like that. Or at least some sort of, at least just the agent stuff, you know, just the box with the agent.  And then if it gets back on a permission, you can just tap it, you know, keep going. Yeah, exactly.
+
+2:25 - Brandon Schurman (Earthly Technologies)
+  Yeah. Yeah. That'd be cool.
+
+2:31 - nacho (Earthly Technologies)
+  That's, I wanted to try some setup like that. It's like, you, sometimes you have a cool idea, you know, in the worst place ever.  So you can just tell the agent to start working on that. So when you get back home, you, you have, yeah.  Yeah.
+
+2:53 - Brandon Schurman (Earthly Technologies)
+  That's exactly what I do now.
+
+2:55 - nacho (Earthly Technologies)
+  Right? Yeah. Yeah.
+
+2:57 - Vlad A. Ionescu (Earthly Technologies)
+  That's right.
+
+2:58 - nacho (Earthly Technologies)
+  There's definitely a way of leaving Newton.
+
+4:00 - Brandon Schurman (Earthly Technologies)
+  And type to it from the car or something while I'm waiting.
+
+4:04 - Vlad A. Ionescu (Earthly Technologies)
+  Wow.
+
+4:06 - nacho (Earthly Technologies)
+  Can you talk to the IDE and get, like, voice recognition? I think that would be super nice for the phone.  Oh, yeah.
+
+4:18 - Brandon Schurman (Earthly Technologies)
+  That would be cool. You know what? You know who needs that? Cory. Well, he's out on his run. He just needs, like, voice command to Claude.  Like coding without the screening. Yeah. Conversation back and forth. Yeah. Just brings it up in your earphones while you're on the go.  Claude just chimes in and is like, oh, I ran into an issue. Do you want to do this or do you want to do that?  You just tell it, go this way, keep working. That's awesome.
+
+4:42 - nacho (Earthly Technologies)
+  But you aren't going driving, right? But you can start, you know? Yeah, yeah. It's a lot of possibilities these days.
+
+4:52 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, yeah, yeah. All right. Let's talk about the UI. And we should also talk about Capital One at some point, Brandon, but yeah.
+
+5:07 - Brandon Schurman (Earthly Technologies)
+  I think it's okay to do this first because I'm like almost settled on all the data and stuff being right.  So maybe if we just come back a little later, if you have time later, it'll be in a better state anyways.
+
+5:22 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. Yeah, on the slides slash story for tomorrow. So, yeah, I just generated the slides just before we jumped on the call.  So I'm now tweaking them with AI. Man, what a world we live in now.
+
+5:43 - Brandon Schurman (Earthly Technologies)
+  That's awesome.
+  SCREEN SHARING: Vlad started screen sharing - WATCH: https://fathom.video/calls/571164328?timestamp=349.718301
+
+5:44 - nacho (Earthly Technologies)
+  I mean, have you realized we have changed 100% the way we work in a couple of months? Yeah, exactly.
+
+5:52 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, it's crazy.
+
+5:53 - Brandon Schurman (Earthly Technologies)
+  It's was one shot.
+
+5:54 - Vlad A. Ionescu (Earthly Technologies)
+  It's crazy.
+
+5:55 - nacho (Earthly Technologies)
+  This was one shot, the whole deck, right?
+
+5:57 - Vlad A. Ionescu (Earthly Technologies)
+  This is a recap of last. Last time, because I fed it to the, you know, the notes and transcripts.  Today's agenda. This is a copied problem slide from DevX team. This are like, you know, kind of a recap of what Lunar is and all that.  These are just copied slides from from another deck. And then the description of the playground environment we're giving them.  Hands on, this will be like the demo itself. And next steps, like all of this in one shot.
+
+6:33 - Brandon Schurman (Earthly Technologies)
+  I think that's a cool product.
+
+6:35 - nacho (Earthly Technologies)
+  That's awesome. Vlad, there's like slides, you know, generated by AI in your browser. Shutable. I cannot live without this now.
+
+6:49 - Vlad A. Ionescu (Earthly Technologies)
+  That could be a whole product. That take all the data from HubSpot and Fathom and put it into the repo.  You know, like it has all the context. When I asked it to prepare for a meeting. mean. I I  It creates a comprehensive plan with slides and everything. I cannot live without this now, because it would take me way, way longer.  Okay, yeah. So let's QA. What do you want us to look at specifically?
+  SCREEN SHARING: Brandon started screen sharing - WATCH: https://fathom.video/calls/571164328?timestamp=441.946859
+
+7:20 - Brandon Schurman (Earthly Technologies)
+  So I think, why don't I share my screen? And why don't we just like go page by page with all our eyes on it and look for any spots that we might be concerned?
+
+7:32 - Vlad A. Ionescu (Earthly Technologies)
+  Okay.
+
+7:34 - Brandon Schurman (Earthly Technologies)
+  And, you know, to make sure things are correct.
+
+7:37 - Vlad A. Ionescu (Earthly Technologies)
+  And specifically, we're looking for links to the runs view, right? Links to the runs view.
+
+7:42 - Brandon Schurman (Earthly Technologies)
+  And if we do link to the runs view, like spot check and make sure like the data is correct.  And we want it to be on that dashboard, or we want it to go to the old one or the new one, or what have you.
+
+7:53 - Vlad A. Ionescu (Earthly Technologies)
+  we're doing this, let me, let me run a quick query or something for, or, um, The automated thing to also look at it.  Should we do that? Yeah. Should I do that often? Yeah.
+
+8:06 - Brandon Schurman (Earthly Technologies)
+  Sure, you could. I asked it to look for the places that the dashboard was linked, but I didn't ask it to actually look at them to make sure they're correct.  I'm not sure how well it would do on the correctness or UX kind of subjective side of it. I'm not sure.  It would be interesting to see if it points out anything we missed, though. Yeah. Okay. From this view, I don't think there's anything.  Right? We linked to things. We could go in here. It's kind of the same thing, I think. It's being a little bit slow.  But these aren't links. Policies. Correct. It just goes to initiative, everything, nothing linking here. you. you.
+
+9:00 - nacho (Earthly Technologies)
+  So, Brandon, just a reminder, we should take a look to the source code instead to properly do the checking because there's some panels that might be missing due to data, right?  Like, for example, the message that we are showing in components basically depends on failures, right? And only when there are failures is when we show the link.  So, I mean, we can do an initial pass, like you mentioned, but I think at the end, we should go through the code itself.
+  ACTION ITEM: Remove disabled navbar error badge code - WATCH: https://fathom.video/calls/571164328?timestamp=574.9999
+
+9:36 - Vlad A. Ionescu (Earthly Technologies)
+  Brandon did ask Claude to look through the code and found a bunch of places.
+
+9:45 - Brandon Schurman (Earthly Technologies)
+  Did you say, nacho, that the navbar error badge, so the one that would show up here, is disabled? Yeah, it is disabled.
+
+9:54 - nacho (Earthly Technologies)
+  Yeah, because basically we have tweaked the implementation. Basically we are returning the number of failures from SQL function that has been basically changed to always return zero.  So the real code is commented. So we are getting always a zero count there. So basically sign up what we have in there.  So I am going to remove that part. So, so we don't have that code around and it's clear where those links are.  Okay.
+
+10:29 - Brandon Schurman (Earthly Technologies)
+  So that was a good chunk of the ones that Claude pointed out are like when it shows up here and those I guess are not valid.  So that eliminates a good chunk of them. And then for the other case where we, we do have a component that does have script errors somewhere in here.  So I think we should be able to see, you know, some places where the, the other error things conditionally show, we should be able to see those cases, think.  Yeah. So I think we Passing sounds like the policy evaluation. We don't use success anywhere else.
+
+12:08 - Vlad A. Ionescu (Earthly Technologies)
+  Maybe success is okay?
+
+12:10 - Brandon Schurman (Earthly Technologies)
+  Like, it ran successfully?
+
+12:11 - Vlad A. Ionescu (Earthly Technologies)
+  We could say completed. think that's a better word. Okay.
+
+12:15 - Brandon Schurman (Earthly Technologies)
+  Yeah. That doesn't imply any sort of true or false statement. Yeah.
+
+12:21 - Vlad A. Ionescu (Earthly Technologies)
+  And I think that would be clear enough. Error. Okay. Did not complete.
+
+12:25 - Brandon Schurman (Earthly Technologies)
+  Ran into an error.
+
+12:27 - Vlad A. Ionescu (Earthly Technologies)
+  Can you repeat that, Vlad? So replace success with the word completed.
+
+12:34 - nacho (Earthly Technologies)
+  But completed, meaning completed with success? Because fail is also completed.
+
+12:44 - Vlad A. Ionescu (Earthly Technologies)
+  I know. But also, it's clear. Because, like, success could mean, you know, the policy is passing, you know, like, from, like… But these have runs, right?
+
+12:58 - nacho (Earthly Technologies)
+  I know. But, like, the user doesn't know our… our… And underneath is, okay, it's just tuning in a little bit.  Yeah, exactly.
+
+14:06 - Brandon Schurman (Earthly Technologies)
+  That makes sense to me. Should we take notes on anything, maybe?
+
+14:11 - Vlad A. Ionescu (Earthly Technologies)
+  I can, yeah. Or just rely on the Fathom?
+
+14:15 - Brandon Schurman (Earthly Technologies)
+  We could rely on the Fathom, yeah.
+
+14:17 - Vlad A. Ionescu (Earthly Technologies)
+  AI, hashtag AI.
+
+14:20 - Brandon Schurman (Earthly Technologies)
+  It should hopefully not miss anything, I would think. So, Brandon, what happened?
+
+14:26 - nacho (Earthly Technologies)
+  I did not have the chance to try this yet. So, if this error is clickable, what happened if you click in errors?
+
+14:39 - Brandon Schurman (Earthly Technologies)
+  So, in this case, errors is probably going to be the same as opening here. So, like, if I click this, it's going to go to this view.  Oh, okay.
+
+14:52 - Vlad A. Ionescu (Earthly Technologies)
+  If it's the same, should we just remove it? I think it will be cleaner.
+
+14:58 - Brandon Schurman (Earthly Technologies)
+  If it's, sorry. Well, the- The thing is, this is reusing the exact same dashboard as everywhere else, and often these numbers, so this number, in most cases, would probably be higher than this one, but because we've already filtered, yeah.  It's actually not the same.
+
+15:16 - Vlad A. Ionescu (Earthly Technologies)
+  It's an extra filter on errors, correct? It's an extra filter on errors, but this view is pre-filtered on errors from here, right?
+
+15:24 - Brandon Schurman (Earthly Technologies)
+  So it's coincidentally the same on this view, but in other cases, it's useful. It's filters. that make sense? Yeah.  if I click expand, it's the same view as before here, too.
+
+15:39 - nacho (Earthly Technologies)
+  Okay. So...
+
+15:41 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, nice. So it maintains the filters from one thing to the other. Yeah. So that doesn't make sense to have that first column.
+
+15:48 - nacho (Earthly Technologies)
+  Can we just put a link in the runs column instead? Do we need the first column at all?
+
+15:56 - Brandon Schurman (Earthly Technologies)
+  Um, we could. It felt... We could.
+
+17:00 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, just did the thing where it went to the last page instead of the next page.
+
+17:05 - Brandon Schurman (Earthly Technologies)
+  Yeah, for me, was pretty fun. Yeah, I don't know what causes that. I'm not seeing any good ones here.  This list, when you look at all runs, is like limited. It's just like the most recent ones. Otherwise, like the, it gets overloaded.  Like it's, it was always that way. I don't know. You can probably tell here though, Nacho, like in this case, like, you know, we have three runs.  If this one failed once and passed three times, we see three here, we might see one here. And if I could click expand, I would see all of them, like three plus like an error one.  But if I were to click just the error, I would just go to the errors. Does that make sense?
+
+17:59 - nacho (Earthly Technologies)
+  Oh, yeah. Yeah, I think so. Okay. So when you click in the first column, you're going to a new dashboard to, or where are we going here?  This is the detail of the script. This is what I am not looking at. So can you click the first column?  Yeah.
+
+18:21 - Brandon Schurman (Earthly Technologies)
+  So this is going, so I'll say one more thing first. The way it works, if there is more than one run, it's an open link that goes to just that one single run directly.  For example, here, like the logs and, you know, the exit code and everything is up here at the top.
+
+18:43 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah. It's like clicking the run ID before. Yeah.
+
+18:46 - nacho (Earthly Technologies)
+  Okay. If there's more than one and you click expand it, this is now the old runs table from before.  Okay.
+
+18:55 - Brandon Schurman (Earthly Technologies)
+  Okay.
+
+18:55 - nacho (Earthly Technologies)
+  That's what I was missing. Yeah. Okay. Makes sense. So now I understand.
+  ACTION ITEM: Fix RunsListing pagination: count query matches table; remove LIMIT/ORDER BY - WATCH: https://fathom.video/calls/571164328?timestamp=1192.9999
+
+20:00 - Brandon Schurman (Earthly Technologies)
+  Right? I don't know. Seems okay to me.
+
+20:03 - Vlad A. Ionescu (Earthly Technologies)
+  Okay, Brandon, so what about pagination?
+
+20:07 - nacho (Earthly Technologies)
+  Did you change the query that computes the total number of pages?
+
+20:19 - Brandon Schurman (Earthly Technologies)
+  Yes, I think there was some changes to that to try to maintain it. That's back if you come to the full runs listing where there's, like, you know, multiple pages.
+
+20:38 - nacho (Earthly Technologies)
+  Yeah, here.
+
+20:39 - Brandon Schurman (Earthly Technologies)
+  So you'll notice that it's getting, like, I don't know how many pages we have per page here, but it's getting, you know, all of the most recent ones, is my understanding, and then grouping them, like, post that.  But it only looks, you know, in terms of the, Pet Clinic ran, right? Same thing. If there's more simultaneous activity, like maybe it would look more mixed, but it's like, clearly it's like we ran one component and then the next one after that.
+
+22:12 - Vlad A. Ionescu (Earthly Technologies)
+  But how come this is only five pages? Wouldn't this be like a really, really long?
+
+22:17 - Brandon Schurman (Earthly Technologies)
+  Well, I think I don't, yeah, it was like this before though. don't think it can handle going through everything.  And I don't know if it's like getting a page at a time. Or whatnot. I'm not that familiar with the code here.  Pretty much Claude just fixed it for me. And I looked at the results and I'm like, it kind of looks right.  But I don't think it's capable of going back too far because there are runs. Like if I were to go say to like a component, right.  And look at these runs, like these are from like 13 days ago. Like those, we can't even go far back enough in here to find those here.  Okay.
+
+22:56 - Vlad A. Ionescu (Earthly Technologies)
+  But like if we go through. through. Some other links? Would this screen be able to show all the runs?
+
+23:07 - Brandon Schurman (Earthly Technologies)
+  Yeah. Yeah. And we can apply the filters here. Like, if I were to put this component. Oh, interesting. I was still on page five and it didn't work.  So if I were to go to this component, now it's showing me because it, like, pre-applied some filters before it hit the database.  So my understanding, there's like a limit on the database query. And when we have all of these not filtered, right?  We reached the limit before we go too far back in history. Does that make sense? No, I don't understand.
+
+23:42 - nacho (Earthly Technologies)
+  What do you mean? Sorry.
+
+23:48 - Brandon Schurman (Earthly Technologies)
+  So it looks like we show like a maximum of five pages worth of data on this runs listing.
+
+23:58 - nacho (Earthly Technologies)
+  That's sure. was like this. Before.
+
+24:00 - Brandon Schurman (Earthly Technologies)
+  Is that right, Nacho? No, no.
+
+24:02 - nacho (Earthly Technologies)
+  I mean, I've seen here hundreds of pages. Oh, really?
+
+24:08 - Brandon Schurman (Earthly Technologies)
+  Okay. Let me look at... So this is the Capital One demo environment that's still on the... Oh, you're right.  This goes back further. It is true that...
+
+24:23 - nacho (Earthly Technologies)
+  does keep going.
+
+24:24 - Brandon Schurman (Earthly Technologies)
+  Yeah, we are...
+
+24:25 - nacho (Earthly Technologies)
+  I think we are only showing results here for the... Latest Manifest.
+
+24:33 - Brandon Schurman (Earthly Technologies)
+  Yeah. So everything on the new one is scoped to Latest Manifest, but you're right. This gets cut off. Yeah.
+
+24:40 - nacho (Earthly Technologies)
+  At five in the old one.
+
+24:41 - Brandon Schurman (Earthly Technologies)
+  The old one didn't. Yeah. Okay. That's a good observation. I thought it did for some reason, but... Basically, we need to check those numbers in the pagination.
+
+24:50 - nacho (Earthly Technologies)
+  It makes sense. Okay. So, Brandon, the old version of the dashboard is still around, right? Because we are linking from...  Yes, it's still in there.
+
+25:02 - Brandon Schurman (Earthly Technologies)
+  And we have, you know, a running example of the old one, too.
+
+25:11 - nacho (Earthly Technologies)
+  So can you navigate to that old version in Cronus and see how many pages we see there?
+
+25:20 - Brandon Schurman (Earthly Technologies)
+  Oh, I see what you're saying. Interesting. Probably.
+
+25:26 - nacho (Earthly Technologies)
+  I mean, it is true, right? This listing is not aggregating runs. So we should see.
+
+25:34 - Brandon Schurman (Earthly Technologies)
+  Yeah, if I come to here and then set all of these.
+
+25:38 - nacho (Earthly Technologies)
+  We should see way more. Okay, your script. You have also the script filter in place. Oh.
+
+25:51 - Brandon Schurman (Earthly Technologies)
+  You do all? Oh, interesting.
+
+25:58 - Vlad A. Ionescu (Earthly Technologies)
+  All right, right. That down as a bug, the script enabled.
+
+26:03 - nacho (Earthly Technologies)
+  you click in runs in the bread scrums?
+
+26:11 - Brandon Schurman (Earthly Technologies)
+  Well, this goes back to the new here, right?
+
+26:14 - nacho (Earthly Technologies)
+  it goes back, yeah. Yeah, removing those links, those filters is tricky. That's why I added those bread scrums. Okay, anyway, we can try this query.  See how, what is the number of, I mean, the pagination is quite simple, right? Basically, what we are doing is in the, we have a variable in this dashboard that computes the number of pages, right?  For that, we're basically running the exact same query of the table, right? But we are only counting the number of records.  That's what we do, without limits. It's, that's... So if you tell me that you have, oh, the A I did, yeah, can you go quickly to the Settings, press Escape, and go to Settings, Variables?
+
+27:21 - Brandon Schurman (Earthly Technologies)
+  In here, Edit Mode? Yeah.
+
+27:24 - nacho (Earthly Technologies)
+  Settings, okay. Variables, right? So we have here a, what's the, okay, page size, page, wait, I don't see here the number of pages, query.
+
+27:58 - Brandon Schurman (Earthly Technologies)
+  Here, if we go to the old.
+
+28:10 - nacho (Earthly Technologies)
+  I don't see it here, Page one and page size?
+
+28:12 - Brandon Schurman (Earthly Technologies)
+  Okay. This is the old version of the dashboard before I made any changes. Oh, oh, yeah.
+
+28:20 - nacho (Earthly Technologies)
+  I'm wrong. We need to go to the actual panel, the pagination panel. There's nothing here. This was the first implementation.  Yeah. Below the table in the... Yeah. Can you go here? Eh, there it is. Edit. So here we have basically another query, right?  And this query needs to be exactly the same, right? But instead of selecting some columns, it's just a count asterisk, count asterisk, okay?  Okay. So quick check that these two queries match, right?
+
+28:59 - Vlad A. Ionescu (Earthly Technologies)
+  Um... It might not match, though, because we're collapsing lots of the rows into, we're merging lots of the rows.
+
+29:06 - nacho (Earthly Technologies)
+  Yeah, but the imagination should be of the collapsed records, right? You still want to navigate through the collapsed records, right?  Yeah, yeah. So that's why if you change, if you change it to one query, you should also change this one.
+
+29:23 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, I see, yeah.
+
+29:25 - nacho (Earthly Technologies)
+  So basically the rows match. You know what I mean, Brandon?
+
+29:34 - Brandon Schurman (Earthly Technologies)
+  So, like, let's say, copy it? Okay. This is the new one.
+
+29:43 - nacho (Earthly Technologies)
+  Okay, actually, go back. Go back to the other query and copy it into the.
+
+29:50 - Brandon Schurman (Earthly Technologies)
+  That's what, okay, that's what I was thinking you were going with it. But when this show more pages, because we're collapsing them, when this show more pages than.  We actually have?
+
+30:02 - nacho (Earthly Technologies)
+  No, we should see the number of pages corresponding to the number of rows we're showing. So that's why the query needs to be the same.  So, okay. What are we looking at right now? This is the old version of the query here that I got from an old dashboard.  No, no. Go to your new version of this table.
+
+30:28 - Brandon Schurman (Earthly Technologies)
+  Okay. Hang on. Let me discard it. Yeah.
+
+30:34 - nacho (Earthly Technologies)
+  Edit and copy that query. Okay.
+
+30:39 - Brandon Schurman (Earthly Technologies)
+  Yeah.
+
+30:39 - nacho (Earthly Technologies)
+  And then go to the pagination below.
+
+30:45 - Brandon Schurman (Earthly Technologies)
+  Oh, this is the query for the pagination.
+
+30:49 - nacho (Earthly Technologies)
+  No. Okay. So to the actual query. Go to the actual query. Okay.
+
+30:53 - Brandon Schurman (Earthly Technologies)
+  I see what you're saying. So, like, what we query for the table here.
+
+30:56 - nacho (Earthly Technologies)
+  Okay. No. And copy that query. And then go to the pagination one. Okay. Remove everything that is between, after the count asterisk from parentheses.  Okay. Just keep that parentheses and remove everything else. So basically we are passing in there the new query. Okay.  Yeah. Right. So right in here. Yeah. You paste the new query. Okay. You can remove the selected fields and instead select count asterisk.  Okay. And yeah. And you also need to remove the limit at the end.
+
+31:46 - Brandon Schurman (Earthly Technologies)
+  Okay. Sorry. Where do you want me to remove?
+
+31:50 - nacho (Earthly Technologies)
+  So the limit.
+
+31:52 - Brandon Schurman (Earthly Technologies)
+  Okay.
+
+31:53 - nacho (Earthly Technologies)
+  You can just select line 18. Okay. Line 18. I think that's the main thing. No. Okay. You can leave everything as it is, okay?  And then go and remove the limit at the end of the query. So we are getting all the records.  Yeah. Right here. Yeah. And also remove the order by. We don't need that. So yeah, that's the query as it should be.  Let's see if there's any difference. Yeah. And run query. see how many. Okay. 35 pages. That number, I think, makes more sense compared to the.
+
+32:43 - Brandon Schurman (Earthly Technologies)
+  Yeah. wonder. Hmm.
+
+32:49 - nacho (Earthly Technologies)
+  Now you can.
+
+32:50 - Brandon Schurman (Earthly Technologies)
+  doesn't seem like enough though, right? I'm still kind of wondering if something's not right.
+
+32:54 - nacho (Earthly Technologies)
+  Okay. Then you can start paginating next. Yeah. Oh. Oh, it's Makes more sense. We are going back in history more than before, right?  So, I mean, this is bulletproof. Basically, we use the same query and remove the limits. So it should be.  should be. So, yeah, make sure to commit that, too. Okay.
+
+34:25 - Vlad A. Ionescu (Earthly Technologies)
+  I have a list of things I've observed while we were talking. I mean, I took notes, actually, in the end.  But maybe I'll say them out loud for the AI to hear and write them down. So, we said we're going to rename succeeds in the status filter to complete it.
+  ACTION ITEM: Standardize filter labels: rename Name→Script; add Script Type, Git SHA - WATCH: https://fathom.video/calls/571164328?timestamp=2136.840547  We're going to rename failed to error also in the status filter. It's just name.
+
+35:51 - Brandon Schurman (Earthly Technologies)
+  Maybe that should be script name. Because it matches the column.
+
+35:55 - Vlad A. Ionescu (Earthly Technologies)
+  Consistency of the filters on this view versus the filters on the other view so that they match exactly. Name is very generic.  maybe I think we should go back to script.
+
+36:06 - Brandon Schurman (Earthly Technologies)
+  This should be script name and script type, I think, to match. This even could be git shah to match the name of the column here.  Yeah.
+
+36:17 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. And then on the other view in the old one, actually, there's no way to select all scripts. That's something here's the old.
+
+36:26 - Brandon Schurman (Earthly Technologies)
+  Here's the old view. Right. All scripts. Oh.
+
+36:35 - Vlad A. Ionescu (Earthly Technologies)
+  Hmm. Interesting. I thought this was the new one, but yeah. Okay.
+
+36:40 - Brandon Schurman (Earthly Technologies)
+  No, I switched. I have both open just to compare. Oh, sorry. Here's here's new one. Here's old one. Um, PR was one.  That we had issues with.
+
+36:51 - Vlad A. Ionescu (Earthly Technologies)
+  No, there was one called Scripts. You were trying to disable all the filters. And one called Scripts was still active.
+
+37:03 - Brandon Schurman (Earthly Technologies)
+  yeah. I see what you're saying. That's when, okay. That was when we had one selected here. Oh, interesting.
+
+37:11 - Vlad A. Ionescu (Earthly Technologies)
+  And it was the last filter in this row. Are you sure this is?
+
+37:19 - Brandon Schurman (Earthly Technologies)
+  Maybe that was when, okay, hang on a sec. That was when we went to a view like this. Yes.  This is what I meant by the old one. It's so confusing. Script.
+
+37:27 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, so actually this, oh, what view is this?
+
+37:30 - Brandon Schurman (Earthly Technologies)
+  Interesting.
+
+37:31 - Vlad A. Ionescu (Earthly Technologies)
+  So this is the old view. there before.
+
+37:33 - Brandon Schurman (Earthly Technologies)
+  No, this is not old.
+
+37:34 - nacho (Earthly Technologies)
+  I mean, that's a script. That's new.
+  ACTION ITEM: Remove extra 'Name' filter in RunsListing - WATCH: https://fathom.video/calls/571164328?timestamp=2256.840547
+
+37:37 - Brandon Schurman (Earthly Technologies)
+  That's, I think the AI might have changed, secretly changed this, actually. Oh, okay.
+
+37:44 - Vlad A. Ionescu (Earthly Technologies)
+  In any, I think. Because there's also a name.
+
+37:46 - Brandon Schurman (Earthly Technologies)
+  Why is it? Oh, yeah.
+
+37:47 - Vlad A. Ionescu (Earthly Technologies)
+  There's also a name. Yeah. Interesting. Where did. did this come from?
+
+37:51 - Brandon Schurman (Earthly Technologies)
+  That is interesting. Okay, so that's a bug. was accidentally added extra.
+
+37:55 - Vlad A. Ionescu (Earthly Technologies)
+  Okay, yeah. Okay, good. But we should probably rename name to just script, maybe. It would be slightly more obvious.  Yes.
+
+38:06 - Brandon Schurman (Earthly Technologies)
+  Or script name if you want to match the column title exactly.
+
+38:12 - Vlad A. Ionescu (Earthly Technologies)
+  Sure. Yeah.
+
+38:14 - nacho (Earthly Technologies)
+  Brandon, one thing that scares me off is using AI to, you know, to change the dashboards. Because, you know, it's a chunk of JSON that...  You can't read it.
+
+38:27 - Brandon Schurman (Earthly Technologies)
+  Yeah. It's very difficult to, you know, even review, right?
+
+38:32 - nacho (Earthly Technologies)
+  Well, what changes are included? So, yeah. How we know that the AI haven't, have not changed, that shouldn't, right?  I mean, it clearly did.
+
+38:45 - Brandon Schurman (Earthly Technologies)
+  Like, I didn't that it added this. I mean, I think the answer is maybe like...
+
+39:50 - Vlad A. Ionescu (Earthly Technologies)
+  correct. Nacho, you might know the answer to this, but I'm always getting confused, like, okay, which one is the old runs versus the new runs, or the breadcrumb here, I think.  the other screens we have, like components and so on, does this look exactly the same and behave the same?  You're muted, Nacho.
+
+40:16 - nacho (Earthly Technologies)
+  Actually, it's not very straightforward to me to know the difference. I think we should maybe give different names to the dashboards, or make more obvious that one is the plain or raw listing, and the other things like RAM groups.  I think that would help to differentiate them. Right now, it's just the structure of the table, right? Yeah.
+
+40:45 - Vlad A. Ionescu (Earthly Technologies)
+  So, I think, conceptually, um... It is a bit different than before. Conceptually, I wouldn't say that these are equal citizens in the hierarchy.  I think it's good that the old one is actually below the new one because you're clicking into something. And when you look at this one in front of us right now, you're only looking at a filtered view.  You never look at all of them. Maybe that's sort of like a way to see this. Kind of like in a component's detail, it's always like filtered by component.  So actually, maybe by that logic, should we remove some of these filters so that the user can never see all of them at the same time in this view?  They can see all of them if they want, if they go to the other, newer view.
+
+41:45 - nacho (Earthly Technologies)
+  Yeah. I see what you're saying. this. I think... The filters have two purposes here, right? One is to let the user obviously change it, but I think that's the secondary one, right?  Because basically we are filtering everywhere. But the other one is to make clear what are the filters in place.  If we remove them, then we need another way to show what are the filters in place.
+
+42:13 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, that's a good point. That's a good point. Because, for example, in the component detail, we show a lot of details about that component and you know where you are, basically.  And yeah, you kind of know what you're looking at based on that. Whereas here, all the filters help paint that picture.
+
+42:31 - Brandon Schurman (Earthly Technologies)
+  Is there a way to just change the state of these to like disabled or something so they're not clickable when we're on this view?  Maybe.
+
+42:45 - nacho (Earthly Technologies)
+  It doesn't hurt, to be honest, right? Having them...
+  ACTION ITEM: Remove Qt panel from RunsListing - WATCH: https://fathom.video/calls/571164328?timestamp=2566.840547
+
+42:54 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, I think I agree once you told me that nacho. think I kind of...
+
+42:59 - Brandon Schurman (Earthly Technologies)
+  It's just a bit confusing that you see both.
+
+43:01 - Vlad A. Ionescu (Earthly Technologies)
+  Can we remove Qt, actually? At least we can, you know, make them look slightly different so that the user isn't confused by, you know, two screens that look basically the same, but yeah.  Yeah, good point.
+
+43:17 - nacho (Earthly Technologies)
+  Yeah, good point. This is like a detail or after filtering down, not really, whatever you are interested. Q only sends to the top level dashboard, right?
+  ACTION ITEM: Adjust column widths to eliminate horizontal scroll - WATCH: https://fathom.video/calls/571164328?timestamp=2602.840547  That's the, to this one, I think. Right.
+
+43:32 - Vlad A. Ionescu (Earthly Technologies)
+  Okay.
+
+43:34 - Brandon Schurman (Earthly Technologies)
+  Makes sense. Remove Qt is another...
+
+43:37 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah.
+
+43:37 - nacho (Earthly Technologies)
+  By the way, Brandon, you need to maybe reduce the size of some of the columns so you can get rid of this horizontal scroll.  That would be nice. Yeah, I'm...
+
+43:50 - Brandon Schurman (Earthly Technologies)
+  Also zoomed in a bit, like, I don't know, I'd be curious what it looks like for you guys on your screens.
+
+43:54 - nacho (Earthly Technologies)
+  Oh, yeah, yeah.
+
+43:55 - Brandon Schurman (Earthly Technologies)
+  Much better, yeah. I zoomed in just so it was easier to read.
+
+43:59 - Vlad A. Ionescu (Earthly Technologies)
+  my screen for a second.
+
+44:01 - Brandon Schurman (Earthly Technologies)
+  This is Kronos. Click on Runs.
+
+44:10 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, it has good size, actually. Yeah. I think it's a good size.
+
+44:30 - Brandon Schurman (Earthly Technologies)
+  We're on the main runs. Yeah, go ahead.
+
+44:35 - Vlad A. Ionescu (Earthly Technologies)
+  what are these two views called, by the way, so that I stop calling them all the new ones? This is RunsListing and the other Yeah, because they're not really old and new.
+
+44:46 - Brandon Schurman (Earthly Technologies)
+  They're both in the same thing. So this is, like, Grouped runs. And the other one is, like, the individual runs.  But what do we call it in the UI, right? Like, in the UI, it goes from. called runs listing.
+
+45:02 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah.
+
+45:02 - Brandon Schurman (Earthly Technologies)
+  Runs listing, I guess.
+
+45:05 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. The other one.
+
+45:12 - Brandon Schurman (Earthly Technologies)
+  I come here. Script runs.
+
+45:15 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. We should make that consistent, whatever we decide. But this is the one where we get the breadcrumb. Yeah.  Should we call it runs expanded or something like that? Could we click on the expand link?
+
+45:34 - Brandon Schurman (Earthly Technologies)
+  I think so. There's just, there is some other places where you get to it. Like here? No.
+
+45:40 - Vlad A. Ionescu (Earthly Technologies)
+  Here you're getting to listing again. Oh, yeah.
+
+45:44 - Brandon Schurman (Earthly Technologies)
+  You're right. We're getting to listing again. You're right. Okay. Okay. Yeah, I guess, I mean, we'll discover. guess never.  If there's anywhere else that we're not thinking, but I think you're right. That's just when you have to expand a grouped run.
+
+45:57 - nacho (Earthly Technologies)
+  So it's run's expanded.
+
+46:00 - Brandon Schurman (Earthly Technologies)
+  Run groups.
+
+46:04 - nacho (Earthly Technologies)
+  I mean, it is true that there's a longer name for a top dashboard, but it's what it is, right?  It's a run group.
+
+46:14 - Vlad A. Ionescu (Earthly Technologies)
+  But not all of them are grouped.
+
+46:16 - Brandon Schurman (Earthly Technologies)
+  They're only grouped when they have to be. And it's kind of like, there are groups. don't know, like, but like in the UI where we just say runs here, like thinking of this as the run's view, because it's the place you land on most of the time.  I think the nacho was meaning the other one to be called run group or something like that.
+
+46:39 - nacho (Earthly Technologies)
+  No, actually I was referring to this one because each row in here is a run group. It's not a run.
+
+46:45 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, I see. Yeah. I would keep this as listing. It's fine. Because like, We went through this evolution ourselves of grouping them, but to the user, it'll be just, you know, just runs, you know, they won't know about this evolution.  I'm still in the old view.
+
+47:02 - nacho (Earthly Technologies)
+  Give me some time.
+
+47:12 - Brandon Schurman (Earthly Technologies)
+  Is there anything else from this view?
+
+47:23 - nacho (Earthly Technologies)
+  So, yeah, regarding open and expand, I find more intuitive detail and list, but give me a couple of days.  But my first reaction to open and expand was not.
+
+47:50 - Brandon Schurman (Earthly Technologies)
+  They're kind of synonyms. Yeah, open and expand kind of mean.
+
+47:53 - nacho (Earthly Technologies)
+  wasn't clear to me what has happened. What do you suggest, Nacho?
+
+47:59 - Brandon Schurman (Earthly Technologies)
+  Like, this would be details?
+
+48:02 - nacho (Earthly Technologies)
+  Detail list.
+  ACTION ITEM: Rename 'Open'→'Details'; remove arrow; link by DB field - WATCH: https://fathom.video/calls/571164328?timestamp=2878.840547
+
+48:06 - Brandon Schurman (Earthly Technologies)
+  Hmm.
+
+48:13 - Vlad A. Ionescu (Earthly Technologies)
+  I think we could rename open to details. I think that's easy. I think expand is kind of logical, though, to me.  Yeah.
+
+48:23 - Brandon Schurman (Earthly Technologies)
+  Because it's, like, almost taking the place of what I was kind of more expecting to be, like, a little drop-down arrow, and it would actually expand in line.
+
+48:31 - nacho (Earthly Technologies)
+  But we don't have that capability with Grafana.
+
+48:35 - Brandon Schurman (Earthly Technologies)
+  So that's why, like, to me, that kind of makes sense, but… Maybe, maybe.
+
+48:39 - nacho (Earthly Technologies)
+  Or can we remove the arrow from the open? I mean, for expanding mixers, like, it's like, okay, it's like the tree below… below…
+
+48:51 - Vlad A. Ionescu (Earthly Technologies)
+  But for Open, maybe it's just without the symbols. So remove the arrow from Open link. I think I found that if we copy the Fathom transcript into Cloud, it works better than relying on Fathom's notes.
+
+49:14 - Brandon Schurman (Earthly Technologies)
+  They're using it. They must be using the Sonnet model or something instead.
+
+49:19 - Vlad A. Ionescu (Earthly Technologies)
+  cheaper, right?
+
+49:31 - Brandon Schurman (Earthly Technologies)
+  Like this? Yeah.
+
+49:33 - nacho (Earthly Technologies)
+  I think it's more readable. Intuitive.-hmm.
+
+49:38 - Vlad A. Ionescu (Earthly Technologies)
+  Looks good. What about the column header?
+
+49:45 - nacho (Earthly Technologies)
+  You don't need to set one, by the way. You can just... leave it blank. I've done that in other tables.
+
+49:55 - Brandon Schurman (Earthly Technologies)
+  Vlad, do you think that would look good? No column header? Yeah.
+
+50:00 - Vlad A. Ionescu (Earthly Technologies)
+  It's self-explanatory, yeah, you don't need it. OK.
+
+50:05 - Brandon Schurman (Earthly Technologies)
+  Edit. I mean, it's pretty easy to You need to put on space. Oh, interesting. It just put a default.  It came up with its own title and you don't have it there.
+
+50:28 - Vlad A. Ionescu (Earthly Technologies)
+  Oh, because it comes from the sequel or something. Yeah, yeah.
+
+50:32 - Brandon Schurman (Earthly Technologies)
+  Oh, yeah. I see it was the name from the sequel. OK.
+
+50:36 - Vlad A. Ionescu (Earthly Technologies)
+  Oh. Interesting. We lost the link.
+
+50:41 - Brandon Schurman (Earthly Technologies)
+  Maybe the linking logic. OK. Well, I'll come back to it. I bet you I'm almost certain there's a way to do that.  But it's just probably the linking logic was based on the column title.
+
+50:50 - nacho (Earthly Technologies)
+  Yeah. You just need to change. If you go to details right now, very quick. Okay. Go to the right column, and you will see over there a column that is not found.  You were referring to that column by the old name that was that arrow. Okay. Not found. And you can just select the one that is empty, the first one.  Or the one based on the database name.
+
+51:17 - Brandon Schurman (Earthly Technologies)
+  There. No, that's the, that one works. The first one you said. Okay.
+
+51:21 - nacho (Earthly Technologies)
+  you can just use the database name. So whenever you change the name after it, it keeps working.
+
+51:28 - Brandon Schurman (Earthly Technologies)
+  Okay. Yeah. Makes sense. But anyways, yeah, that, that worked there. Okay. I like that. Nice little improvement.
+
+51:44 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. Cool. We were supposed to go through all those screens and look for it. Yeah.
+
+51:49 - Brandon Schurman (Earthly Technologies)
+  Yeah. Yeah. Mm-hmm. Yeah. So this is where I wanted to come back to. The components view. two links under runs?
+
+51:57 - Vlad A. Ionescu (Earthly Technologies)
+  Yes.
+
+51:58 - Brandon Schurman (Earthly Technologies)
+  So we checked the errors. There's Collectors and Policies. Yep. So this is where I come here all the time.  This is where I thought this was really nice to have this improvement because the hotel thing was just flooding this before.  So now here's what we see.
+
+52:22 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. So like this represents reruns also, right? a side effect, which is probably good.
+
+52:29 - Brandon Schurman (Earthly Technologies)
+  Yeah. This component is like been sitting here for like six days. I wonder, like a lot of these are probably, there's been no commits to this component and we've just been rerunning the manifest.
+
+52:41 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. The latest sorting is alphabetical, which doesn't make sense.
+
+52:48 - Brandon Schurman (Earthly Technologies)
+  Oh, you're right. Okay. you.
+
+52:55 - Vlad A. Ionescu (Earthly Technologies)
+  It's not an actual kernel.
+
+52:57 - nacho (Earthly Technologies)
+  No, but that is because you clicked that column, right? So you really want to short in a page by that?  Or should the query just short by that?
+
+53:15 - Brandon Schurman (Earthly Technologies)
+  This column you're talking about, right? Yeah.
+
+53:18 - Vlad A. Ionescu (Earthly Technologies)
+  I mean, we shouldn't allow it, sorting by that column, and instead sort in SQL, right?
+
+53:25 - nacho (Earthly Technologies)
+  Yeah, the thing is that if you use the table controls to short by column, right, basically you only short in a single page, right?  It's whatever data you have in there. If you still want to do that, making it work is easy, right?  It's just... Okay, yeah.
+
+53:47 - Vlad A. Ionescu (Earthly Technologies)
+  Actually, should work, right?
+
+53:49 - nacho (Earthly Technologies)
+  It should work, right? There's...
+  ACTION ITEM: Disable per-page sorting; enforce SQL sort - WATCH: https://fathom.video/calls/571164328?timestamp=3277.840547
+
+54:50 - Brandon Schurman (Earthly Technologies)
+  Just on this page. Just on this page.
+
+54:52 - nacho (Earthly Technologies)
+  So that can be disabled. Yeah, think it's better to disable it.
+
+54:57 - Vlad A. Ionescu (Earthly Technologies)
+  Okay, I didn't know you could disable that.
+
+54:59 - Brandon Schurman (Earthly Technologies)
+  So I just thought that was a limitation that I had delivered, but okay.
+
+55:04 - Vlad A. Ionescu (Earthly Technologies)
+  We're going to disable the sorting of the table itself. Did you get that AI?
+
+55:10 - Brandon Schurman (Earthly Technologies)
+  Don't forget.
+
+55:11 - nacho (Earthly Technologies)
+  So, Brandon, I think you might have lost also the pagination fix. So, yeah, that's for you to be aware.  Okay. Yeah, yeah, I probably did.
+
+55:25 - Brandon Schurman (Earthly Technologies)
+  But we'll go through the notes. We'll just take the Fathom transcript and paste it into Claude and say, fix all these things.  And then we'll come back and QA it again later and find more bugs.
+
+55:37 - nacho (Earthly Technologies)
+  Okay, Claude, remember to fix pagination, too.
+
+55:45 - Brandon Schurman (Earthly Technologies)
+  Okay, this was the runs that we got to from... Clicking Collectors here, right? So Collectors come here. This is, as we can see, filtered by SHA, Type Collector, Component, Earthly Cloud, right?  And this is what we see. And to me, looks right, I guess. Any other concerns? Move on to the next.  Yeah, let's move on. Okay. Okay. Policies is the same, but Type Policy. You can say Show Reruns, and these turn into Expands instead.  Oh, interesting. Yeah, okay.
+
+56:40 - Vlad A. Ionescu (Earthly Technologies)
+  Interesting. Hmm. Yeah. That makes Yeah, exactly.
+
+57:59 - Brandon Schurman (Earthly Technologies)
+  This is like a neglected one. And we also no longer rerun code collectors on manifest changes. So that's why it's like six days ago is the most recent.
+
+58:11 - Vlad A. Ionescu (Earthly Technologies)
+  Because that lines up with when we made that change.
+
+58:16 - nacho (Earthly Technologies)
+  We also have lost the first column changes we did. Yeah, yeah.
+
+58:22 - Brandon Schurman (Earthly Technologies)
+  Yeah. None of this stuff is persisting. But we'll get Claude to redo it, I guess. Or Nacho. Whoever wants to.  I'm not doing it by hand, though. JSON view would be unchanged, right? Yep. JSON it doesn't load anything for some reason.
+
+58:52 - nacho (Earthly Technologies)
+  So, PRs. From PRs, have similar links. Yeah.
+
+58:58 - Brandon Schurman (Earthly Technologies)
+  Yeah. Good point. Okay. And that thing in here.
+
+59:01 - Vlad A. Ionescu (Earthly Technologies)
+  What's in there? What's in CI, CD pipeline?
+
+59:04 - Brandon Schurman (Earthly Technologies)
+  Hotel. The hotel stuff. Oh, okay.
+
+59:07 - Vlad A. Ionescu (Earthly Technologies)
+  Got it.
+
+59:10 - Brandon Schurman (Earthly Technologies)
+  This didn't have it.
+
+59:12 - Vlad A. Ionescu (Earthly Technologies)
+  But if we go to, like, a more recent one.
+
+59:15 - Brandon Schurman (Earthly Technologies)
+  So, let's go to one that has PRs also. Gosh, it's slow sometimes.
+
+59:40 - nacho (Earthly Technologies)
+  I always will with the backend. Yeah.
+
+59:46 - Brandon Schurman (Earthly Technologies)
+  Oh, just because I'm curious. This has some errors, too. Okay. Two things. Good to know. So CI, CD pipelines, in this case, apparently is still not working.
+
+1:00:01 - Vlad A. Ionescu (Earthly Technologies)
+  That's fine.
+
+1:00:03 - Brandon Schurman (Earthly Technologies)
+  I go to collectors, remove that? Yeah. And interestingly, though, the CI thing, this OTEL thing did run. So I'm kind of surprised.
+  ACTION ITEM: Remove CI/CD Pipelines panel from Components detail - WATCH: https://fathom.video/calls/571164328?timestamp=3611.840547  This normally used to work. I'm not sure why it's not. Anyways, it's bug. If it's not error-prone, we can remove it.
+
+1:00:26 - Vlad A. Ionescu (Earthly Technologies)
+  Note to the AI, remove CI, CD pipelines panel from the components detail screen. And also buy 500 rubber ducks off of Amazon.
+
+1:00:43 - Brandon Schurman (Earthly Technologies)
+  I better hope that Claude doesn't have your Amazon password, Vlad.
+
+1:00:47 - Vlad A. Ionescu (Earthly Technologies)
+  Thank you. Thank you. And why? Thank
+
+1:00:54 - Brandon Schurman (Earthly Technologies)
+  Oh, active PRs, Brandon.
+
+1:00:57 - nacho (Earthly Technologies)
+  Active PRs, sorry, yeah.
+
+1:01:02 - Brandon Schurman (Earthly Technologies)
+  Okay. Sorry, is that a GitHub link?
+
+1:01:09 - Vlad A. Ionescu (Earthly Technologies)
+  it's a PR view. Oh yeah, let's look at the PR view too. Forgot about this one.
+
+1:01:13 - nacho (Earthly Technologies)
+  So we have the error link and also the collectors and policies run.
+
+1:01:21 - Vlad A. Ionescu (Earthly Technologies)
+  Just closing some other stuff.
+
+1:01:23 - Brandon Schurman (Earthly Technologies)
+  Okay. So error link. Looks as expected.
+
+1:01:29 - Vlad A. Ionescu (Earthly Technologies)
+  Yep.
+
+1:01:30 - nacho (Earthly Technologies)
+  By the PR, by the commit. Yeah. Looks correct.
+
+1:01:34 - Brandon Schurman (Earthly Technologies)
+  Yep. Okay. Oh, maybe one more thing to check. When I click expand on one, that's also going keep maintaining the filters.  Okay. Looks good. again. Yep. Nice. CICD Pipeline still doesn't work. Collectors. Filtered by PR. That's right. Looks good.
+
+1:02:12 - Vlad A. Ionescu (Earthly Technologies)
+  Expand. Filtered by PR. Yeah, looks good.
+
+1:02:17 - Brandon Schurman (Earthly Technologies)
+  Policies. Same thing. Yep. Same thing. Looks good. Yep. I don't think there's anywhere else. All right.
+
+1:02:43 - Vlad A. Ionescu (Earthly Technologies)
+  Can you go in Collectors and Policies in detail?
+
+1:02:49 - Brandon Schurman (Earthly Technologies)
+  Yeah. Yeah. So the... These have their own embedded view. Go back. back.
+
+1:02:54 - Vlad A. Ionescu (Earthly Technologies)
+  back. back. There's a runs column. Yes.
+
+1:02:57 - Brandon Schurman (Earthly Technologies)
+  I checked this too. So this goes to the new view. Okay. And I don't think this is interesting. I was expecting to see this applied, but it's still somehow filtering it, correct?  So I think there's, like, a problem with this filter being set to the right value, but the variable passed into the SQL.  Do you see what I'm saying? I don't know if that's right. Because this is, oh, no, this is showing both.
+
+1:03:41 - nacho (Earthly Technologies)
+  Can you go back, Brandon, to see where did you click from? And can you click on CodeCoff, for example?  That is not the first one. Yeah, in the rounds. CodeCov, what is that? Oh, I think I know.
+
+1:04:03 - Brandon Schurman (Earthly Technologies)
+  So this is because this is a parent policy, right? And this is now showing the two sub-policies.
+
+1:04:10 - nacho (Earthly Technologies)
+  Good point, good point. Yeah, this is not going through there. Does this, this doesn't support putting just CodeCov, I think.  Oh, no, OK, OK. It's in the in the bread scrums.
+
+1:04:24 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, it's in a different parameter.
+
+1:04:26 - nacho (Earthly Technologies)
+  It's not in the filters. It's in a different parameter. But it is there, yeah. It's working.
+
+1:04:32 - Brandon Schurman (Earthly Technologies)
+  That seems like it would be an existing limitation from before that you don't see it here. I assume.
+
+1:04:40 - Vlad A. Ionescu (Earthly Technologies)
+  But should we expose that parameter as a filter? We do.
+
+1:04:45 - nacho (Earthly Technologies)
+  We do. Basically, we are showing all the children of CodeCov. We do. do. We want do That's why we, I know, but like, it's not visible.
+
+1:04:54 - Vlad A. Ionescu (Earthly Technologies)
+  It just says name all, which is confusing. That's, it's not all, clearly.
+
+1:05:00 - Brandon Schurman (Earthly Technologies)
+  I think it would be cool if I put CodeCov here, like it would say CodeCov, CodeCov.ran, CodeCov.results.
+
+1:05:06 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, that'd be better. And I could pick any of them.
+
+1:05:09 - Brandon Schurman (Earthly Technologies)
+  Yeah, but we kind of do that.
+
+1:05:10 - nacho (Earthly Technologies)
+  That's a, but a funnel control. So basically you.
+
+1:05:17 - Vlad A. Ionescu (Earthly Technologies)
+  No, but like, oh, I see ArgoCD in the list. Can you click name again?
+
+1:05:24 - Brandon Schurman (Earthly Technologies)
+  Yeah, but I think that's because we applied the grouping later on. Like this used to be the name of the collector and now this is the name of the collector.
+
+1:05:35 - Vlad A. Ionescu (Earthly Technologies)
+  Do you know what I mean?
+
+1:05:37 - Brandon Schurman (Earthly Technologies)
+  And we don't have that for CodeCov?
+
+1:05:39 - Vlad A. Ionescu (Earthly Technologies)
+  Or it doesn't even work?
+
+1:05:42 - Brandon Schurman (Earthly Technologies)
+  Why doesn't this work? Oh, because there's a filter applied underneath that we don't see. Yeah, you got
+
+1:05:50 - nacho (Earthly Technologies)
+  Can remove the CodeCov parameter from the URL?
+
+1:05:56 - Vlad A. Ionescu (Earthly Technologies)
+  So that parameter should be the filter.
+
+1:05:59 - nacho (Earthly Technologies)
+  It's a bad prefix.
+
+1:06:10 - Vlad A. Ionescu (Earthly Technologies)
+  Do you guys understand what I'm saying? And instead of if there is extra filtering, we should expose it here to the user.
+
+1:06:21 - Brandon Schurman (Earthly Technologies)
+  Yeah, I see what you're saying. It'd be nice if it could be all in one table. But here's another concern, Vlad.  Isn't it, like, it's not just a single parent-child structure. It could be, you know, deeply nested more than just two, you know?  that's fine.
+
+1:06:41 - Vlad A. Ionescu (Earthly Technologies)
+  But then what do we need?
+
+1:06:42 - Brandon Schurman (Earthly Technologies)
+  A different column, a different dynamic number of filters? There's...
+
+1:06:47 - Vlad A. Ionescu (Earthly Technologies)
+  So wait, couldn't couldn't the name, sir? Couldn't the name have all versions? So both CodeCov and also CodeCov, that CodeCov and...
+
+1:06:57 - Brandon Schurman (Earthly Technologies)
+  That's what I thought would be ideal, but Nacho sounded like it wasn't going to be possible. mean, yeah.
+
+1:07:03 - nacho (Earthly Technologies)
+  I mean, maybe it's possible, right? Absolutely it's possible if we can preload all the possibilities in there, in the options to select, and then we change the...  the filtering for a prefix. I cannot remember why I chose to use a different parameter, but I see what you mean.
+
+1:07:34 - Vlad A. Ionescu (Earthly Technologies)
+  I see what you mean.
+
+1:07:37 - Brandon Schurman (Earthly Technologies)
+  Can we log it as like a future improvement outside of the current bug scrub? Because it was there before, and it sounds like maybe it's a little more complicated.  But it should ideally work that way, I think. And by the way, the reason we see both of these here is because this is the old one from three months ago, where it was just called that, and now it's called this, right?
+
+1:08:04 - Vlad A. Ionescu (Earthly Technologies)
+  Yeah, just Yeah, kind of like a glitch, basically.
+
+1:08:10 - Brandon Schurman (Earthly Technologies)
+  History.
+
+1:08:10 - Vlad A. Ionescu (Earthly Technologies)
+  that's, yeah, so that's if we click here, but otherwise seems to work, right? Yeah. go to here? That works.
+
+1:08:22 - Brandon Schurman (Earthly Technologies)
+  And if, yeah, so like, let's, what's one that actually has more than one that would be good. CodeCov. I come here.  Oh, I just, I noticed something. Runs 27. But if I click it, it's showing. Nine runs only. Go back.
+
+1:08:56 - Vlad A. Ionescu (Earthly Technologies)
+  Interesting.
+
+1:08:58 - Brandon Schurman (Earthly Technologies)
+  27 runs. Nine runs on just the backend component.
+
+1:09:08 - nacho (Earthly Technologies)
+  Code go front. Okay.
+
+1:09:15 - Brandon Schurman (Earthly Technologies)
+  So something with the query that we're accounting here is different than what we're getting here and I don't know which of them is right.
+
+1:09:23 - nacho (Earthly Technologies)
+  you go back? Run results. It would be nice to can you can you run that filter in the in the old dashboard?
+
+1:09:47 - Brandon Schurman (Earthly Technologies)
+  This is a different environment. I'll take. But this is the old dashboard. So if we go Collectors, here, don't know, CodeCov.  Oh, this one hasn't even run, so it's not a very good example. Let's take this GitHub one. 19. And that looks like roughly 19 things.  Yeah, don't know. I mean, it could be interesting to, like, deploy the old Grafana dashboard there. Oh, interesting.
+
+1:10:31 - nacho (Earthly Technologies)
+  it would be nice to have both dashboards at the same time, so we can narrow down where it's coming from.  Well, look at this one.
+
+1:10:41 - Brandon Schurman (Earthly Technologies)
+  This one says 19 runs, and I click it, and there's actually none here.
+
+1:10:46 - nacho (Earthly Technologies)
+  Okay. Yeah, that's... that's... I
+
+1:10:50 - Brandon Schurman (Earthly Technologies)
+  don't know what that is, a different issue or the same issue? I'm not sure.
+
+1:10:54 - nacho (Earthly Technologies)
+  No, no, it's definitely something weird in there to verify. So basically it's collectors runs table, runs column, those numbers don't match the run listing.  Okay.
+
+1:11:09 - Brandon Schurman (Earthly Technologies)
+  Because if I go to, and if I go to the new one here, right, this one says 27, this one says nine.  But these are, this all was one CodeCov plugin that got slotted in at once. And in theory, probably should have ran the same number of times, right?
+
+1:11:27 - nacho (Earthly Technologies)
+  Yeah.
+
+1:11:28 - Brandon Schurman (Earthly Technologies)
+  So maybe actually this should stay nine, but I mean, to be determined. No, it's like the number of triggers, actually.
+
+1:11:36 - Vlad A. Ionescu (Earthly Technologies)
+  They trigger on different things.
+
+1:11:40 - Brandon Schurman (Earthly Technologies)
+  I guess if one's a CI, oh, they are both CI collectors, CI.
+
+1:11:45 - Vlad A. Ionescu (Earthly Technologies)
+  So this, this one is triggering on less commands than this one, maybe.
+
+1:11:49 - Brandon Schurman (Earthly Technologies)
+  Okay. Okay. Yeah, I took what I said. Take a look, too.
+
+1:11:55 - nacho (Earthly Technologies)
+  Okay.
+
+1:12:00 - Brandon Schurman (Earthly Technologies)
+  Okay. Otherwise, if we click on one of these.
+
+1:12:12 - nacho (Earthly Technologies)
+  There's runs in there. Why is runs nine?
+
+1:12:16 - Brandon Schurman (Earthly Technologies)
+  Yeah, the number there matches the previous one, so at the end, there's going to be the same fix applied to both of them.  but I guess why is this not showing nine things here? This is banned. Oh, nine runs. Okay, so it's showing all nine runs on the backend component.  Oops. But, one we're showing here is the most recent one, only. Finally. Okay. Everything else looks okay here. Basically, this view is unchanged, so.
+
+1:14:01 - Vlad A. Ionescu (Earthly Technologies)
+  Okay. I need to run, actually. I'm going to have the meeting with Sean very soon. So I'll leave the two of you to finish this up.  Okay.
+
+1:14:15 - nacho (Earthly Technologies)
+  What's the timeline for fixing this?
+
+1:14:19 - Brandon Schurman (Earthly Technologies)
+  The little bugs, I think we could probably fix today, hopefully. Then the future ones, like the bigger ones we do later.
+
+1:14:30 - nacho (Earthly Technologies)
+  Okay. Do you want to take care of this, Brandon? And maybe I can take over if you play some the dent with the AI?
+
+1:14:40 - Brandon Schurman (Earthly Technologies)
+  Yeah. I think most of the things we identified are pretty straightforward to fix. Is that true? All Yeah.
+
+1:14:49 - nacho (Earthly Technologies)
+  actually I'll take a stab.
+
+1:14:51 - Brandon Schurman (Earthly Technologies)
+  I'll take a stab at it. I'll put it in the background. I'll get the AI to fix the things we pointed out.  And then maybe you could take a look at it after, nacho, and be a second set of eyes for me.  Make sure that everything looks good again. Perfect.
+
+1:15:11 - nacho (Earthly Technologies)
+  I will keep...
+
+1:15:12 - Brandon Schurman (Earthly Technologies)
+  then, yeah, like you could just maybe I'll deploy it and maybe you could poke around and spot check and make sure it looks good.  The only other place we didn't look at on this call was the policies view.
+
+1:15:26 - nacho (Earthly Technologies)
+  policies is similar to the other one. So we are having problems with those counters. It's going to be also a problem there.
+
+1:15:35 - Brandon Schurman (Earthly Technologies)
+  Well, don't even... It doesn't even look like we have links necessarily here to any counters. Yeah. Oh, runs here.  301. That shows up. So this would be the only place where we end up filtering for policy. So that number doesn't match neither here.  Yeah, yeah. Why is this 301? Interesting.
+
+1:16:03 - nacho (Earthly Technologies)
+  Okay, can you look at show policy reruns? Okay, it's actually true. Anyway, yeah. I can take a look to that.
+  ACTION ITEM: Create issues for pre-existing counter mismatches/filtering; assign to Nacho - WATCH: https://fathom.video/calls/571164328?timestamp=4573.840547
+
+1:16:16 - Brandon Schurman (Earthly Technologies)
+  Interesting. That's a minor, like, that's, like, not very likely to be unnoticed by Capital One in their demo environment, I would think.  So let's do this.
+
+1:16:28 - nacho (Earthly Technologies)
+  Let's create all the issues that we talk about. Okay. All the issues that were before you introduced new dashboard, like these counters, for example, assign them to me.  Okay. Okay. The counter mismatch, the filtering we mentioned, right? That, for the prefix. Yeah. Okay. You know, all the ones that were not related to these changes given to me, because probably I will move faster.  Yeah.
+
+1:16:59 - Brandon Schurman (Earthly Technologies)
+  And then there's a bunch of little things, like, you know, how the columns look and the names of things and stuff like that'll be all pretty easy.  I'll just get Claude to do it.
+
+1:17:12 - nacho (Earthly Technologies)
+  Okay. Awesome. Okay.
+
+1:17:14 - Brandon Schurman (Earthly Technologies)
+  All right.
+
+1:17:15 - nacho (Earthly Technologies)
+  Thank you. Thanks, Nacho.
+
+1:17:18 - Brandon Schurman (Earthly Technologies)
+  Yeah, I'll keep you posted. I'll make the tickets first. Okay. Thank you, man. Bye. All right. See ya.

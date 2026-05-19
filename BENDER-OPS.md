@@ -20,44 +20,75 @@ sudo journalctl -u bender -f
 # View recent logs
 sudo journalctl -u bender --since "5 min ago" --no-pager
 
-# Restart (kills any running Claude processes)
-sudo systemctl restart bender
-
 # Health check
 curl -s localhost:3000/health
 curl -s localhost:3000/status | jq .
 ```
 
-## Deploy Changes
+## Restarting Bender — ALWAYS use `bender-restart`
+
+**Rule: never run `sudo systemctl restart bender` directly.** Always use the `bender-restart` helper, which already has the guardrails built in. It:
+
+1. Checks `/status` for busy workers and aborts if any are active (unless `--force`)
+2. Checks for background Claude child processes that would be orphaned
+3. Writes a restart notification file so Bender announces himself in Slack when back online
+
+```bash
+# Correct way (safe by default — aborts if anything is running):
+bender-restart "reason for restart, e.g. shipping actor-allowlist fix"
+
+# Force restart (KILLS active workers — only when user explicitly asks):
+bender-restart --force "emergency: bad deploy, need to roll back"
+```
+
+If `bender-restart` aborts because workers are busy:
+
+- **Don't ask the user to force it.** Queue the change on disk (keep edits in `/tmp/` or unpushed) and wait. Code changes are not urgent — queued fixes get applied when the next natural quiet moment arrives, or when the user explicitly says "go ahead".
+- **Tell the user what you're waiting on** — which worker, what it's doing — so they can decide whether to wait or force.
+
+### `/status` is NOT enough — always check all three
+
+The `/status` endpoint only reflects the in-memory Worker-slot table. **Background workers spawned via `handleSlackWork` (long-running Slack work-mode replies) do NOT show up in `/status`**. A `/status` that says "all workers idle" can still mean a live claude process is actively working in the background.
+
+Before any restart, check **all three**:
+
+```bash
+# 1. Slot-based workers (short chat tasks)
+curl -s localhost:3000/status | jq '{busy_slots: [.workers[] | select(.busy)], queue: .queue.length}'
+
+# 2. Background claude processes (work-mode Slack invocations, cron scripts, etc.)
+pgrep -af 'claude --' | grep -v grep
+
+# 3. Tracked background workers that haven't exited yet
+for f in ~/.bender/workers/*.json; do
+  status=$(jq -r '.status' "$f" 2>/dev/null)
+  pid=$(jq -r '.pid' "$f" 2>/dev/null)
+  if [ "$status" = "running" ] && kill -0 "$pid" 2>/dev/null; then
+    echo "RUNNING pid=$pid $(jq -r '.description[0:80]' "$f")"
+  fi
+done
+```
+
+Only restart when **all three** are clean. `bender-restart` itself only checks #1 (the slot table), so it can greenlight a restart while a background worker is live — DON'T rely on `bender-restart` alone as the safety check.
+
+(Follow-up ticket material: fix `/status` to include background workers by reading `~/.bender/workers/*.json` and filtering by `status == "running"` and `kill -0 $pid`. Then `bender-restart` can use the unified view.)
+
+### Why this matters
+
+A raw `systemctl restart` kills the Node server but **orphans** any running Claude child processes. Those processes keep running (they have their own token budget), but the server loses its exit-code callback — session state (`claude_session_id`, PR tracking, phase transitions) never updates. The worker still posts to Slack via `curl`, but the server won't know it finished and the session looks forever-parked in the UI.
+
+Worse, any queued events for that PR get silently dropped when the server restarts (the queue is in-memory), which is exactly what the "stale-drain bug" on PR #142 was.
+
+### Deploy Changes
 
 ```bash
 cd ~/bender/server
 git pull
-npm run build
-sudo systemctl restart bender
+npm run build          # build into dist/, no service touched yet
+# ⚠️ Now verify the service hasn't been left in a bad state by the build:
+systemctl is-active bender
+bender-restart "deploy <commit-sha>: <short description>"
 ```
-
-**IMPORTANT:** Check for running work before restarting. There are TWO things to check:
-
-1. **Server worker slots** (fast Sonnet chat — OK to interrupt):
-```bash
-curl -s localhost:3000/status | jq '.workers[] | select(.busy)'
-```
-
-2. **Background Claude processes** (long-running work — DO NOT interrupt):
-```bash
-ps aux | grep claude | grep -v grep
-ls -la ~/.bender/workers/*.json | tail -5
-# Check status of each worker file:
-for f in ~/.bender/workers/*.json; do python3 -c "import json; s=json.load(open('$f')); print(f\"{s['status']:10} pid={s['pid']} desc={s['description'][:60]}\")"; done
-```
-
-If background Claude processes are running, **do NOT restart**. The restart kills the Node server but orphans the Claude processes — they keep running but the server loses the completion callback, so session state (claude_session_id, PR tracking) won't be updated. The worker will still post to Slack via curl, but the server won't know it finished.
-
-**Safe restart procedure:**
-1. Check both worker slots AND `ps aux | grep claude`
-2. If Claude processes are running, wait for them to finish (check the log file size — if it stops growing, it's done)
-3. Only restart when both are clear
 
 ## Key Directories on VM
 
